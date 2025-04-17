@@ -14,7 +14,10 @@ defmodule Tidewave.MCP do
     silence_logs()
     add_logger_backend()
     MCP.Server.init_tools()
-    :persistent_term.put({__MODULE__, :cwd}, File.cwd!())
+
+    if Application.get_env(:tidewave, :root) == nil do
+      Application.put_env(:tidewave, :root, File.cwd!())
+    end
 
     children = [
       {Registry, name: MCP.Registry, keys: :unique},
@@ -25,9 +28,9 @@ defmodule Tidewave.MCP do
   end
 
   @doc """
-  Returns the working directory at startup.
+  Returns the working directory.
   """
-  def get_cwd, do: :persistent_term.get({__MODULE__, :cwd})
+  def root, do: Application.fetch_env!(:tidewave, :root)
 
   if Mix.env() != :test do
     defp silence_logs do

@@ -36,7 +36,7 @@ defmodule Tidewave.MCP.GitLS do
     args = if git_dir, do: ["--git-dir", git_dir], else: []
     args = args ++ ["ls-files", "--cached", "--others", "--exclude-standard"]
 
-    with {result, 0} <- System.cmd("git", args, cd: MCP.get_cwd()) do
+    with {result, 0} <- System.cmd("git", args, cd: MCP.root()) do
       {:ok, String.split(result, "\n", trim: true)}
     else
       {error, exit_code} -> {:error, "Command failed with exit code #{exit_code}: #{error}"}
@@ -47,7 +47,7 @@ defmodule Tidewave.MCP.GitLS do
     args = if git_dir, do: ["--git-dir", git_dir], else: []
     args = args ++ ["ls-files", "--cached", "--others", "--exclude-standard", "--eol"]
 
-    with {result, 0} <- System.cmd("git", args, cd: MCP.get_cwd()) do
+    with {result, 0} <- System.cmd("git", args, cd: MCP.root()) do
       {:ok, parse_line_endings(result)}
     else
       {error, exit_code} -> {:error, "Command failed with exit code #{exit_code}: #{error}"}

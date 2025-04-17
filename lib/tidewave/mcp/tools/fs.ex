@@ -183,7 +183,7 @@ defmodule Tidewave.MCP.Tools.FS do
   end
 
   defp safe_path(path) do
-    case Path.relative_to(path, MCP.get_cwd()) |> Path.safe_relative() do
+    case Path.relative_to(path, MCP.root()) |> Path.safe_relative() do
       {:ok, path} -> {:ok, path}
       :error -> {:error, "The path is invalid or not relative to the project root"}
     end
@@ -287,7 +287,7 @@ defmodule Tidewave.MCP.Tools.FS do
 
   defp maybe_autoformat(state, path, content) do
     if Map.get(state, :autoformat, true) do
-      {fun, _opts} = Mix.Tasks.Format.formatter_for_file(path, root: MCP.get_cwd())
+      {fun, _opts} = Mix.Tasks.Format.formatter_for_file(path, root: MCP.root())
       fun.(content)
     else
       content
@@ -408,7 +408,7 @@ defmodule Tidewave.MCP.Tools.FS do
     # Add the search pattern and execute
     args = args ++ [pattern, "."]
 
-    case System.cmd(ripgrep_executable(), args, stderr_to_stdout: true, cd: MCP.get_cwd()) do
+    case System.cmd(ripgrep_executable(), args, stderr_to_stdout: true, cd: MCP.root()) do
       {output, 0} ->
         matches =
           output

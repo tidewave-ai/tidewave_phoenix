@@ -117,7 +117,7 @@ defmodule Tidewave.MCP.Tools.Eval do
   def shell_eval(args) do
     case args do
       %{"command" => command} ->
-        case System.shell(command, stderr_to_stdout: true, cd: MCP.get_cwd()) do
+        case System.shell(command, stderr_to_stdout: true, cd: MCP.root()) do
           {output, 0} ->
             {:ok, output}
 

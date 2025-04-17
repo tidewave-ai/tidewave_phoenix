@@ -2,38 +2,28 @@ defmodule Tidewave.MCP.Tools.FSSyncTest do
   # we use File.cd to change the working directory, so these tests run synchronously
   use ExUnit.Case, async: false
 
-  alias Tidewave.MCP
   alias Tidewave.MCP.Tools.FS
 
-  # Shared setup for both ripgrep and grep tests
-  defp setup_grep_test_environment(%{tmp_dir: tmp_dir}) do
-    files = [
-      {"file1.txt", "This is a test file with TEST content."},
-      {"file2.md", "Another file with different test content."},
-      {"file3.ex", "Elixir file with TEST pattern."},
-      {Path.join("subdir", "file4.ex"), "Nested file with test content."}
-    ]
+  setup context do
+    if tmp_dir = context[:tmp_dir] do
+      # Change to the test directory to make grep search there
+      original_dir = File.cwd!()
+      File.cd!(tmp_dir)
 
-    Enum.each(files, fn {file, content} ->
-      full_path = Path.join(tmp_dir, file)
-      File.mkdir_p!(Path.dirname(full_path))
-      File.write!(full_path, content)
-    end)
+      # also overwrite the stored MCP working directory
+      old_root = Application.get_env(:tidewave, :root)
+      Application.put_env(:tidewave, :root, tmp_dir)
 
-    # Change to the test directory to make grep search there
-    original_dir = File.cwd!()
-    File.cd!(tmp_dir)
-    # also overwrite the stored MCP working directory
-    old_cwd = :persistent_term.get({MCP, :cwd})
-    :persistent_term.put({MCP, :cwd}, tmp_dir)
+      on_exit(fn ->
+        # Restore original directory
+        File.cd!(original_dir)
+        Application.put_env(:tidewave, :root, old_root)
+      end)
 
-    on_exit(fn ->
-      # Restore original directory
-      File.cd!(original_dir)
-      :persistent_term.put({MCP, :cwd}, old_cwd)
-    end)
-
-    :ok
+      %{test_dir: tmp_dir}
+    else
+      :ok
+    end
   end
 
   for tool <- [:ripgrep, :elixir_grep] do
@@ -41,7 +31,20 @@ defmodule Tidewave.MCP.Tools.FSSyncTest do
       @describetag tool
       @describetag :tmp_dir
 
-      setup :setup_grep_test_environment
+      setup %{tmp_dir: tmp_dir} do
+        files = [
+          {"file1.txt", "This is a test file with TEST content."},
+          {"file2.md", "Another file with different test content."},
+          {"file3.ex", "Elixir file with TEST pattern."},
+          {Path.join("subdir", "file4.ex"), "Nested file with test content."}
+        ]
+
+        Enum.each(files, fn {file, content} ->
+          full_path = Path.join(tmp_dir, file)
+          File.mkdir_p!(Path.dirname(full_path))
+          File.write!(full_path, content)
+        end)
+      end
 
       test "finds text matches with default options" do
         arguments = %{"pattern" => "test"}
@@ -103,21 +106,6 @@ defmodule Tidewave.MCP.Tools.FSSyncTest do
         File.mkdir_p!(Path.dirname(full_path))
         File.write!(full_path, "Test content for #{file}")
       end)
-
-      # Change to the test directory to make grep search there
-      original_dir = File.cwd!()
-      File.cd!(tmp_dir)
-      # also overwrite the stored MCP working directory
-      old_cwd = :persistent_term.get({MCP, :cwd})
-      :persistent_term.put({MCP, :cwd}, tmp_dir)
-
-      on_exit(fn ->
-        # Restore original directory
-        File.cd!(original_dir)
-        :persistent_term.put({MCP, :cwd}, old_cwd)
-      end)
-
-      %{test_dir: tmp_dir}
     end
 
     test "finds files matching pattern" do
