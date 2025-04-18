@@ -22,10 +22,10 @@ that:
     unwanted access to your application and development tools like Tidewave.
 
   * **Remote IP checks** - Tidewave verifies that requests coming to the
-    MCP belongs to the current machine by verifying the connection remote IP.
+    MCP belongs to the current machine by verifying the connection's remote IP.
 
   * **Origin checks** - For browser requests, Tidewave also verifies that
-    the request "origin" header matches your development URL.
+    the request's "origin" header matches your development URL.
 
 Here is a summary of how these measures are enabled across different Tidewave
 implementations. The values below represent the default settings used by Tidewave
@@ -50,7 +50,7 @@ Here are some best practices put in place by Tidewave which you could also emplo
   * Tidewave MCP is open source, which means you can navigate its source
     code and verify its tools and prompts, avoiding attacks such as prompt injection
 
-  * If the file system tools are enabled, they are restricted to your application
+  * If the file system tools are enabled, they are restricted to your application's
     root directory
 
   * Because Tidewave runs within your web application, you may also run your web
