@@ -18,16 +18,16 @@ Here is a baseline comparison of the tools supported by different frameworks/lan
 
 ### Runtime intelligence
 
-| Features                     | Phoenix | Rails |
-| :--------------------------- | :-----: | :---: |
-| `project_eval`               | ✓       | ✓     |
-| `package_search`             | ✓       | ✓     |
-| `package_docs_search`        | ✓       |       |
-| `get_docs`                   | ✓       |       |
-| `get_source_location`        | ✓       | ✓     |
-| `get_logs`                   | ✓       | ✓     |
-| `get_models` / `get_schemas` | ✓       | ✓     |
-| `execute_sql_query`          | ✓       | ✓     |
+| Features                     | Tidewave for Phoenix | Tidewave for Rails |
+| :--------------------------- | :------------------: | :----------------: |
+| `project_eval`               | ✅                    | ✅                 |
+| `package_search`             | ✅                    | ✅                 |
+| `package_docs_search`        | ✅                    |                   |
+| `get_docs`                   | ✅                    |                   |
+| `get_source_location`        | ✅                    | ✅                 |
+| `get_logs`                   | ✅                    | ✅                 |
+| `get_models` / `get_schemas` | ✅                    | ✅                 |
+| `execute_sql_query`          | ✅                    | ✅                 |
 
 ### Filesystem tools
 
@@ -35,17 +35,17 @@ Our MCP servers may also accept `/tidewave/mcp?include_fs_tools=true` option,
 which enables your assistant to run shell commands as well as list, read, write,
 edit, and search files. This is useful for tools like Claude Desktop:
 
-| Features                   | Phoenix | Rails |
-| :------------------------- | :-----: | :---: |
-| `shell_eval`               | ✓       | ✓     |
-| `list_project_files`       | ✓       | ✓     |
-| `read_project_file`        | ✓       | ✓     |
-| `edit_project_file`        | ✓       | ✓     |
-| `write_project_file`       | ✓       | ✓     |
-| `glob_project_files`       | ✓       | ✓     |
-| `grep_project_files`       | ✓       | ✓     |
-| Syntax validation          | ✓       | ✓     |
-| Automatic formatting       | ✓       |       |
+| Features                   | Tidewave for Phoenix | Tidewave for Rails |
+| :------------------------- | :------------------: | :----------------: |
+| `shell_eval`               | ✅                    | ✅                 |
+| `list_project_files`       | ✅                    | ✅                 |
+| `read_project_file`        | ✅                    | ✅                 |
+| `edit_project_file`        | ✅                    | ✅                 |
+| `write_project_file`       | ✅                    | ✅                 |
+| `glob_project_files`       | ✅                    | ✅                 |
+| `grep_project_files`       | ✅                    | ✅                 |
+| Syntax validation          | ✅                    | ✅                 |
+| Automatic formatting       | ✅                    |                   |
 
 Tidewave stores the timestamps files have been read and written to, to avoid accidentally
 overriding previous work. Writing and editing files may also perform syntax validation and

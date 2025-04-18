@@ -45,8 +45,10 @@ defmodule Tidewave.MixProject do
         "pages/editors/mcp.md",
         "pages/editors/claude.md",
         "pages/editors/cursor.md",
+        "pages/editors/windsurf.md",
         "pages/editors/zed.md",
-        "pages/guides/mcp_proxy.md"
+        "pages/guides/mcp_proxy.md",
+        "pages/guides/security.md"
       ],
       groups_for_extras: [
         "Editors & Assistants": ~r/pages\/editors\/.?/,
