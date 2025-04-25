@@ -36,12 +36,12 @@ defmodule Tidewave.MCP.Tools.EvalTest do
       assert {:ok, "42"} = Eval.project_eval(%{"code" => code})
     end
 
-    test "raises for errors in Elixir code" do
+    test "returns formatted errors for exceptions" do
       code = "1 / 0"
 
-      assert_raise ArithmeticError, fn ->
-        Eval.project_eval(%{"code" => code})
-      end
+      assert {:ok, error} = Eval.project_eval(%{"code" => code})
+      assert error =~ "ArithmeticError"
+      assert error =~ "bad argument in arithmetic expression"
     end
 
     test "can use IEx helpers" do
@@ -50,6 +50,22 @@ defmodule Tidewave.MCP.Tools.EvalTest do
       assert {:ok, docs} = Eval.project_eval(%{"code" => code})
 
       assert docs =~ "Tidewave"
+    end
+
+    test "catches exits" do
+      assert {:error, "Failed to evaluate code. Process exited with reason: :brutal_kill"} =
+               Eval.project_eval(%{"code" => "Process.exit(self(), :brutal_kill)"})
+    end
+
+    test "times out" do
+      assert {:error, "Evaluation timed out after 50 milliseconds."} =
+               Eval.project_eval(%{"code" => "Process.sleep(10_000)", "timeout" => 50})
+    end
+
+    test "returns IO up to exception" do
+      assert {:ok, result} = Eval.project_eval(%{"code" => ~s[IO.puts("Hello!"); 1 / 0]})
+      assert result =~ "Hello!"
+      assert result =~ "ArithmeticError"
     end
   end
 
