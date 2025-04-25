@@ -21,6 +21,16 @@ and more.
 
 ## Installation
 
+<!-- tabs-open -->
+
+### Using Igniter (recommended)
+
+```sh
+mix igniter.install tidewave
+```
+
+### Manually
+
 You can install Tidewave by adding the `tidewave` package to your list of dependencies in `mix.exs`:
 
 ```elixir
@@ -40,6 +50,8 @@ Then, for Phoenix applications, go to your `lib/my_app_web/endpoint.ex` and righ
 
    if code_reloading? do
 ```
+
+<!-- tabs-close -->
 
 Tidewave will now run on the same port as your regular Phoenix application.
 In particular, the MCP is located by default at http://localhost:4000/tidewave/mcp.

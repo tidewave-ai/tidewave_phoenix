@@ -40,6 +40,7 @@ defmodule Tidewave.MixProject do
       {:jason, "~> 1.4"},
       {:circular_buffer, "~> 0.4"},
       {:req, "~> 0.5"},
+      {:igniter, "~> 0.5 and >= 0.5.47", optional: true},
       {:bandit, "~> 1.6", only: :test},
       {:ex_doc, ">= 0.0.0", only: :docs},
       {:makeup_json, ">= 0.0.0", only: :docs}
