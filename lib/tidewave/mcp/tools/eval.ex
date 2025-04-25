@@ -93,10 +93,11 @@ defmodule Tidewave.MCP.Tools.Eval do
 
     receive do
       {:result, result} ->
-        {:ok, inspect(result, limit: :infinity, printable_limit: :infinity, pretty: true)}
+        {:ok, result}
 
       {:DOWN, ^ref, :process, ^pid, reason} ->
-        {:error, "Failed to evaluate code. Process exited with reason: #{inspect(reason)}"}
+        {:error,
+         "Failed to evaluate code. Process exited with reason: #{Exception.format_exit(reason)}"}
     after
       timeout ->
         Process.demonitor(ref, [:flush])
@@ -116,11 +117,15 @@ defmodule Tidewave.MCP.Tools.Eval do
         end
       end)
 
+    inspect_all = fn i ->
+      inspect(i, limit: :infinity, printable_limit: :infinity, pretty: true)
+    end
+
     case result do
       # this is returned by IEx helpers
       {:"do not show this result in output", io} -> io
-      {result, ""} -> result
-      {result, io} -> %{result: result, io: io}
+      {result, ""} -> inspect_all.(result)
+      {result, io} -> "IO:\n\n#{io}\n\nResult:\n\n#{inspect_all.(result)}"
     end
   end
 
