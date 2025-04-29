@@ -5,7 +5,7 @@ You can use Tidewave with [Zed](https://zed.dev/). Zed currently only supports M
 At the time of writing, Zed agents/assistants are in beta. Therefore the instructions
 below may be out of date. In any case, let's do this.
 
-Zed agents/assistants are currently in beta and the steps below may not be
+Zed agents/assistants are currently in beta and the steps below may not reflect the latest behaviour.
 Once that's done, open up the Assistant tab and click on the `⋯` icon at the
 top right (see image below):
 
