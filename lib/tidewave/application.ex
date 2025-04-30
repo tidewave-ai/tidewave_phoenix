@@ -4,8 +4,10 @@ defmodule Tidewave.Application do
 
   @impl true
   def start(_type, _args) do
+    tools = Application.get_env(:tidewave, :tools, [])
+
     children = [
-      Tidewave.MCP
+      {Tidewave.MCP, tools: tools}
     ]
 
     opts = [strategy: :one_for_one, name: Tidewave.Supervisor]

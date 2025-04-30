@@ -11,8 +11,8 @@ defmodule Tidewave.MCP.Server do
   @vsn Mix.Project.config()[:version]
 
   @doc false
-  def init_tools do
-    tools = raw_tools()
+  def init_tools(custom_tools) do
+    tools = List.flatten([raw_tools(), custom_tools])
     dispatch_map = Map.new(tools, fn tool -> {tool.name, tool.callback} end)
 
     :persistent_term.put({__MODULE__, :tools_and_dispatch}, {tools, dispatch_map})
@@ -34,7 +34,6 @@ defmodule Tidewave.MCP.Server do
       Tools.Phoenix.tools(),
       Tools.Hex.tools()
     ]
-    |> List.flatten()
   end
 
   defp tools(connect_params) do

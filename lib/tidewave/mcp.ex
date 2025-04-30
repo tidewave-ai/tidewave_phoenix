@@ -10,10 +10,10 @@ defmodule Tidewave.MCP do
   end
 
   @impl true
-  def init(_init_arg) do
+  def init(init_arg) do
     silence_logs()
     add_logger_backend()
-    MCP.Server.init_tools()
+    MCP.Server.init_tools(init_arg[:tools])
 
     if Application.get_env(:tidewave, :root) == nil do
       Application.put_env(:tidewave, :root, File.cwd!())
