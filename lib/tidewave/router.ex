@@ -42,6 +42,12 @@ defmodule Tidewave.Router do
     |> halt()
   end
 
+  post "/mcp" do
+    conn
+    |> send_resp(405, "Method not allowed")
+    |> halt()
+  end
+
   post "/mcp/message" do
     Logger.metadata(tidewave_mcp: true)
 

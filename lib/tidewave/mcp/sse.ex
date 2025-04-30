@@ -90,6 +90,8 @@ defmodule Tidewave.MCP.SSE do
             conn |> put_status(202) |> send_json(%{status: "ok"})
           else
             # Handle requests that expect responses
+            # TODO: we can always directly reply with 202 Accepted here, the response
+            # is sent over the SSE connection
             case Server.handle_message(message, connection_pid) do
               {:ok, nil} ->
                 conn |> put_status(202) |> send_json(%{status: "ok"})
@@ -103,7 +105,9 @@ defmodule Tidewave.MCP.SSE do
                 Logger.warning("Error handling message: #{inspect(error_response)}")
                 # Send error response via SSE to match JSON-RPC 2.0 spec
                 Connection.send_sse_message(connection_pid, error_response)
-                conn |> put_status(400) |> send_json(error_response)
+                # we still reply with 202, because some clients abort the connection
+                # when they receive a non-200 response
+                conn |> put_status(202) |> send_json(%{status: "ok"})
             end
           end
       end

@@ -86,4 +86,12 @@ defmodule TidewaveTest do
 
     assert conn.status == 200
   end
+
+  test "405 when POSTing to /mcp" do
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> Tidewave.call([])
+
+    assert conn.status == 405
+  end
 end
