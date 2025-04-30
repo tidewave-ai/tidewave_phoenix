@@ -85,6 +85,8 @@ defmodule Tidewave.Router do
 
   defp is_local?({127, 0, 0, _}), do: true
   defp is_local?({0, 0, 0, 0, 0, 0, 0, 1}), do: true
+  # ipv4 mapped ipv6 address ::ffff:127.0.0.1
+  defp is_local?({0, 0, 0, 0, 0, 65535, 32512, 1}), do: true
   defp is_local?(_), do: false
 
   defp check_origin(conn, _opts) do
