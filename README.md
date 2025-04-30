@@ -26,21 +26,19 @@ You can install Tidewave by adding the `tidewave` package to your list of depend
 ```elixir
 def deps do
   [
-    {:tidewave, "~> 0.1"}
+    {:tidewave, "~> 0.1", only: :dev}
   ]
 end
 ```
 
-Then, for Phoenix applications, go to your `lib/my_app_web/endpoint.ex` and within the `if code_reloading? do` block, add:
+Then, for Phoenix applications, go to your `lib/my_app_web/endpoint.ex` and right above the `if code_reloading? do` block, add:
 
 ```diff
- if code_reloading? do
-   socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket
-+  plug Tidewave
-   plug Phoenix.LiveReloader
-   plug Phoenix.CodeReloader
-   plug Phoenix.Ecto.CheckRepoStatus, otp_app: :my_app
- end
++  if Code.ensure_loaded?(Tidewave) do
++    plug Tidewave
++  end
+
+   if code_reloading? do
 ```
 
 Tidewave will now run on the same port as your regular Phoenix application.
