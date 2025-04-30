@@ -1,11 +1,11 @@
 # Zed
 
-You can use Tidewave with [Zed](https://zed.dev/). Zed currently only supports MCP through the IO protocol. So the first step is to install a [mcp-proxy](../guides/mcp_proxy.md).
+You can use Tidewave with [Zed](https://zed.dev/). At the time of writing,
+Zed agents/assistants are in closed beta. If you have access, you can follow
+the steps below, although they may not reflect the latest behaviour.
 
-At the time of writing, Zed agents/assistants are in beta. Therefore the instructions
-below may be out of date. In any case, let's do this.
-
-Zed agents/assistants are currently in beta and the steps below may not reflect the latest behaviour.
+Zed currently only supports MCP through the IO protocol.
+So the first step is to install a [mcp-proxy](../guides/mcp_proxy.md).
 Once that's done, open up the Assistant tab and click on the `⋯` icon at the
 top right (see image below):
 
