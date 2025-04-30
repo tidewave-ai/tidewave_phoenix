@@ -48,6 +48,12 @@ defmodule Tidewave.MCP.Connection do
     # Start inactivity timeout
     timeout_ref = Process.send_after(self(), :inactivity_timeout, @inactivity_timeout)
 
+    # this is the map that is passed as `state` to the tools
+    assigns =
+      conn.private[:tidewave_opts]
+      |> Map.new()
+      |> Map.put(:phoenix_endpoint, conn.private[:phoenix_endpoint])
+
     :gen_server.enter_loop(__MODULE__, [], %{
       session_id: session_id,
       conn: conn,
@@ -58,8 +64,7 @@ defmodule Tidewave.MCP.Connection do
       # Add reference to the timeout timer
       timeout_ref: timeout_ref,
       requests: %{},
-      # this is the map that is passed as `state` to the tools
-      assigns: Map.new(conn.private[:tidewave_opts])
+      assigns: assigns
     })
   end
 
@@ -121,7 +126,7 @@ defmodule Tidewave.MCP.Connection do
         last_activity: System.monotonic_time(:millisecond)
     }
 
-    schedule_next_ping(state.conn.private[:tidewave_opts])
+    schedule_next_ping(state.assigns)
 
     {:reply, :ok, new_state}
   end
@@ -226,7 +231,7 @@ defmodule Tidewave.MCP.Connection do
   def handle_info(:send_ping, %{state: :ready} = state) do
     case handle_ping(state) do
       {:ok, state} ->
-        schedule_next_ping(state.conn.private[:tidewave_opts])
+        schedule_next_ping(state.assigns)
         {:noreply, state}
 
       {:error, :closed} ->
@@ -235,7 +240,7 @@ defmodule Tidewave.MCP.Connection do
   end
 
   def handle_info(:send_ping, state) do
-    schedule_next_ping(state.conn.private[:tidewave_opts])
+    schedule_next_ping(state.assigns)
     {:noreply, state}
   end
 
@@ -245,7 +250,7 @@ defmodule Tidewave.MCP.Connection do
   end
 
   defp schedule_next_ping(opts) do
-    case Keyword.get(opts, :sse_keepalive_timeout, 15_000) do
+    case Map.get(opts, :sse_keepalive_timeout, 15_000) do
       # Don't schedule next ping if disabled
       :infinity ->
         :ok

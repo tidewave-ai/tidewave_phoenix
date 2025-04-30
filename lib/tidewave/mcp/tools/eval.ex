@@ -1,6 +1,7 @@
 defmodule Tidewave.MCP.Tools.Eval do
   @moduledoc false
 
+  @compile {:no_warn_undefined, Phoenix.CodeReloader}
   alias Tidewave.MCP
 
   def tools do
@@ -40,7 +41,7 @@ defmodule Tidewave.MCP.Tools.Eval do
             }
           }
         },
-        callback: &project_eval/1
+        callback: &project_eval/2
       },
       %{
         name: "shell_eval",
@@ -78,15 +79,19 @@ defmodule Tidewave.MCP.Tools.Eval do
 
   Returns the formatted result of the evaluation.
   """
-  def project_eval(args) do
+  def project_eval(args, assigns) do
     case args do
-      %{"code" => code} -> eval_code(code, Map.get(args, "timeout", 30_000))
+      %{"code" => code} -> eval_code(code, Map.get(args, "timeout", 30_000), assigns)
       _ -> {:error, :invalid_arguments}
     end
   end
 
-  defp eval_code(code, timeout) do
+  defp eval_code(code, timeout, assigns) do
     parent = self()
+
+    if endpoint = assigns[:phoenix_endpoint] do
+      Phoenix.CodeReloader.reload(endpoint)
+    end
 
     {pid, ref} =
       spawn_monitor(fn ->
@@ -97,7 +102,7 @@ defmodule Tidewave.MCP.Tools.Eval do
 
     receive do
       {:result, result} ->
-        {:ok, result}
+        {:ok, result, assigns}
 
       {:DOWN, ^ref, :process, ^pid, reason} ->
         {:error,

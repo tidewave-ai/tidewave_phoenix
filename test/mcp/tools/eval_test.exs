@@ -17,11 +17,11 @@ defmodule Tidewave.MCP.Tools.EvalTest do
     end
   end
 
-  describe "project_eval/1" do
+  describe "project_eval/2" do
     test "evaluates simple Elixir expressions" do
       code = "1 + 1"
 
-      assert {:ok, "2"} = Eval.project_eval(%{"code" => code})
+      assert {:ok, "2", %{}} = Eval.project_eval(%{"code" => code}, %{})
     end
 
     test "evaluates complex Elixir expressions" do
@@ -33,13 +33,13 @@ defmodule Tidewave.MCP.Tools.EvalTest do
       Temp.add(40, 2)
       """
 
-      assert {:ok, "42"} = Eval.project_eval(%{"code" => code})
+      assert {:ok, "42", %{}} = Eval.project_eval(%{"code" => code}, %{})
     end
 
     test "returns formatted errors for exceptions" do
       code = "1 / 0"
 
-      assert {:ok, error} = Eval.project_eval(%{"code" => code})
+      assert {:ok, error, %{}} = Eval.project_eval(%{"code" => code}, %{})
       assert error =~ "ArithmeticError"
       assert error =~ "bad argument in arithmetic expression"
     end
@@ -47,23 +47,25 @@ defmodule Tidewave.MCP.Tools.EvalTest do
     test "can use IEx helpers" do
       code = "h Tidewave"
 
-      assert {:ok, docs} = Eval.project_eval(%{"code" => code})
+      assert {:ok, docs, %{}} = Eval.project_eval(%{"code" => code}, %{})
 
       assert docs =~ "Tidewave"
     end
 
     test "catches exits" do
       assert {:error, "Failed to evaluate code. Process exited with reason: :brutal_kill"} =
-               Eval.project_eval(%{"code" => "Process.exit(self(), :brutal_kill)"})
+               Eval.project_eval(%{"code" => "Process.exit(self(), :brutal_kill)"}, %{})
     end
 
     test "times out" do
       assert {:error, "Evaluation timed out after 50 milliseconds."} =
-               Eval.project_eval(%{"code" => "Process.sleep(10_000)", "timeout" => 50})
+               Eval.project_eval(%{"code" => "Process.sleep(10_000)", "timeout" => 50}, %{})
     end
 
     test "returns IO up to exception" do
-      assert {:ok, result} = Eval.project_eval(%{"code" => ~s[IO.puts("Hello!"); 1 / 0]})
+      assert {:ok, result, %{}} =
+               Eval.project_eval(%{"code" => ~s[IO.puts("Hello!"); 1 / 0]}, %{})
+
       assert result =~ "Hello!"
       assert result =~ "ArithmeticError"
     end
