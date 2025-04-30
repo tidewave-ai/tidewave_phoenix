@@ -30,7 +30,9 @@ if Code.ensure_loaded?(Igniter) do
     @plug_example """
         if code_reloading? do
           socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket
-        +  plug Tidewave
+        + if Code.ensure_loaded?(Tidewave) do
+        +   plug Tidewave
+        + end
           plug Phoenix.LiveReloader
           plug Phoenix.CodeReloader
           plug Phoenix.Ecto.CheckRepoStatus, otp_app: :my_app
@@ -83,7 +85,16 @@ if Code.ensure_loaded?(Igniter) do
         with {:ok, zipper} <- Igniter.Code.Common.move_to(zipper, &code_reloading?/1),
              {:ok, zipper} <- Igniter.Code.Common.move_to_do_block(zipper),
              {:ok, zipper} <- move_to_first_plug(zipper) do
-          {:ok, Igniter.Code.Common.add_code(zipper, "plug Tidewave", placement: :before)}
+          {:ok,
+           Igniter.Code.Common.add_code(
+             zipper,
+             """
+             if Code.ensure_loaded?(Tidewave) do
+               plug Tidewave
+             end
+             """,
+             placement: :before
+           )}
         else
           :error ->
             {:warning,

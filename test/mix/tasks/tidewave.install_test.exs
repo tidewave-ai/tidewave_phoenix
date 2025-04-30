@@ -28,7 +28,10 @@ defmodule Mix.Tasks.Tidewave.InstallTest do
     )
     |> Igniter.compose_task("tidewave.install")
     |> assert_has_patch("lib/test_web/endpoint.ex", """
-    + | plug(Tidewave)
+    + | if Code.ensure_loaded?(Tidewave) do
+    + |   plug(Tidewave)
+    + | end
+    + |
       | plug(Phoenix.LiveReloader)
     """)
   end

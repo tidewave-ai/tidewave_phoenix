@@ -25,8 +25,24 @@ and more.
 
 ### Using Igniter (recommended)
 
+#### Installing into an existing project
+
 ```sh
+# install igniter_new if you haven't already
+mix archive.install hex igniter_new
+
+# install tidewave
 mix igniter.install tidewave
+```
+
+#### Create a new project with Phoenix & Tidewave
+
+```sh
+# install igniter_new if you haven't already
+mix archive.install hex igniter_new
+
+# install tidewave
+mix igniter.new app_name --with phx.new --install tidewave
 ```
 
 ### Manually
