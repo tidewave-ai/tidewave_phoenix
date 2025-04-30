@@ -173,8 +173,8 @@ defmodule Tidewave.MCP.Server do
       is_nil(client_version) ->
         {:error, "Protocol version is required"}
 
-      client_version != unquote(@protocol_version) ->
-        {:error, "Unsupported protocol version. Server supports: #{unquote(@protocol_version)}"}
+      client_version >= unquote(@protocol_version) ->
+        {:error, "Unsupported protocol version. Server supports #{unquote(@protocol_version)} or later"}
 
       true ->
         :ok
