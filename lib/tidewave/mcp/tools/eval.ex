@@ -163,6 +163,10 @@ defmodule Tidewave.MCP.Tools.Eval do
   """
   def shell_eval(args) do
     case args do
+      %{"command" => "iex " <> _} ->
+        {:error,
+         "Do not use shell_eval to evaluate Elixir code, use the project_eval tool instead"}
+
       %{"command" => command} ->
         case System.shell(command, stderr_to_stdout: true, cd: MCP.root()) do
           {output, 0} ->

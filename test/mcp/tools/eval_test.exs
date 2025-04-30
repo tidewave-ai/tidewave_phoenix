@@ -78,6 +78,10 @@ defmodule Tidewave.MCP.Tools.EvalTest do
       assert {:ok, "hello world\n"} = Eval.shell_eval(%{"command" => "echo hello world"})
     end
 
+    test "refuses to execute iex" do
+      assert {:error, "Do not use shell_eval" <> _} = Eval.shell_eval(%{"command" => "iex -e 1"})
+    end
+
     test "handles failed commands" do
       # Using a non-existent command
       command = "nonexistentcommand"
