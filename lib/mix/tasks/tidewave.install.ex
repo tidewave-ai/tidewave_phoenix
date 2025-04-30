@@ -82,7 +82,12 @@ if Code.ensure_loaded?(Igniter) do
 
     defp add_plug_to_endpoint(igniter, endpoint) do
       Igniter.Project.Module.find_and_update_module!(igniter, endpoint, fn zipper ->
-        with {:ok, zipper} <- Igniter.Code.Common.move_to(zipper, &code_reloading?/1),
+        with :error <-
+               Igniter.Code.Common.move_to(zipper, fn zipper ->
+                 Igniter.Code.Function.function_call?(zipper, :plug) and
+                   Igniter.Code.Function.argument_equals?(zipper, 0, Tidewave)
+               end),
+             {:ok, zipper} <- Igniter.Code.Common.move_to(zipper, &code_reloading?/1),
              {:ok, zipper} <- Igniter.Code.Common.move_to_do_block(zipper),
              {:ok, zipper} <- move_to_first_plug(zipper) do
           {:ok,
@@ -96,6 +101,9 @@ if Code.ensure_loaded?(Igniter) do
              placement: :before
            )}
         else
+          {:ok, _} ->
+            {:ok, zipper}
+
           :error ->
             {:warning,
              """

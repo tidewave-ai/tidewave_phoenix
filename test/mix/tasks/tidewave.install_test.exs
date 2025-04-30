@@ -36,6 +36,36 @@ defmodule Mix.Tasks.Tidewave.InstallTest do
     """)
   end
 
+  test "installation is idempotent" do
+    test_project(
+      files: %{
+        "lib/test_web/endpoint.ex" => """
+        defmodule TestWeb.Endpoint do
+          use Phoenix.Endpoint, otp_app: :test
+
+          if code_reloading? do
+            socket("/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket)
+            plug(Phoenix.LiveReloader)
+            plug(Phoenix.CodeReloader)
+            plug(Phoenix.Ecto.CheckRepoStatus, otp_app: :tunez)
+          end
+        end
+        """
+      }
+    )
+    |> Igniter.compose_task("tidewave.install")
+    |> assert_has_patch("lib/test_web/endpoint.ex", """
+    + | if Code.ensure_loaded?(Tidewave) do
+    + |   plug(Tidewave)
+    + | end
+    + |
+      | plug(Phoenix.LiveReloader)
+    """)
+    |> apply_igniter!()
+    |> Igniter.compose_task("tidewave.install")
+    |> assert_unchanged()
+  end
+
   test "installation warns when it can't find the code reloading block" do
     test_project(
       files: %{
