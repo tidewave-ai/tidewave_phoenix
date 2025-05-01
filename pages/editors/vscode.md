@@ -3,8 +3,9 @@
 You can use Tidewave with Visual Studio Code through the [GitHub Copilot extension](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot).
 
 At the time of writing, MCP support in GitHub Copilot is in public preview and only
-available in "Agent" mode. Therefore the instructions below may be out of date.
-In any case, let's do this.
+available when **a)** the 'Editor Preview Features' flag is enabled in your GitHub
+settings and **b)** your Copilot session is in "Agent" mode. Given the preview state
+of the feature, the instructions below may be out of date. In any case, let's do this.
 
 Open up your AI assistant and then click on the red arrow in your editor (shown below)
 to enable "Agent" mode and then the Wrench icon (pointed by the green arrow) to
