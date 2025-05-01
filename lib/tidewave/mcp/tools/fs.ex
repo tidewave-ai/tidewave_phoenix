@@ -291,7 +291,12 @@ defmodule Tidewave.MCP.Tools.FS do
       stat = File.stat!(path)
 
       assigns =
-        Map.update(assigns, :read_timestamps, %{path => stat.mtime}, &Map.put(&1, path, stat.mtime))
+        Map.update(
+          assigns,
+          :read_timestamps,
+          %{path => stat.mtime},
+          &Map.put(&1, path, stat.mtime)
+        )
 
       {:ok, "Success!", assigns}
     rescue
