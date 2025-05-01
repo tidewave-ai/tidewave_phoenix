@@ -8,25 +8,13 @@ defmodule Mix.Tasks.Tidewave.Install.Docs do
   def example do
     "mix igniter.install tidewave"
   end
-
-  def long_doc do
-    """
-    #{short_doc()}
-
-    ## Example
-
-    ```bash
-    #{example()}
-    ```
-    """
-  end
 end
 
 if Code.ensure_loaded?(Igniter) do
   defmodule Mix.Tasks.Tidewave.Install do
     @shortdoc "#{__MODULE__.Docs.short_doc()}"
 
-    @moduledoc __MODULE__.Docs.long_doc()
+    @moduledoc false
     @plug_example """
     + if Code.ensure_loaded?(Tidewave) do
     +   plug Tidewave
@@ -126,16 +114,6 @@ if Code.ensure_loaded?(Igniter) do
           0,
           &Igniter.Code.Common.variable?(&1, :code_reloading?)
         )
-    end
-
-    defp move_to_first_plug(zipper) do
-      case Igniter.Code.Common.move_right(
-             zipper,
-             &Igniter.Code.Function.function_call?(&1, :plug)
-           ) do
-        {:ok, zipper} -> {:ok, zipper}
-        :error -> {:ok, zipper}
-      end
     end
   end
 else
