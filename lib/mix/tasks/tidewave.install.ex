@@ -28,15 +28,16 @@ if Code.ensure_loaded?(Igniter) do
 
     @moduledoc __MODULE__.Docs.long_doc()
     @plug_example """
-        if code_reloading? do
-          socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket
-        + if Code.ensure_loaded?(Tidewave) do
-        +   plug Tidewave
-        + end
-          plug Phoenix.LiveReloader
-          plug Phoenix.CodeReloader
-          plug Phoenix.Ecto.CheckRepoStatus, otp_app: :my_app
-        end
+    + if Code.ensure_loaded?(Tidewave) do
+    +   plug Tidewave
+    + end
+
+    if code_reloading? do
+      socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket
+      plug Phoenix.LiveReloader
+      plug Phoenix.CodeReloader
+      plug Phoenix.Ecto.CheckRepoStatus, otp_app: :my_app
+    end
     """
 
     use Igniter.Mix.Task
@@ -86,9 +87,7 @@ if Code.ensure_loaded?(Igniter) do
                  Igniter.Code.Function.function_call?(zipper, :plug) and
                    Igniter.Code.Function.argument_equals?(zipper, 0, Tidewave)
                end),
-             {:ok, zipper} <- Igniter.Code.Common.move_to(zipper, &code_reloading?/1),
-             {:ok, zipper} <- Igniter.Code.Common.move_to_do_block(zipper),
-             {:ok, zipper} <- move_to_first_plug(zipper) do
+             {:ok, zipper} <- Igniter.Code.Common.move_to(zipper, &code_reloading?/1) do
           {:ok,
            Igniter.Code.Common.add_code(
              zipper,
@@ -106,7 +105,7 @@ if Code.ensure_loaded?(Igniter) do
           :error ->
             {:warning,
              """
-             Could not find the section of your endpoint `#{inspect(endpoint)}` dedicated to dev plugs.
+             Could not find the section of your endpoint `#{inspect(endpoint)}` dedicated to code reloading.
              We look for `if code_reloading? do`, but you may have customized this code.
              Please add the plug manually, for example:
 

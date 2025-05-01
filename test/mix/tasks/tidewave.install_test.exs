@@ -28,11 +28,11 @@ defmodule Mix.Tasks.Tidewave.InstallTest do
     )
     |> Igniter.compose_task("tidewave.install")
     |> assert_has_patch("lib/test_web/endpoint.ex", """
-    + | if Code.ensure_loaded?(Tidewave) do
-    + |   plug(Tidewave)
-    + | end
+    + |  if Code.ensure_loaded?(Tidewave) do
+    + |    plug(Tidewave)
+    + |  end
     + |
-      | plug(Phoenix.LiveReloader)
+      |  if code_reloading? do
     """)
   end
 
@@ -54,13 +54,6 @@ defmodule Mix.Tasks.Tidewave.InstallTest do
       }
     )
     |> Igniter.compose_task("tidewave.install")
-    |> assert_has_patch("lib/test_web/endpoint.ex", """
-    + | if Code.ensure_loaded?(Tidewave) do
-    + |   plug(Tidewave)
-    + | end
-    + |
-      | plug(Phoenix.LiveReloader)
-    """)
     |> apply_igniter!()
     |> Igniter.compose_task("tidewave.install")
     |> assert_unchanged()
@@ -80,7 +73,7 @@ defmodule Mix.Tasks.Tidewave.InstallTest do
     |> assert_unchanged("lib/test_web/endpoint.ex")
     |> assert_has_warning(
       &(&1 =~
-          "Could not find the section of your endpoint `TestWeb.Endpoint` dedicated to dev plugs.")
+          "Could not find the section of your endpoint `TestWeb.Endpoint` dedicated to code reloading.")
     )
   end
 end
