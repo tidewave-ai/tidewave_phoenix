@@ -4,6 +4,7 @@ You can integrate Tidewave into any editor or AI assistant that supports the Mod
 
   * [Claude Code and Claude Desktop](claude.md)
   * [Cursor](cursor.md)
+  * [Neovim](neovim.md)
   * [VS Code](vscode.md)
   * [Windsurf](windsurf.md)
   * [Zed](zed.md)
