@@ -181,12 +181,26 @@ defmodule Tidewave.MCP.SSE do
 
   defp enter_loop(conn, session_id) do
     try do
+      Registry.register(Tidewave.MCP.Registry, session_id, [])
       Connection.init({session_id, conn})
     catch
       :exit, :normal -> conn
       :exit, {:shutdown, _} -> conn
     after
+      # Bandit re-uses the same process for new requests,
+      # therefore we need to unregister manually and clear
+      # any pending messages from the inbox
+      Registry.unregister(Tidewave.MCP.Registry, session_id)
+      clear_inbox()
       send(self(), {:plug_conn, :sent})
+    end
+  end
+
+  defp clear_inbox do
+    receive do
+      _ -> clear_inbox()
+    after
+      0 -> :ok
     end
   end
 

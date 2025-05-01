@@ -41,7 +41,6 @@ defmodule Tidewave.MCP.Connection do
 
   @impl GenServer
   def init({session_id, conn}) do
-    Registry.register(Tidewave.MCP.Registry, session_id, [])
     Logger.metadata(tidewave_mcp: true)
     # Start initialization timeout
     Process.send_after(self(), :init_timeout, @init_timeout)
@@ -236,6 +235,10 @@ defmodule Tidewave.MCP.Connection do
 
   def handle_info(:send_ping, state) do
     schedule_next_ping(state.assigns)
+    {:noreply, state}
+  end
+
+  def handle_info({:plug_conn, :sent}, state) do
     {:noreply, state}
   end
 

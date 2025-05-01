@@ -120,7 +120,7 @@ else
   defmodule Mix.Tasks.Tidewave.Install do
     @shortdoc "#{__MODULE__.Docs.short_doc()} | Install `igniter` to use"
 
-    @moduledoc __MODULE__.Docs.long_doc()
+    @moduledoc false
 
     use Mix.Task
 
