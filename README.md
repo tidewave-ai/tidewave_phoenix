@@ -21,30 +21,6 @@ and more.
 
 ## Installation
 
-<!-- tabs-open -->
-
-### Using Igniter (recommended)
-
-#### Installing into an existing project
-
-```sh
-# install igniter_new if you haven't already
-mix archive.install hex igniter_new
-
-# install tidewave
-mix igniter.install tidewave
-```
-
-#### Create a new project with Phoenix & Tidewave
-
-```sh
-# install igniter_new if you haven't already
-mix archive.install hex igniter_new
-
-# install tidewave
-mix igniter.new app_name --with phx.new --install tidewave
-```
-
 ### Manually
 
 You can install Tidewave by adding the `tidewave` package to your list of dependencies in `mix.exs`:
@@ -67,7 +43,21 @@ Then, for Phoenix applications, go to your `lib/my_app_web/endpoint.ex` and righ
    if code_reloading? do
 ```
 
-<!-- tabs-close -->
+Tidewave will now run on the same port as your regular Phoenix application.
+In particular, the MCP is located by default at http://localhost:4000/tidewave/mcp.
+[You must configure your editor and AI assistants accordingly](https://hexdocs.pm/tidewave/mcp.html).
+
+### Using Igniter
+
+Alternatively, you can use `igniter` to automatically install it into an existing Phoenix application:
+
+```sh
+# install igniter_new if you haven't already
+mix archive.install hex igniter_new
+
+# install tidewave
+mix igniter.install tidewave
+```
 
 Tidewave will now run on the same port as your regular Phoenix application.
 In particular, the MCP is located by default at http://localhost:4000/tidewave/mcp.
