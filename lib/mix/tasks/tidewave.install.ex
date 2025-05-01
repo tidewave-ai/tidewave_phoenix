@@ -56,8 +56,7 @@ if Code.ensure_loaded?(Igniter) do
       |> Igniter.add_notice("""
       Tidewave next steps:
 
-      * Set up your editor to integrate with your new Tidewave MCP: https://github.com/tidewave-ai/tidewave_phoenix/tree/main/pages/editors
-      * Configure the tidewave plug: https://github.com/tidewave-ai/tidewave_phoenix/tree/main?tab=readme-ov-file#configuration
+      * Enable Tidewave in your editor: https://hexdocs.pm/tidewave/mcp.html
       """)
     end
 
