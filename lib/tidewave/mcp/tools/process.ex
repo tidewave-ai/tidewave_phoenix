@@ -63,7 +63,7 @@ defmodule Tidewave.MCP.Tools.Process do
                 }
               }
             },
-            callback: &trace_process/1
+            callback: &trace_process/2
           }
         ]
       else
@@ -177,14 +177,14 @@ defmodule Tidewave.MCP.Tools.Process do
 
   Note: This function requires OTP 27 or later.
   """
-  def trace_process(args) do
+  def trace_process(args, assigns) do
     case args do
       %{"pid" => pid_string, "message_count" => message_count}
       when is_binary(pid_string) and is_integer(message_count) ->
         with {:ok, pid} <- parse_pid(pid_string),
              :ok <- alive?(pid) do
           timeout = Map.get(args, "timeout", 30_000)
-          do_trace(pid, message_count, timeout)
+          do_trace(pid, message_count, timeout, assigns.inspect_opts)
         end
 
       _ ->
@@ -192,7 +192,7 @@ defmodule Tidewave.MCP.Tools.Process do
     end
   end
 
-  defp do_trace(pid, message_count, timeout) do
+  defp do_trace(pid, message_count, timeout, inspect_opts) do
     timer_ref = Process.send_after(self(), :timeout, timeout)
 
     try do
@@ -213,11 +213,11 @@ defmodule Tidewave.MCP.Tools.Process do
           {:trace_ts, traced_pid, :send, message, to_pid, timestamp} ->
             time_str = format_timestamp(timestamp)
 
-            "#{time_str} #{inspect(traced_pid)} sent #{inspect(message)} to #{inspect(to_pid)}"
+            "#{time_str} #{inspect(traced_pid)} sent #{inspect(message, inspect_opts)} to #{inspect(to_pid)}"
 
           {:trace_ts, traced_pid, :receive, message, timestamp} ->
             time_str = format_timestamp(timestamp)
-            "#{time_str} #{inspect(traced_pid)} received #{inspect(message)}"
+            "#{time_str} #{inspect(traced_pid)} received #{inspect(message, inspect_opts)}"
 
           other ->
             "Other trace: #{inspect(other)}"

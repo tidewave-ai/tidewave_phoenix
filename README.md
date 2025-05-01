@@ -61,6 +61,9 @@ The following options are available:
 
   * `:autoformat` - When writing Elixir source files, Tidewave will automatically format them with `mix format` by default. Setting this option to `false` disabled autoformatting.
 
+  * `:inspect_opts` - Custom options passed to `Kernel.inspect/2` when formatting some tool results.
+    Defaults to: `[charlists: :as_lists, limit: 50, pretty: true]`
+
 ## License
 
 Copyright (c) 2025 Dashbit

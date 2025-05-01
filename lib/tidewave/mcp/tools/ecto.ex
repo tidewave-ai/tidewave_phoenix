@@ -59,7 +59,7 @@ defmodule Tidewave.MCP.Tools.Ecto do
               }
             }
           },
-          callback: &execute_sql_query/1
+          callback: &execute_sql_query/2
         },
         %{
           name: "get_ecto_schemas",
@@ -82,14 +82,14 @@ defmodule Tidewave.MCP.Tools.Ecto do
     end
   end
 
-  def execute_sql_query(%{"query" => query} = args) do
+  def execute_sql_query(%{"query" => query} = args, state) do
     repo =
       case args["repo"] do
         nil -> List.first(ecto_repos())
         repo -> Module.concat([repo])
       end
 
-    limit = 50
+    limit = Keyword.get(state.inspect_opts, :limit, 50)
 
     case repo.query(query, args["arguments"] || []) do
       {:ok, result} ->
@@ -102,10 +102,10 @@ defmodule Tidewave.MCP.Tools.Ecto do
               ""
           end
 
-        {:ok, preamble <> inspect(result, limit: limit, pretty: true)}
+        {:ok, preamble <> inspect(result, state.inspect_opts)}
 
       {:error, reason} ->
-        {:error, "Failed to execute query: #{inspect(reason)}"}
+        {:error, "Failed to execute query: #{inspect(reason, state.inspect_opts)}"}
     end
   end
 

@@ -102,7 +102,7 @@ defmodule Tidewave.MCP.Tools.Eval do
       spawn_monitor(fn ->
         # we need to set the logger metadata again
         Logger.metadata(tidewave_mcp: true)
-        send(parent, {:result, eval_with_captured_io(code)})
+        send(parent, {:result, eval_with_captured_io(code, assigns.inspect_opts)})
       end)
 
     receive do
@@ -120,7 +120,7 @@ defmodule Tidewave.MCP.Tools.Eval do
     end
   end
 
-  defp eval_with_captured_io(code) do
+  defp eval_with_captured_io(code, inspect_opts) do
     result =
       capture_io(fn ->
         try do
@@ -131,15 +131,11 @@ defmodule Tidewave.MCP.Tools.Eval do
         end
       end)
 
-    inspect_all = fn i ->
-      inspect(i, limit: :infinity, printable_limit: :infinity, pretty: true)
-    end
-
     case result do
       # this is returned by IEx helpers
       {:"do not show this result in output", io} -> io
-      {result, ""} -> inspect_all.(result)
-      {result, io} -> "IO:\n\n#{io}\n\nResult:\n\n#{inspect_all.(result)}"
+      {result, ""} -> inspect(result, inspect_opts)
+      {result, io} -> "IO:\n\n#{io}\n\nResult:\n\n#{inspect(result, inspect_opts)}"
     end
   end
 

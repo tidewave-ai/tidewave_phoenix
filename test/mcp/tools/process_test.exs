@@ -100,7 +100,11 @@ defmodule Tidewave.MCP.Tools.ProcessTest do
       # start ping pong loop
       send(pid1, {:ping, pid2})
 
-      {:ok, result} = ProcessTool.trace_process(%{"pid" => inspect(pid1), "message_count" => 3})
+      {:ok, result} =
+        ProcessTool.trace_process(
+          %{"pid" => inspect(pid1), "message_count" => 3},
+          Tidewave.init([])
+        )
 
       lines = String.split(result, "\n")
 
@@ -116,11 +120,14 @@ defmodule Tidewave.MCP.Tools.ProcessTest do
       pid = spawn_link(fn -> Process.sleep(:infinity) end)
 
       assert {:ok, text} =
-               ProcessTool.trace_process(%{
-                 "pid" => inspect(pid),
-                 "message_count" => 10,
-                 "timeout" => 50
-               })
+               ProcessTool.trace_process(
+                 %{
+                   "pid" => inspect(pid),
+                   "message_count" => 10,
+                   "timeout" => 50
+                 },
+                 Tidewave.init([])
+               )
 
       assert text =~ "Timed out waiting for more messages"
     end

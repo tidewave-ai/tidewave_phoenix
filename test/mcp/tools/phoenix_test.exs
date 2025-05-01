@@ -24,7 +24,7 @@ defmodule Tidewave.MCP.Tools.PhoenixTest do
       # which is difficult to test, so we'll just verify the function runs
       # and returns the expected format
       assert {:ok, "There are no LiveView processes connected!"} =
-               Phoenix.list_liveview_pages(%{})
+               Phoenix.list_liveview_pages(%{}, Tidewave.init([]))
 
       parent = self()
 
@@ -47,7 +47,7 @@ defmodule Tidewave.MCP.Tools.PhoenixTest do
           {:ready, lv_pid} -> lv_pid
         end
 
-      {:ok, text} = Phoenix.list_liveview_pages(%{})
+      {:ok, text} = Phoenix.list_liveview_pages(%{}, Tidewave.init([]))
 
       assert text =~ inspect(lv_pid)
       assert text =~ "view: Tidewave.MCP.Tools.PhoenixTest"

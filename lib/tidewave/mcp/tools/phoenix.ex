@@ -16,12 +16,12 @@ defmodule Tidewave.MCP.Tools.Phoenix do
           properties: %{},
           required: []
         },
-        callback: &list_liveview_pages/1
+        callback: &list_liveview_pages/2
       }
     ]
   end
 
-  def list_liveview_pages(_args) do
+  def list_liveview_pages(_args, assigns) do
     liveviews =
       for process <- Process.list(),
           result = liveview_process?(process),
@@ -35,7 +35,7 @@ defmodule Tidewave.MCP.Tools.Phoenix do
         {:ok, "There are no LiveView processes connected!"}
 
       liveviews ->
-        {:ok, inspect(liveviews, limit: :infinity, printable_limit: :infinity, pretty: true)}
+        {:ok, inspect(liveviews, assigns.inspect_opts)}
     end
   end
 
