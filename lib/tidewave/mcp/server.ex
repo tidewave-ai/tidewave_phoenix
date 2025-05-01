@@ -128,6 +128,10 @@ defmodule Tidewave.MCP.Server do
     result_or_error(request_id, dispatch(name, args, state_pid))
   end
 
+  def handle_call_tool(request_id, %{"name" => name}, state_pid) do
+    result_or_error(request_id, dispatch(name, %{}, state_pid))
+  end
+
   defp result_or_error(request_id, {:ok, text}) when is_binary(text) do
     result_or_error(request_id, {:ok, %{content: [%{type: "text", text: text}]}})
   end
