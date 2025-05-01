@@ -171,7 +171,7 @@ defmodule Tidewave.MCP.Tools.FS do
     end
   end
 
-  def read_project_file(args, state) do
+  def read_project_file(args, assigns) do
     case args do
       %{"path" => path} ->
         line_offset = Map.get(args, "line_offset", 0)
@@ -180,15 +180,15 @@ defmodule Tidewave.MCP.Tools.FS do
         with {:ok, content} <- get_file_content(path, line_offset, count, !args["raw"]) do
           stat = File.stat!(path)
 
-          state =
+          assigns =
             Map.update(
-              state,
+              assigns,
               :read_timestamps,
               %{path => stat.mtime},
               &Map.put(&1, path, stat.mtime)
             )
 
-          {:ok, content, state}
+          {:ok, content, assigns}
         end
 
       _ ->
@@ -224,14 +224,14 @@ defmodule Tidewave.MCP.Tools.FS do
     end
   end
 
-  def write_project_file(args, state) do
+  def write_project_file(args, assigns) do
     case args do
       %{"path" => path, "content" => content} ->
-        read_timestamps = Map.get(state, :read_timestamps, %{})
+        read_timestamps = Map.get(assigns, :read_timestamps, %{})
 
         with {:ok, path} <- safe_path(path),
              :ok <- check_stale(path, read_timestamps, true) do
-          do_write_file(path, content, state)
+          do_write_file(path, content, assigns)
         end
 
       _ ->
@@ -241,18 +241,18 @@ defmodule Tidewave.MCP.Tools.FS do
 
   def edit_project_file(
         args,
-        state
+        assigns
       ) do
     case args do
       %{"path" => path, "old_string" => old_string, "new_string" => new_string} ->
-        read_timestamps = Map.get(state, :read_timestamps, %{})
+        read_timestamps = Map.get(assigns, :read_timestamps, %{})
 
         with {:ok, path} <- safe_path(path),
              :ok <- check_stale(path, read_timestamps),
              old_content = File.read!(path),
              :ok <- ensure_one_match(old_content, old_string) do
           new_content = String.replace(old_content, old_string, new_string)
-          do_write_file(path, new_content, state)
+          do_write_file(path, new_content, assigns)
         end
 
       _ ->
@@ -274,11 +274,11 @@ defmodule Tidewave.MCP.Tools.FS do
     end
   end
 
-  defp do_write_file(path, content, state) do
-    state = ensure_default_line_endings(state)
+  defp do_write_file(path, content, assigns) do
+    assigns = ensure_default_line_endings(assigns)
 
     content =
-      case Utils.detect_file_line_endings(path) || state.default_line_endings do
+      case Utils.detect_file_line_endings(path) || assigns.default_line_endings do
         :crlf -> String.replace(content, ["\r\n", "\n"], "\r\n")
         :lf -> content
       end
@@ -286,21 +286,21 @@ defmodule Tidewave.MCP.Tools.FS do
     File.mkdir_p!(Path.dirname(path))
 
     try do
-      content = maybe_autoformat(state, path, content)
+      content = maybe_autoformat(assigns, path, content)
       File.write!(path, content)
       stat = File.stat!(path)
 
-      state =
-        Map.update(state, :read_timestamps, %{path => stat.mtime}, &Map.put(&1, path, stat.mtime))
+      assigns =
+        Map.update(assigns, :read_timestamps, %{path => stat.mtime}, &Map.put(&1, path, stat.mtime))
 
-      {:ok, "Success!", state}
+      {:ok, "Success!", assigns}
     rescue
       e -> {:error, "Failed to format file: #{Exception.format(:error, e, __STACKTRACE__)}"}
     end
   end
 
-  defp maybe_autoformat(state, path, content) do
-    if Map.get(state, :autoformat, true) do
+  defp maybe_autoformat(assigns, path, content) do
+    if Map.get(assigns, :autoformat, true) do
       {fun, _opts} = Mix.Tasks.Format.formatter_for_file(path, root: MCP.root())
       fun.(content)
     else
@@ -488,8 +488,8 @@ defmodule Tidewave.MCP.Tools.FS do
     end
   end
 
-  defp ensure_default_line_endings(state) do
-    Map.put_new_lazy(state, :default_line_endings, fn ->
+  defp ensure_default_line_endings(assigns) do
+    Map.put_new_lazy(assigns, :default_line_endings, fn ->
       case GitLS.detect_line_endings() do
         {:ok, default_line_endings} -> default_line_endings
         {:error, _} -> :lf
