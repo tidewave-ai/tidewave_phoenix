@@ -69,7 +69,7 @@ defmodule Tidewave.Router do
       is_local?(conn.remote_ip) ->
         conn
 
-      Keyword.get(conn.private[:tidewave_opts], :allow_remote_access, false) ->
+      conn.private.tidewave_config.allow_remote_access ->
         conn
 
       true ->
@@ -106,7 +106,7 @@ defmodule Tidewave.Router do
   end
 
   defp validate_allowed_origin(conn, origin) do
-    case Keyword.get(conn.private[:tidewave_opts], :allowed_origins) do
+    case conn.private.tidewave_config.allowed_origins do
       nil ->
         validate_origin_from_endpoint!(conn, origin)
 

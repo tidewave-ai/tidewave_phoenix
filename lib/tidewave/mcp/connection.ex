@@ -48,12 +48,6 @@ defmodule Tidewave.MCP.Connection do
     # Start inactivity timeout
     timeout_ref = Process.send_after(self(), :inactivity_timeout, @inactivity_timeout)
 
-    # this is the map that is passed as `state` to the tools
-    assigns =
-      conn.private[:tidewave_opts]
-      |> Map.new()
-      |> Map.put(:phoenix_endpoint, conn.private[:phoenix_endpoint])
-
     :gen_server.enter_loop(__MODULE__, [], %{
       session_id: session_id,
       conn: conn,
@@ -64,7 +58,8 @@ defmodule Tidewave.MCP.Connection do
       # Add reference to the timeout timer
       timeout_ref: timeout_ref,
       requests: %{},
-      assigns: assigns
+      # We convert the configuration into the `assigns` map passed to tools
+      assigns: conn.private.tidewave_config
     })
   end
 

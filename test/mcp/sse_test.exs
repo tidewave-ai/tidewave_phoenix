@@ -18,7 +18,7 @@ defmodule Tidewave.MCP.SSETest do
         |> Map.put(:port, 9000)
 
       # Start the SSE connection in a separate process to avoid blocking the test
-      :proc_lib.spawn_link(fn -> Tidewave.call(conn, []) end)
+      :proc_lib.spawn_link(fn -> Tidewave.call(conn, Tidewave.init([])) end)
 
       # Wait briefly for the connection to be established
       :timer.sleep(100)
@@ -39,7 +39,7 @@ defmodule Tidewave.MCP.SSETest do
 
       state_pid =
         :proc_lib.spawn_link(fn ->
-          Tidewave.call(sse_conn, [])
+          Tidewave.call(sse_conn, Tidewave.init([]))
         end)
 
       %{session_id: session_id} = :sys.get_state(state_pid)
@@ -70,7 +70,7 @@ defmodule Tidewave.MCP.SSETest do
       }
 
       conn = %{conn | body_params: message}
-      response = Tidewave.call(conn, [])
+      response = Tidewave.call(conn, Tidewave.init([]))
 
       assert response.status == 202
       assert Jason.decode!(response.resp_body) == %{"status" => "ok"}
@@ -86,7 +86,7 @@ defmodule Tidewave.MCP.SSETest do
       }
 
       conn = %{conn | body_params: message}
-      response = Tidewave.call(conn, [])
+      response = Tidewave.call(conn, Tidewave.init([]))
 
       assert response.status == 202
       assert Jason.decode!(response.resp_body) == %{"status" => "ok"}
@@ -100,7 +100,7 @@ defmodule Tidewave.MCP.SSETest do
       }
 
       conn = %{conn | body_params: message}
-      response = Tidewave.call(conn, [])
+      response = Tidewave.call(conn, Tidewave.init([]))
 
       assert response.status == 202
       assert Jason.decode!(response.resp_body) == %{"status" => "ok"}
@@ -111,7 +111,7 @@ defmodule Tidewave.MCP.SSETest do
 
       log =
         capture_log([level: :warning], fn ->
-          response = Tidewave.call(conn, [])
+          response = Tidewave.call(conn, Tidewave.init([]))
 
           assert response.status == 400
           assert Jason.decode!(response.resp_body) == %{"error" => "session_id is required"}
@@ -125,7 +125,7 @@ defmodule Tidewave.MCP.SSETest do
 
       log =
         capture_log([level: :warning], fn ->
-          response = Tidewave.call(conn, [])
+          response = Tidewave.call(conn, Tidewave.init([]))
 
           assert response.status == 400
           assert Jason.decode!(response.resp_body) == %{"error" => "Invalid session ID"}
@@ -139,7 +139,7 @@ defmodule Tidewave.MCP.SSETest do
 
       log =
         capture_log([level: :warning], fn ->
-          response = Tidewave.call(conn, [])
+          response = Tidewave.call(conn, Tidewave.init([]))
 
           assert response.status == 404
           assert Jason.decode!(response.resp_body) == %{"error" => "Could not find session"}
@@ -154,7 +154,7 @@ defmodule Tidewave.MCP.SSETest do
       log =
         capture_log([level: :warning], fn ->
           conn = %{conn | body_params: message}
-          response = Tidewave.call(conn, [])
+          response = Tidewave.call(conn, Tidewave.init([]))
 
           assert response.status == 200
           response_body = Jason.decode!(response.resp_body)
@@ -174,7 +174,7 @@ defmodule Tidewave.MCP.SSETest do
                    conn
                    | body_params: %{"jsonrpc" => "2.0", "method" => "notifications/initialized"}
                  },
-                 []
+                 Tidewave.init([])
                )
 
       assert %{status: 202, resp_body: ~s({"status":"ok"})} =
@@ -191,7 +191,7 @@ defmodule Tidewave.MCP.SSETest do
                        }
                      }
                  },
-                 []
+                 Tidewave.init([])
                )
 
       assert Process.alive?(state_pid)
