@@ -63,13 +63,16 @@ defmodule Tidewave.MCP.Tools.HexTest do
           "packages" => [
             %{
               "name" => "phoenix",
-              "description" => "Productive. Reliable. Fast."
+              "description" => "Productive. Reliable. Fast.",
+              "latest_version" => "1.8.0"
             }
           ]
         })
       end)
 
-      assert {:ok, _} = Hex.package_search(%{"search" => "phoenix"})
+      assert {:ok, response} = Hex.package_search(%{"search" => "phoenix"})
+      [phoenix] = Jason.decode!(response)
+      assert phoenix == %{"name" => "phoenix", "latest_version" => "1.8.0"}
     end
 
     test "includes sort parameter when provided" do

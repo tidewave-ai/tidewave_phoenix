@@ -158,8 +158,11 @@ defmodule Tidewave.MCP.Tools.Hex do
         opts = Keyword.merge(req_opts(), params: query_params)
 
         case Req.get("https://hex.pm/api/packages", opts) do
-          {:ok, %{status: 200, body: body}} ->
-            {:ok, Jason.encode!(body)}
+          {:ok, %{status: 200, body: %{"packages" => packages}}} ->
+            {:ok,
+             packages
+             |> Enum.map(&Map.take(&1, ["name", "latest_version"]))
+             |> Jason.encode!()}
 
           {:ok, %{status: status, body: body}} ->
             {:error, "HTTP error #{status} - #{inspect(body)}"}
