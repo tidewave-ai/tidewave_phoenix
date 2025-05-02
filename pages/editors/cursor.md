@@ -4,20 +4,32 @@ You can use Tidewave with [Cursor](https://cursor.com/).
 
 Cursor allows you to place a file at `.cursor/mcp.json`, for configuration
 which is specific to your project. Given Tidewave is explicitly tied to your
-web application, that's our preferred approach. Create a file at
-`.cursor/mcp.json` and add the following contents.
+web application, that's our preferred approach.
+
+> #### Installing an MCP proxy {: .info}
+> The SSE integration of Cursor has shown to be unreliable. Whenever the connection
+> drops to the SSE server, for example when you restart your dev server, Cursor does
+> not properly reconnect, leading to a frustrating user experience. For this reason,
+> we highly recommend to use an [MCP proxy](../guides/mcp_proxy.md), despite the built
+> in SSE support.
+
+Create a file at `.cursor/mcp.json` and add the following contents.
 
 ```json
 {
   "mcpServers": {
     "tidewave": {
-      "url": "http://localhost:$PORT/tidewave/mcp"
+      "command": "mcp-proxy",
+      "args": [
+        "http://localhost:$PORT/tidewave/mcp"
+      ]
     }
   }
 }
 ```
 
-Where `$PORT` is the port your web application is running on.
+Where `$PORT` is the port your web application is running on. If the `mcp-proxy` command
+is not in your path, you might need to specify the full path instead, for example: `/Users/foo/.mix/escripts/mcp-proxy`.
 
 If you prefer, you can also add Tidewave globally to your editor
 by adding the same contents as above to the `~/.cursor/mcp.json`
