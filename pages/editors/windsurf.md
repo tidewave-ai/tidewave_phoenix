@@ -76,9 +76,9 @@ On Windows:
 Where you replace `$HOME` by your home folder (shown during installation)
 and `$PORT` by the port your web application is running on.
 
-### Direct Connect
+### SSE connection
 
-Note, if you restart your phoenix server, you will need to refresh the MCP connection. 
+Note, if you restart your dev server, you will need to refresh the MCP connection. 
 
 ```json
 {
