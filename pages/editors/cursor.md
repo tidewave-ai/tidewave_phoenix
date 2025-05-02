@@ -15,11 +15,17 @@ web application, that's our preferred approach.
 
 Create a file at `.cursor/mcp.json` and add the following contents.
 
+<!-- tabs-open -->
+
+### Python Proxy
+
+On macos/Linux:
+
 ```json
 {
   "mcpServers": {
     "tidewave": {
-      "command": "mcp-proxy",
+      "command": "/path/to/mcp-proxy",
       "args": [
         "http://localhost:$PORT/tidewave/mcp"
       ]
@@ -28,8 +34,77 @@ Create a file at `.cursor/mcp.json` and add the following contents.
 }
 ```
 
+On Windows:
+
+```json
+{
+  "mcpServers": {
+    "tidewave": {
+      "command": "/path/to/mcp-proxy.exe",
+      "args": [
+        "http://localhost:$PORT/tidewave/mcp"
+      ]
+    }
+  }
+}
+```
+
+Where `$PORT` is the port your web application is running on.
+
+### Elixir Proxy
+
+On macos/Linux:
+
+```json
+{
+  "mcpServers": {
+    "tidewave": {
+      "command": "/path/to/escript",
+      "args": [
+        "/$HOME/.mix/escripts/mcp-proxy",
+        "http://localhost:$PORT/tidewave/mcp"
+      ]
+    }
+  }
+}
+```
+
+On Windows:
+
+```json
+{
+  "mcpServers": {
+    "tidewave": {
+      "command": "/path/to/escript.exe",
+      "args": [
+        "/$HOME/.mix/escripts/mcp-proxy",
+        "http://localhost:$PORT/tidewave/mcp"
+      ]
+    }
+  }
+}
+```
+
+Where you replace `$HOME` by your home folder (shown during installation)
+and `$PORT` by the port your web application is running on.
+
+### Direct Connect
+
+Note: as mentioned above, we do not recommend this approach!
+
+```json
+{
+  "mcpServers": {
+    "tidewave": {
+      "url": "http://localhost:$PORT/tidewave/mcp"
+    }
+  }
+}
+```
+
 Where `$PORT` is the port your web application is running on. If the `mcp-proxy` command
-is not in your path, you might need to specify the full path instead, for example: `/Users/foo/.mix/escripts/mcp-proxy`.
+
+<!-- tabs-close -->
 
 If you prefer, you can also add Tidewave globally to your editor
 by adding the same contents as above to the `~/.cursor/mcp.json`
