@@ -19,7 +19,7 @@ And then at the center top:
 
 2. Choose "HTTP (Server sent events)..."
 
-3. Add the URL your web application is running on with `/tidewave/mcp` at the end, such as `localhost:$PORT/tidewave/mcp`, where `$PORT` is the port it is running on
+3. Add the URL your web application is running on with `/tidewave/mcp` at the end, such as `http://localhost:$PORT/tidewave/mcp`, where `$PORT` is the port it is running on
 
 4. Add a name of your choice
 
