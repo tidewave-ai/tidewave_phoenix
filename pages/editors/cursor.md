@@ -88,7 +88,7 @@ On Windows:
 Where you replace `$HOME` by your home folder (shown during installation)
 and `$PORT` by the port your web application is running on.
 
-### Direct Connect
+### SSE connection
 
 Note: as mentioned above, we do not recommend this approach!
 
