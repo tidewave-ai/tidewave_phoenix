@@ -73,8 +73,8 @@ In particular:
     remember vetting their docs is also important
 
   * When searching documentation, Tidewave by default searches only your
-    project packages. The tool support additional packages to be given,
+    project packages. The tool supports additional packages to be given,
     which you must then confirm before allowing the tool to run
 
   * When searching packages, Tidewave only returns their names and versions,
-    as to avoid any package description from entering the conversation
+    as to avoid any package description from entering the conversation.
