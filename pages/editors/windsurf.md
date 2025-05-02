@@ -76,6 +76,20 @@ On Windows:
 Where you replace `$HOME` by your home folder (shown during installation)
 and `$PORT` by the port your web application is running on.
 
+### Direct Connect
+
+Note, if you restart your phoenix server, you will need to refresh the MCP connection. 
+
+```json
+{
+  "mcpServers": {
+    "tidewave": {
+      "serverUrl": "http://localhost:4000/tidewave/mcp"
+    }
+  }
+}
+```
+
 <!-- tabs-close -->
 
 And you are good to go! Now Windsurf will list all tools from Tidewave
