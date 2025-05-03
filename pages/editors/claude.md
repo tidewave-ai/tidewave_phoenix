@@ -94,7 +94,7 @@ Adding Tidewave to [Claude Code](https://docs.anthropic.com/en/docs/agents-and-t
 is straight-forward, just run:
 
 ```shell
-$ claude mcp add --transport sse tidewave http://localhost:$PORT/tidewave/mcp
+$ claude mcp add --transport sse tidewave http://127.0.0.1:$PORT/tidewave/mcp
 ```
 
 Where `$PORT` is the port your web application is running on. And you are good to go!
