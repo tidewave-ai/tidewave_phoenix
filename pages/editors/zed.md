@@ -38,13 +38,13 @@ Where `$PORT` is the port your web application is running on.
 On macos/Linux:
 
 ```text
-/path/to/escript /$HOME/.mix/escripts/mcp-proxy http://localhost:$PORT/tidewave/mcp
+/path/to/escript $HOME/.mix/escripts/mcp-proxy http://localhost:$PORT/tidewave/mcp
 ```
 
 On Windows:
 
 ```text
-escript.exe /$HOME/.mix/escripts/mcp-proxy http://localhost:$PORT/tidewave/mcp
+escript.exe $HOME/.mix/escripts/mcp-proxy http://localhost:$PORT/tidewave/mcp
 ```
 
 Where you replace `$HOME` by your home folder (shown during installation)

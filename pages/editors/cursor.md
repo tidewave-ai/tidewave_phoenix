@@ -62,7 +62,7 @@ On macos/Linux:
     "tidewave": {
       "command": "/path/to/escript",
       "args": [
-        "/$HOME/.mix/escripts/mcp-proxy",
+        "$HOME/.mix/escripts/mcp-proxy",
         "http://localhost:$PORT/tidewave/mcp"
       ]
     }
@@ -78,7 +78,7 @@ On Windows:
     "tidewave": {
       "command": "/path/to/escript.exe",
       "args": [
-        "/$HOME/.mix/escripts/mcp-proxy",
+        "$HOME/.mix/escripts/mcp-proxy",
         "http://localhost:$PORT/tidewave/mcp"
       ]
     }

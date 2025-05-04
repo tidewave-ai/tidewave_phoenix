@@ -35,7 +35,7 @@ And on Unix, you will need to know the path to the `escript`
 executable by running `which escript`. Then you run it as:
 
 ``` shell
-$ /path/to/escript /$HOME/.mix/escripts/mcp-proxy http://localhost:$PORT/tidewave/mcp
+$ /path/to/escript $HOME/.mix/escripts/mcp-proxy http://localhost:$PORT/tidewave/mcp
 ```
 
 Where you replace `$HOME` by your home folder (shown during installation)
