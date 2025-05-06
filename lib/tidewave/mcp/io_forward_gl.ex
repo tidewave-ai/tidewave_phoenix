@@ -43,12 +43,18 @@ defmodule Tidewave.MCP.IOForwardGL do
   end
 
   def with_forwarded_io(name, fun) do
-    GenServer.call(name, {:add_target, self()})
+    case Process.info(self(), :group_leader) do
+      {:group_leader, group_leader} ->
+        GenServer.call(name, {:add_target, group_leader})
 
-    try do
-      fun.()
-    after
-      GenServer.call(name, {:remove_target, self()})
+        try do
+          fun.()
+        after
+          GenServer.call(name, {:remove_target, group_leader})
+        end
+
+      _ ->
+        fun.()
     end
   end
 
@@ -70,13 +76,7 @@ defmodule Tidewave.MCP.IOForwardGL do
     Enum.each(state.targets, fn target ->
       # forward to all explicitly registered targets, using self()
       # to discard replies
-      case Process.info(target, :group_leader) do
-        {:group_leader, group_leader} ->
-          send(group_leader, {:io_request, self(), reply_as, req})
-
-        _ ->
-          :ok
-      end
+      send(target, {:io_request, self(), reply_as, req})
     end)
 
     {:noreply, state}
