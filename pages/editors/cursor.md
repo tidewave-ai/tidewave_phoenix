@@ -18,7 +18,7 @@ Create a file at `.cursor/mcp.json` and add the following contents.
 
 <!-- tabs-open -->
 
-### Python Proxy
+### Rust Proxy
 
 On macos/Linux:
 
@@ -51,43 +51,6 @@ On Windows:
 ```
 
 Where `$PORT` is the port your web application is running on.
-
-### Elixir Proxy
-
-On macos/Linux:
-
-```json
-{
-  "mcpServers": {
-    "tidewave": {
-      "command": "/path/to/escript",
-      "args": [
-        "$HOME/.mix/escripts/mcp-proxy",
-        "http://localhost:$PORT/tidewave/mcp"
-      ]
-    }
-  }
-}
-```
-
-On Windows:
-
-```json
-{
-  "mcpServers": {
-    "tidewave": {
-      "command": "/path/to/escript.exe",
-      "args": [
-        "$HOME/.mix/escripts/mcp-proxy",
-        "http://localhost:$PORT/tidewave/mcp"
-      ]
-    }
-  }
-}
-```
-
-Where you replace `$HOME` by your home folder (shown during installation)
-and `$PORT` by the port your web application is running on.
 
 ### SSE connection
 

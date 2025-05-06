@@ -5,11 +5,11 @@ install a [`mcp-proxy`](../guides/mcp_proxy.md).
 
 Once you are done, open up your "Windsurf Settings", find the "Cascade" section,
 click "Add Server" and then "Add custom server". A file will open up and you can
-manually add Tidewave, according to your proxy of choice:
+manually add Tidewave:
 
 <!-- tabs-open -->
 
-### Python Proxy
+### Rust Proxy
 
 On macos/Linux:
 
@@ -38,43 +38,6 @@ On Windows:
 ```
 
 Where `$PORT` is the port your web application is running on.
-
-### Elixir Proxy
-
-On macos/Linux:
-
-```json
-{
-  "mcpServers": {
-    "tidewave": {
-      "command": "/path/to/escript",
-      "args": [
-        "$HOME/.mix/escripts/mcp-proxy",
-        "http://localhost:$PORT/tidewave/mcp"
-      ]
-    }
-  }
-}
-```
-
-On Windows:
-
-```json
-{
-  "mcpServers": {
-    "tidewave": {
-      "command": "escript.exe",
-      "args": [
-        "$HOME/.mix/escripts/mcp-proxy",
-        "http://localhost:$PORT/tidewave/mcp"
-      ]
-    }
-  }
-}
-```
-
-Where you replace `$HOME` by your home folder (shown during installation)
-and `$PORT` by the port your web application is running on.
 
 ### SSE connection
 

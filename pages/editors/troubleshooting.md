@@ -3,7 +3,7 @@
 This page contains several steps to help debug issues when integrating Tidewave with an editor or MCP client. There are usually three distinct components to investigate:
 
 * Your web application
-* (optional) The [MCP proxy](../guides/mcp_proxy.md)
+* (optional, but recommended) The [MCP proxy](../guides/mcp_proxy.md)
 * Your editor
 
 ## Your web application
@@ -53,9 +53,8 @@ In case connections to your web application is working fine but your editor/MCP 
 
 If the MCP proxy does not work, here is what you can try to debug it:
 
-  * Can you invoke the proxy directly? For example, what happens if you invoke `path/to/mcp-proxy http://localhost:PORT/tidewave/mcp` in your terminal? Do you see `event: endpoint` as part of the output?
-
-  * Have you tried using one of the alternative proxies?
+  * Can you invoke the proxy directly? For example, what happens if you invoke `echo '{"jsonrpc":"2.0","id":1,"method":"ping"}' | /path/to/mcp-proxy` in your terminal?
+  * Our Rust proxy accepts a `--debug` parameter, which logs helpful debugging information on stderr.
 
 ## Your editor
 
