@@ -33,8 +33,12 @@ defmodule Tidewave.MCP.Tools.Source do
   def get_source_location(args) do
     case args do
       %{"reference" => ref} ->
-        with {:ok, {mod, fun, arity}} <- parse_reference(ref) do
-          find_source_for_mfa(mod, fun, arity)
+        case parse_reference(ref) do
+          {:ok, mod, fun, arity} ->
+            find_source_for_mfa(mod, fun, arity)
+
+          :error ->
+            {:error, "Failed to parse reference: #{inspect(ref)}"}
         end
 
       _ ->
@@ -42,25 +46,39 @@ defmodule Tidewave.MCP.Tools.Source do
     end
   end
 
-  defp parse_reference(ref) do
-    with {:ok, ast} <- Code.string_to_quoted(ref) do
-      case decompose(ast, __ENV__) do
-        {mod, fun, arity} ->
-          {:ok, {mod, fun, arity}}
+  defp parse_reference(string) when is_binary(string) do
+    case Code.string_to_quoted(string) do
+      {:ok, ast} ->
+        parse_reference(ast)
 
-        {mod, fun} ->
-          {:ok, {mod, fun, :*}}
-
-        mod when is_atom(mod) ->
-          {:ok, {mod, nil, :*}}
-
-        :error ->
-          {:error, "Failed to parse reference: #{inspect(ref)}"}
-      end
-    else
-      _ -> {:error, "Failed to parse reference: #{inspect(ref)}"}
+      {:error, _} ->
+        {:error, "Failed to parse reference: #{inspect(string)}"}
     end
   end
+
+  defp parse_reference({:/, _, [call, arity]}) when arity in 0..255,
+    do: parse_call(call, arity)
+
+  defp parse_reference(call),
+    do: parse_call(call, :*)
+
+  defp parse_call({{:., _, [mod, fun]}, _, _}, arity),
+    do: parse_module(mod, fun, arity)
+
+  defp parse_call(mod, :*),
+    do: parse_module(mod, nil, :*)
+
+  defp parse_call(_mod, _arity),
+    do: :error
+
+  defp parse_module(mod, fun, arity) when is_atom(mod),
+    do: {:ok, mod, fun, arity}
+
+  defp parse_module({:__aliases__, _, [head | _] = parts}, fun, arity) when is_atom(head),
+    do: {:ok, Module.concat(parts), fun, arity}
+
+  defp parse_module(_mod, _fun, _arity),
+    do: :error
 
   defp find_source_for_mfa(mod, function, arity) do
     result = open_mfa(mod, function, arity)
@@ -167,33 +185,5 @@ defmodule Tidewave.MCP.Tools.Source do
       |> Enum.split_while(&(&1 not in ["lib", "src"]))
 
     Path.join([lib_or_src | Enum.reverse(in_app)])
-  end
-
-  # IEx.Introspection.decompose
-
-  defp decompose(atom, _context) when is_atom(atom), do: atom
-
-  defp decompose({:__aliases__, _, _} = module, context) do
-    Macro.expand(module, context)
-  end
-
-  defp decompose({:/, _, [call, arity]}, context) do
-    case Macro.decompose_call(call) do
-      {mod, fun, []} ->
-        {Macro.expand(mod, context), fun, arity}
-
-      _ ->
-        :error
-    end
-  end
-
-  defp decompose(call, context) do
-    case Macro.decompose_call(call) do
-      {mod, fun, []} ->
-        {Macro.expand(mod, context), fun}
-
-      _ ->
-        :error
-    end
   end
 end
