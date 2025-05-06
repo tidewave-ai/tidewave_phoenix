@@ -39,21 +39,50 @@ defmodule Tidewave.MCP.IOForwardGL do
   @impl true
   def init({name, previous}) do
     Process.flag(:trap_exit, true)
-    {:ok, %{name: name, previous: previous}}
+    {:ok, %{name: name, previous: previous, targets: []}}
+  end
+
+  def with_forwarded_io(name, fun) do
+    GenServer.call(name, {:add_target, self()})
+
+    try do
+      fun.()
+    after
+      GenServer.call(name, {:remove_target, self()})
+    end
+  end
+
+  @impl true
+  def handle_call({:add_target, target}, _from, state) do
+    {:reply, :ok, %{state | targets: [target | state.targets]}}
+  end
+
+  @impl true
+  def handle_call({:remove_target, target}, _from, state) do
+    {:reply, :ok, %{state | targets: List.delete(state.targets, target)}}
   end
 
   @impl true
   def handle_info({:io_request, from, reply_as, req}, state) do
-    case Process.info(from, :group_leader) do
-      {:group_leader, group_leader} ->
-        # Forward the request to sender's group leader and instruct
-        # it to get back to the sender.
-        send(group_leader, {:io_request, from, reply_as, req})
+    # by default, we just forward to the original target
+    send(state.previous, {:io_request, from, reply_as, req})
 
-      _ ->
-        send(from, {:io_reply, reply_as, {:error, :terminated}})
-    end
+    Enum.each(state.targets, fn target ->
+      # forward to all explicitly registered targets, using self()
+      # to discard replies
+      case Process.info(target, :group_leader) do
+        {:group_leader, group_leader} ->
+          send(group_leader, {:io_request, self(), reply_as, req})
 
+        _ ->
+          send(from, {:io_reply, reply_as, {:error, :terminated}})
+      end
+    end)
+
+    {:noreply, state}
+  end
+
+  def handle_info({:io_reply, _reply_as, _reply}, state) do
     {:noreply, state}
   end
 

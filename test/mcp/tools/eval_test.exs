@@ -75,6 +75,16 @@ defmodule Tidewave.MCP.Tools.EvalTest do
       assert result =~ "Hello!"
       assert result =~ "ArithmeticError"
     end
+
+    test "captures standard_error" do
+      assert {:ok, result, %{}} =
+               Eval.project_eval(
+                 %{"code" => "hello"},
+                 Tidewave.init([])
+               )
+
+      assert result =~ "undefined variable \"hello\""
+    end
   end
 
   describe "shell_eval/1" do

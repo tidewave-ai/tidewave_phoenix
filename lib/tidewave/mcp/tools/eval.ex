@@ -2,7 +2,9 @@ defmodule Tidewave.MCP.Tools.Eval do
   @moduledoc false
 
   @compile {:no_warn_undefined, Phoenix.CodeReloader}
+
   alias Tidewave.MCP
+  alias Tidewave.MCP.IOForwardGL
 
   def tools do
     [
@@ -123,12 +125,14 @@ defmodule Tidewave.MCP.Tools.Eval do
   defp eval_with_captured_io(code, inspect_opts) do
     result =
       capture_io(fn ->
-        try do
-          {result, _bindings} = Code.eval_string(code, [], env())
-          result
-        catch
-          kind, reason -> Exception.format(kind, reason, __STACKTRACE__)
-        end
+        IOForwardGL.with_forwarded_io(:standard_error, fn ->
+          try do
+            {result, _bindings} = Code.eval_string(code, [], env())
+            result
+          catch
+            kind, reason -> Exception.format(kind, reason, __STACKTRACE__)
+          end
+        end)
       end)
 
     case result do
