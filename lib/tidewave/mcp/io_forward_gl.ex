@@ -75,7 +75,7 @@ defmodule Tidewave.MCP.IOForwardGL do
           send(group_leader, {:io_request, self(), reply_as, req})
 
         _ ->
-          send(from, {:io_reply, reply_as, {:error, :terminated}})
+          :ok
       end
     end)
 
