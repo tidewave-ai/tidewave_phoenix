@@ -39,33 +39,30 @@ defmodule Tidewave.MCP.IOForwardGL do
   @impl true
   def init({name, previous}) do
     Process.flag(:trap_exit, true)
-    {:ok, %{name: name, previous: previous, targets: []}}
+    {:ok, %{name: name, previous: previous, targets: %{}}}
   end
 
   def with_forwarded_io(name, fun) do
-    case Process.info(self(), :group_leader) do
-      {:group_leader, group_leader} ->
-        GenServer.call(name, {:add_target, group_leader})
+    group_leader = Process.group_leader()
+    ref = GenServer.call(name, {:add_target, self(), group_leader})
 
-        try do
-          fun.()
-        after
-          GenServer.call(name, {:remove_target, group_leader})
-        end
-
-      _ ->
-        fun.()
+    try do
+      fun.()
+    after
+      GenServer.call(name, {:remove_target, ref, group_leader})
     end
   end
 
   @impl true
-  def handle_call({:add_target, target}, _from, state) do
-    {:reply, :ok, %{state | targets: [target | state.targets]}}
+  def handle_call({:add_target, owner, target}, _from, state) do
+    ref = Process.monitor(owner, tag: {:DOWN, :target, target})
+    {:reply, ref, %{state | targets: add_target(state.targets, target)}}
   end
 
   @impl true
-  def handle_call({:remove_target, target}, _from, state) do
-    {:reply, :ok, %{state | targets: List.delete(state.targets, target)}}
+  def handle_call({:remove_target, ref, target}, _from, state) do
+    Process.demonitor(ref, [:flush])
+    {:reply, :ok, %{state | targets: drop_target(state.targets, target)}}
   end
 
   @impl true
@@ -73,7 +70,7 @@ defmodule Tidewave.MCP.IOForwardGL do
     # by default, we just forward to the original target
     send(state.previous, {:io_request, from, reply_as, req})
 
-    Enum.each(state.targets, fn target ->
+    Enum.each(state.targets, fn {target, _count} ->
       # forward to all explicitly registered targets, using self()
       # to discard replies
       send(target, {:io_request, self(), reply_as, req})
@@ -86,6 +83,10 @@ defmodule Tidewave.MCP.IOForwardGL do
     {:noreply, state}
   end
 
+  def handle_info({{:DOWN, :target, target}, _ref, :process, _pid, _reason}, state) do
+    {:noreply, %{state | targets: drop_target(state.targets, target)}}
+  end
+
   @impl true
   def terminate(_, %{name: name, previous: previous}) do
     if name && previous do
@@ -94,5 +95,16 @@ defmodule Tidewave.MCP.IOForwardGL do
     end
 
     :ok
+  end
+
+  defp add_target(targets, target) do
+    Map.update(targets, target, 1, fn count -> count + 1 end)
+  end
+
+  defp drop_target(targets, target) do
+    case Map.update!(targets, target, fn count -> count - 1 end) do
+      %{^target => 0} -> Map.delete(targets, target)
+      targets -> targets
+    end
   end
 end
