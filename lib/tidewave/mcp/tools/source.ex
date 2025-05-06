@@ -18,15 +18,10 @@ defmodule Tidewave.MCP.Tools.Source do
           type: "object",
           required: ["module"],
           properties: %{
-            module: %{
+            reference: %{
               type: "string",
               description:
-                "The module to get source location for. When this is the single argument passed, the entire module source is returned."
-            },
-            function: %{
-              type: "string",
-              description:
-                "The function to get source location for. When used, a module must also be passed."
+                "The reference to get source location for. Can be a module name, a Module.function or Module.function/arity."
             }
           }
         },
@@ -37,24 +32,9 @@ defmodule Tidewave.MCP.Tools.Source do
 
   def get_source_location(args) do
     case args do
-      %{"module" => module} ->
-        mod = string_to_module(module)
-        function = if function = args["function"], do: String.to_atom(function)
-        arity = :*
-        result = open_mfa(mod, function, arity)
-
-        case result do
-          {_source_file, _module_pair, {fun_file, fun_line}} ->
-            {:ok, "#{fun_file}:#{fun_line}"}
-
-          {_source_file, {module_file, module_line}, nil} ->
-            {:ok, "#{module_file}:#{module_line}"}
-
-          {source_file, nil, nil} ->
-            {:ok, source_file}
-
-          {:error, error} ->
-            {:error, "Failed to get source location: #{inspect(error)}"}
+      %{"reference" => ref} ->
+        with {:ok, {mod, fun, arity}} <- parse_reference(ref) do
+          find_source_for_mfa(mod, fun, arity)
         end
 
       _ ->
@@ -62,10 +42,41 @@ defmodule Tidewave.MCP.Tools.Source do
     end
   end
 
-  defp string_to_module(module) do
-    case module do
-      <<":", erl_module::binary>> -> String.to_existing_atom(erl_module)
-      module -> Module.concat([module])
+  defp parse_reference(ref) do
+    with {:ok, ast} <- Code.string_to_quoted(ref) do
+      case decompose(ast, __ENV__) do
+        {mod, fun, arity} ->
+          {:ok, {mod, fun, arity}}
+
+        {mod, fun} ->
+          {:ok, {mod, fun, :*}}
+
+        mod when is_atom(mod) ->
+          {:ok, {mod, nil, :*}}
+
+        :error ->
+          {:error, "Failed to parse reference: #{inspect(ref)}"}
+      end
+    else
+      _ -> {:error, "Failed to parse reference: #{inspect(ref)}"}
+    end
+  end
+
+  defp find_source_for_mfa(mod, function, arity) do
+    result = open_mfa(mod, function, arity)
+
+    case result do
+      {_source_file, _module_pair, {fun_file, fun_line}} ->
+        {:ok, "#{fun_file}:#{fun_line}"}
+
+      {_source_file, {module_file, module_line}, nil} ->
+        {:ok, "#{module_file}:#{module_line}"}
+
+      {source_file, nil, nil} ->
+        {:ok, source_file}
+
+      {:error, error} ->
+        {:error, "Failed to get source location: #{inspect(error)}"}
     end
   end
 
@@ -156,5 +167,92 @@ defmodule Tidewave.MCP.Tools.Source do
       |> Enum.split_while(&(&1 not in ["lib", "src"]))
 
     Path.join([lib_or_src | Enum.reverse(in_app)])
+  end
+
+  # IEx.Introspection.decompose
+
+  defp decompose(atom, _context) when is_atom(atom), do: atom
+
+  defp decompose({:__aliases__, _, _} = module, context) do
+    Macro.expand(module, context)
+  end
+
+  defp decompose({:/, _, [call, arity]}, context) do
+    case Macro.decompose_call(call) do
+      {_mod, :__info__, []} when arity == 1 ->
+        {Module, :__info__, 1}
+
+      {mod, fun, []} ->
+        {Macro.expand(mod, context), fun, arity}
+
+      {fun, []} ->
+        {find_decompose_fun_arity(fun, arity, context), fun, arity}
+
+      _ ->
+        :error
+    end
+  end
+
+  defp decompose(call, context) do
+    case Macro.decompose_call(call) do
+      {_mod, :__info__, []} ->
+        {Module, :__info__, 1}
+
+      {maybe_sigil, [_, _]} ->
+        case Atom.to_string(maybe_sigil) do
+          "sigil_" <> _ ->
+            {find_decompose_fun_arity(maybe_sigil, 2, context), maybe_sigil, 2}
+
+          _ ->
+            :error
+        end
+
+      {mod, fun, []} ->
+        {Macro.expand(mod, context), fun}
+
+      {fun, []} ->
+        {find_decompose_fun(fun, context), fun}
+
+      _ ->
+        :error
+    end
+  end
+
+  defp find_decompose_fun(fun, context) do
+    find_import(fun, context.functions) || find_import(fun, context.macros) ||
+      find_special_form(fun) || Kernel
+  end
+
+  defp find_decompose_fun_arity(fun, arity, context) do
+    pair = {fun, arity}
+
+    find_import(pair, context.functions) || find_import(pair, context.macros) ||
+      find_special_form(pair) || Kernel
+  end
+
+  defp find_import(pair, context) when is_tuple(pair) do
+    Enum.find_value(context, fn {mod, functions} ->
+      if pair in functions, do: mod
+    end)
+  end
+
+  defp find_import(fun, context) do
+    Enum.find_value(context, fn {mod, functions} ->
+      if Keyword.has_key?(functions, fun), do: mod
+    end)
+  end
+
+  defp find_special_form(pair) when is_tuple(pair) do
+    special_form_function? = pair in Kernel.SpecialForms.__info__(:functions)
+    special_form_macro? = pair in Kernel.SpecialForms.__info__(:macros)
+
+    if special_form_function? or special_form_macro?, do: Kernel.SpecialForms
+  end
+
+  defp find_special_form(fun) do
+    special_form_function? = Keyword.has_key?(Kernel.SpecialForms.__info__(:functions), fun)
+    special_form_macro? = Keyword.has_key?(Kernel.SpecialForms.__info__(:macros), fun)
+
+    if special_form_function? or special_form_macro?, do: Kernel.SpecialForms
   end
 end
