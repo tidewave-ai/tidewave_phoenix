@@ -18,7 +18,7 @@ Create a file at `.cursor/mcp.json` and add the following contents.
 
 <!-- tabs-open -->
 
-### Rust Proxy
+### MCP Proxy
 
 On macos/Linux:
 

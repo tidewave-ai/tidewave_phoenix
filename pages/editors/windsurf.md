@@ -9,7 +9,7 @@ manually add Tidewave:
 
 <!-- tabs-open -->
 
-### Rust Proxy
+### MCP Proxy
 
 On macos/Linux:
 
