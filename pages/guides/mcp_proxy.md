@@ -18,7 +18,7 @@ the executable will also have the `.exe` extension.
 ## Other proxies
 
 There are also other proxies available, for example [an implementation in Python](https://github.com/sparfenyuk/mcp-proxy),
-but it did not handle reconnects last time we tried.
+but it did not handle reconnects last time we tried. The Rust proxy is also simpler to install.
 
-We also provided an [Elixir based proxy](https://github.com/tidewave-ai/mcp_proxy_elixir) in the past, but it is now
-deprecated in favor of the Rust version.
+We also provided an [Elixir based proxy](https://github.com/tidewave-ai/mcp_proxy_elixir) in the past,
+but it is now deprecated as the Rust proxy is simpler to install (as it does not require Elixir).
