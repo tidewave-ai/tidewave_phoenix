@@ -11,7 +11,7 @@ defmodule Tidewave.MCP do
 
   @impl true
   def init(_init_arg) do
-    silence_logs()
+    maybe_silence_logs()
     add_logger_backend()
     MCP.Server.init_tools()
 
@@ -33,14 +33,14 @@ defmodule Tidewave.MCP do
   """
   def root, do: Application.fetch_env!(:tidewave, :root)
 
-  if Mix.env() != :test do
-    defp silence_logs do
+  defp maybe_silence_logs do
+    if Application.get_env(:tidewave, :debug) do
+      :ok
+    else
       Logger.put_module_level(MCP.SSE, :none)
       Logger.put_module_level(MCP.Connection, :none)
       Logger.put_module_level(MCP.Server, :none)
     end
-  else
-    defp silence_logs, do: :ok
   end
 
   defp add_logger_backend() do
