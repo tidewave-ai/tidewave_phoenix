@@ -36,7 +36,8 @@ Here is a baseline comparison of the tools supported by different frameworks/lan
 
 Our MCP servers may also accept `/tidewave/mcp?include_fs_tools=true` option,
 which enables your assistant to run shell commands as well as list, read, write,
-edit, and search files. This is useful for assistants like Claude Desktop:
+edit, and search files. Most editors already provide such tools, and therefore
+you must not enable the Tidewave ones, except for assistants like Claude Desktop:
 
 | Features                   | Tidewave for Phoenix | Tidewave for Rails |
 | :------------------------- | :------------------: | :----------------: |

@@ -18,15 +18,10 @@ defmodule Tidewave.MCP.Tools.Source do
           type: "object",
           required: ["module"],
           properties: %{
-            module: %{
+            reference: %{
               type: "string",
               description:
-                "The module to get source location for. When this is the single argument passed, the entire module source is returned."
-            },
-            function: %{
-              type: "string",
-              description:
-                "The function to get source location for. When used, a module must also be passed."
+                "The reference to get source location for. Can be a module name, a Module.function or Module.function/arity."
             }
           }
         },
@@ -37,24 +32,13 @@ defmodule Tidewave.MCP.Tools.Source do
 
   def get_source_location(args) do
     case args do
-      %{"module" => module} ->
-        mod = string_to_module(module)
-        function = if function = args["function"], do: String.to_atom(function)
-        arity = :*
-        result = open_mfa(mod, function, arity)
+      %{"reference" => ref} ->
+        case parse_reference(ref) do
+          {:ok, mod, fun, arity} ->
+            find_source_for_mfa(mod, fun, arity)
 
-        case result do
-          {_source_file, _module_pair, {fun_file, fun_line}} ->
-            {:ok, "#{fun_file}:#{fun_line}"}
-
-          {_source_file, {module_file, module_line}, nil} ->
-            {:ok, "#{module_file}:#{module_line}"}
-
-          {source_file, nil, nil} ->
-            {:ok, source_file}
-
-          {:error, error} ->
-            {:error, "Failed to get source location: #{inspect(error)}"}
+          :error ->
+            {:error, "Failed to parse reference: #{inspect(ref)}"}
         end
 
       _ ->
@@ -62,10 +46,55 @@ defmodule Tidewave.MCP.Tools.Source do
     end
   end
 
-  defp string_to_module(module) do
-    case module do
-      <<":", erl_module::binary>> -> String.to_existing_atom(erl_module)
-      module -> Module.concat([module])
+  defp parse_reference(string) when is_binary(string) do
+    case Code.string_to_quoted(string) do
+      {:ok, ast} ->
+        parse_reference(ast)
+
+      {:error, _} ->
+        {:error, "Failed to parse reference: #{inspect(string)}"}
+    end
+  end
+
+  defp parse_reference({:/, _, [call, arity]}) when arity in 0..255,
+    do: parse_call(call, arity)
+
+  defp parse_reference(call),
+    do: parse_call(call, :*)
+
+  defp parse_call({{:., _, [mod, fun]}, _, _}, arity),
+    do: parse_module(mod, fun, arity)
+
+  defp parse_call(mod, :*),
+    do: parse_module(mod, nil, :*)
+
+  defp parse_call(_mod, _arity),
+    do: :error
+
+  defp parse_module(mod, fun, arity) when is_atom(mod),
+    do: {:ok, mod, fun, arity}
+
+  defp parse_module({:__aliases__, _, [head | _] = parts}, fun, arity) when is_atom(head),
+    do: {:ok, Module.concat(parts), fun, arity}
+
+  defp parse_module(_mod, _fun, _arity),
+    do: :error
+
+  defp find_source_for_mfa(mod, function, arity) do
+    result = open_mfa(mod, function, arity)
+
+    case result do
+      {_source_file, _module_pair, {fun_file, fun_line}} ->
+        {:ok, "#{fun_file}:#{fun_line}"}
+
+      {_source_file, {module_file, module_line}, nil} ->
+        {:ok, "#{module_file}:#{module_line}"}
+
+      {source_file, nil, nil} ->
+        {:ok, source_file}
+
+      {:error, error} ->
+        {:error, "Failed to get source location: #{inspect(error)}"}
     end
   end
 

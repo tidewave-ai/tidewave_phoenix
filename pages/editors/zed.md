@@ -1,16 +1,16 @@
 # Zed
 
-You can use Tidewave with [Zed](https://zed.dev/).
 
-Zed currently only supports MCP through the IO protocol.
-So the first step is to install a [mcp-proxy](../guides/mcp_proxy.md).
+You can use Tidewave with [Zed](https://zed.dev/). First, you must
+install a [`mcp-proxy`](../guides/mcp_proxy.md).
+
 Once that's done, open up the Assistant tab and click on the `⋯` icon at the
 top right (see image below):
 
 ![Zed AI panel](assets/zed.png)
 
-In the new pane, select "Add Custom Server", to open a new dialog. Fill in
-the name of your choice and the following command:
+In the new pane, select "Add Custom Server" to open a new dialog. Fill in
+the name of your choice and the following command.
 
 On macos/Linux:
 
