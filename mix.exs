@@ -37,6 +37,7 @@ defmodule Tidewave.MixProject do
   defp deps do
     [
       {:plug, "~> 1.17"},
+      {:phoenix_html, "~> 4.0"},
       {:jason, "~> 1.4"},
       {:circular_buffer, "~> 0.4"},
       {:req, "~> 0.5"},
