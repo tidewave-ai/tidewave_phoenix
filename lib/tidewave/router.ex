@@ -6,22 +6,6 @@ defmodule Tidewave.Router do
   import Plug.Conn
   alias Tidewave.MCP
 
-  # We return a basic page that loads script from Tidewave server to
-  # bootstrap the client app. Note that the script name does not
-  # include a hash, since is is very small and its main purpose is
-  # to fetch the latest assets, those include the hash and can be
-  # cached.
-  @tidewave_html """
-  <html>
-    <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <script type="module" src="#{Application.compile_env(:tidewave, :client_url, "https://tidewave.ai")}/tc/tc.js"></script>
-    </head>
-    <body></body>
-  </html>
-  """
-
   plug(:match)
   plug(:check_remote_ip)
   plug(:check_origin)
@@ -30,7 +14,7 @@ defmodule Tidewave.Router do
   get "/" do
     conn
     |> put_resp_content_type("text/html")
-    |> send_resp(200, @tidewave_html)
+    |> send_resp(200, tidewave_html())
     |> halt()
   end
 
@@ -129,5 +113,41 @@ defmodule Tidewave.Router do
             plug Tidewave, allowed_origins: ["http://localhost:4000"]
         """
     end
+  end
+
+  defp tidewave_html() do
+    client_url = Application.get_env(:tidewave, :client_url, "https://tidewave.ai")
+
+    credentials = Application.get_env(:tidewave, :credentials, [])
+    credentials = Keyword.merge(default_credentials(), credentials)
+
+    config = %{credentials: Map.new(credentials)}
+
+    # We return a basic page that loads script from Tidewave server to
+    # bootstrap the client app. Note that the script name does not
+    # include a hash, since is is very small and its main purpose is
+    # to fetch the latest assets, those include the hash and can be
+    # cached.
+    """
+    <html>
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="tidewave:config" content="#{config |> Jason.encode!() |> Plug.HTML.html_escape()}" />
+        <script type="module" src="#{client_url}/tc/tc.js"></script>
+      </head>
+      <body></body>
+    </html>
+    """
+  end
+
+  defp default_credentials() do
+    credentials = [
+      anthropic: System.get_env("ANTHROPIC_API_KEY"),
+      openai: System.get_env("OPENAI_API_KEY"),
+      google: System.get_env("GOOGLE_AI_API_KEY")
+    ]
+
+    Enum.filter(credentials, fn {_key, value} -> value end)
   end
 end
