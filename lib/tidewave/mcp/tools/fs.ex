@@ -33,8 +33,6 @@ defmodule Tidewave.MCP.Tools.FS do
         Supports an optional line_offset and count. To read the full file, only the path needs to be passed.
 
         This only works for files that are relative to the project root: #{MCP.root()}.
-
-        To read any other files, use shell tools like `cat` or `grep` instead.
         """,
         inputSchema: %{
           type: "object",
