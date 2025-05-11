@@ -40,7 +40,7 @@ defmodule Tidewave.MCP.Tools.Hex do
         Searches for packages on Hex.
 
         Use this tool if you need to find new packages to add to the project. Before using this tool,
-        get an overview of the existing dependencies by using the `project_eval` tool and executing `Mix.Project.deps_apps()`.
+        get an overview of the existing dependencies by using the `get_package_location` tool to find existing dependencies.
 
         By default, the packages are sorted by popularity (number of downloads).
         """,
