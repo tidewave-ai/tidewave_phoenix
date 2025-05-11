@@ -102,7 +102,7 @@ defmodule Tidewave.MCP.Connection do
   def handle_cast({:send_sse_message, message}, state) do
     case handle_sse_message(state.conn, state.session_id, message) do
       {:ok, conn} -> {:noreply, %{state | conn: conn}}
-      {:error, :closed} -> {:stop, {:shutdown, :closed}, state}
+      {:error, reason} -> {:stop, {:shutdown, reason}, state}
     end
   end
 
@@ -228,8 +228,8 @@ defmodule Tidewave.MCP.Connection do
         schedule_next_ping(state.assigns)
         {:noreply, state}
 
-      {:error, :closed} ->
-        {:stop, {:shutdown, :closed}, state}
+      {:error, reason} ->
+        {:stop, {:shutdown, reason}, state}
     end
   end
 
@@ -263,7 +263,7 @@ defmodule Tidewave.MCP.Connection do
 
     case chunk(conn, "event: close\ndata: #{reason}\n\n") do
       {:ok, conn} -> halt(conn)
-      {:error, :closed} -> halt(conn)
+      {:error, _reason} -> halt(conn)
     end
   end
 
@@ -273,7 +273,7 @@ defmodule Tidewave.MCP.Connection do
 
     case chunk(conn, sse_message) do
       {:ok, conn} -> {:ok, conn}
-      {:error, :closed} -> {:error, :closed}
+      {:error, reason} -> {:error, reason}
     end
   end
 
@@ -292,7 +292,7 @@ defmodule Tidewave.MCP.Connection do
            "\n\n"
          ]) do
       {:ok, conn} -> {:ok, %{state | conn: conn}}
-      {:error, :closed} -> {:error, :closed}
+      {:error, reason} -> {:error, reason}
     end
   end
 end

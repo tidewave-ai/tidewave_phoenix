@@ -175,7 +175,7 @@ defmodule Tidewave.MCP.SSE do
 
     case chunk(conn, "event: endpoint\ndata: #{endpoint}\n\n") do
       {:ok, conn} -> conn
-      {:error, :closed} -> conn
+      {:error, _reason} -> conn
     end
   end
 
