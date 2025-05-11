@@ -32,7 +32,7 @@ defmodule Tidewave.MCP.Tools.Source do
       %{
         name: "get_package_location",
         description: """
-        Returns the location of the given dependency package.
+        Returns the location of dependency packages.
 
         You can use this tool to get the location of any project dependency. Optionally,
         a specific dependency name can be provided to only return the location of that dependency.
