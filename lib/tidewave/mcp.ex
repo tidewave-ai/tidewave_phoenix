@@ -13,11 +13,12 @@ defmodule Tidewave.MCP do
   def init(_init_arg) do
     maybe_silence_logs()
     add_logger_backend()
-    MCP.Server.init_tools()
 
     if Application.get_env(:tidewave, :root) == nil do
       Application.put_env(:tidewave, :root, File.cwd!())
     end
+
+    MCP.Server.init_tools()
 
     children = [
       {Registry, name: MCP.Registry, keys: :unique},

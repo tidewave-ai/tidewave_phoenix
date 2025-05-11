@@ -39,6 +39,9 @@ defmodule Tidewave.MCP.Tools.Source do
 
         Use the result in combination with shell tools like grep to look for specific
         code inside dependencies.
+
+        Do NOT use `list_project_files` to inspect dependencies. It will NOT return files from dependencies,
+        but only files from the current project itself.
         """,
         inputSchema: %{
           type: "object",
