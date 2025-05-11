@@ -1,6 +1,8 @@
 defmodule Tidewave.MCP.Tools.Source do
   @moduledoc false
 
+  alias Tidewave.MCP
+
   def tools do
     [
       %{
@@ -26,6 +28,30 @@ defmodule Tidewave.MCP.Tools.Source do
           }
         },
         callback: &get_source_location/1
+      },
+      %{
+        name: "get_package_location",
+        description: """
+        Returns the location of the given dependency package.
+
+        You can use this tool to get the location of any project dependency. Optionally,
+        a specific dependency name can be provided to only return the location of that dependency.
+
+        Use the result in combination with shell tools like grep to look for specific
+        code inside dependencies.
+        """,
+        inputSchema: %{
+          type: "object",
+          required: [],
+          properties: %{
+            package: %{
+              type: "string",
+              description:
+                "The name of the package to get the location of. If not provided, the location of all packages will be returned."
+            }
+          }
+        },
+        callback: &get_package_location/1
       }
     ]
   end
@@ -43,6 +69,33 @@ defmodule Tidewave.MCP.Tools.Source do
 
       _ ->
         {:error, :invalid_arguments}
+    end
+  end
+
+  def get_package_location(args) do
+    # when no package is provided, we only return top-level dependencies,
+    # but if a specific package is requested, we check all dependencies
+    deps =
+      Mix.Project.deps_paths(depth: 1)
+      |> Map.new(fn {package, path} -> {to_string(package), path} end)
+
+    all_deps =
+      Mix.Project.deps_paths()
+      |> Map.new(fn {package, path} -> {to_string(package), path} end)
+
+    case args do
+      %{"package" => package} when is_map_key(all_deps, package) ->
+        {:ok, all_deps[package]}
+
+      %{"package" => package} ->
+        {:error,
+         "Package #{package} not found. The overall dependency path is #{Mix.Project.deps_path()}."}
+
+      _ ->
+        {:ok,
+         Enum.map_join(deps, "\n", fn {package, path} ->
+           "#{package}: #{Path.relative_to(path, MCP.root())}"
+         end)}
     end
   end
 
