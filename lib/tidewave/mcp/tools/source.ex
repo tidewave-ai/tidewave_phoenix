@@ -37,11 +37,10 @@ defmodule Tidewave.MCP.Tools.Source do
         You can use this tool to get the location of any project dependency. Optionally,
         a specific dependency name can be provided to only return the location of that dependency.
 
-        Use the result in combination with shell tools like grep to look for specific
-        code inside dependencies.
-
-        Do NOT use `list_project_files` to inspect dependencies. It will NOT return files from dependencies,
-        but only files from the current project itself.
+        Packages that are placed with the current project will return
+        a relative path and can be read as part of the project files.
+        Dependencies with an absolute path must be read with care
+        through shell commands.
         """,
         inputSchema: %{
           type: "object",
@@ -88,7 +87,7 @@ defmodule Tidewave.MCP.Tools.Source do
 
     case args do
       %{"package" => package} when is_map_key(all_deps, package) ->
-        {:ok, all_deps[package]}
+        {:ok, Path.relative_to(all_deps[package], MCP.root())}
 
       %{"package" => package} ->
         {:error,

@@ -13,9 +13,6 @@ defmodule Tidewave.MCP.Tools.FS do
         name: "list_project_files",
         description: """
         Returns a list of all files in the project that are not ignored by .gitignore.
-
-        Note that this does NOT include dependencies. To inspect dependencies, use `get_package_location` in combination
-        with shell commands like `cat` or `grep`.
         """,
         inputSchema: %{
           type: "object",
@@ -32,7 +29,7 @@ defmodule Tidewave.MCP.Tools.FS do
 
         Supports an optional line_offset and count. To read the full file, only the path needs to be passed.
 
-        This only works for files that are relative to the project root: #{MCP.root()}.
+        For security reasons, this tool only works for files that are relative to the project root: #{MCP.root()}.
         """,
         inputSchema: %{
           type: "object",
@@ -208,7 +205,8 @@ defmodule Tidewave.MCP.Tools.FS do
 
       :error ->
         {:error,
-         "The path is invalid or not relative to the project root. Try to use shell tools like cat, grep, etc. instead."}
+         "The path is invalid or not relative to the project root. " <>
+           "Files outside the root cannot be read for security reasons."}
     end
   end
 
