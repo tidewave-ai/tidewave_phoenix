@@ -11,7 +11,6 @@ defmodule Tidewave.MCP.Tools.FSTest do
       assert Enum.any?(tools, &(&1.name == "list_project_files"))
       assert Enum.any?(tools, &(&1.name == "read_project_file"))
       assert Enum.any?(tools, &(&1.name == "write_project_file"))
-      assert Enum.any?(tools, &(&1.name == "glob_project_files"))
 
       # grep tool might be available depending on the system
       has_grep = System.find_executable("rg") != nil || System.find_executable("grep") != nil

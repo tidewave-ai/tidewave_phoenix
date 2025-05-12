@@ -3,8 +3,8 @@ defmodule Tidewave.MCP.GitLS do
 
   alias Tidewave.MCP
 
-  def list_files do
-    execute_git(&list_files/1)
+  def list_files(glob_pattern \\ nil, no_gitignore \\ false) do
+    execute_git(fn git_dir -> list_files(git_dir, glob_pattern, no_gitignore) end)
   end
 
   def detect_line_endings do
@@ -32,9 +32,11 @@ defmodule Tidewave.MCP.GitLS do
     end
   end
 
-  defp list_files(git_dir) do
+  defp list_files(git_dir, glob_pattern, no_gitignore) do
     args = if git_dir, do: ["--git-dir", git_dir], else: []
-    args = args ++ ["ls-files", "--cached", "--others", "--exclude-standard"]
+    args = args ++ ["ls-files", "--cached", "--others"]
+    args = if !no_gitignore, do: args ++ ["--exclude-standard"], else: args
+    args = if glob_pattern, do: args ++ [glob_pattern], else: args
 
     with {result, 0} <- System.cmd("git", args, cd: MCP.root()) do
       {:ok, String.split(result, "\n", trim: true)}

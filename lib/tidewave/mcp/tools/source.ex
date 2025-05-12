@@ -1,6 +1,8 @@
 defmodule Tidewave.MCP.Tools.Source do
   @moduledoc false
 
+  alias Tidewave.MCP
+
   def tools do
     [
       %{
@@ -88,7 +90,7 @@ defmodule Tidewave.MCP.Tools.Source do
         {:ok, "#{fun_file}:#{fun_line}"}
 
       {_source_file, {module_file, module_line}, nil} ->
-        {:ok, "#{module_file}:#{module_line}"}
+        {:ok, "#{Path.relative_to(module_file, MCP.root())}:#{module_line}"}
 
       {source_file, nil, nil} ->
         {:ok, source_file}

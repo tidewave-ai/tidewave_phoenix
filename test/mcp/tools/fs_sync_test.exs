@@ -90,7 +90,7 @@ defmodule Tidewave.MCP.Tools.FSSyncTest do
     end
   end
 
-  describe "glob/1" do
+  describe "list_project_files/1 with glob pattern" do
     @describetag :tmp_dir
 
     setup %{tmp_dir: tmp_dir} do
@@ -109,18 +109,30 @@ defmodule Tidewave.MCP.Tools.FSSyncTest do
     end
 
     test "finds files matching pattern" do
-      assert {:ok, text} = FS.glob_project_files(%{"pattern" => "*.txt"})
+      assert {:ok, text} = FS.list_project_files(%{"glob_pattern" => "*.txt"})
 
       assert text =~ "file1.txt"
       refute text =~ "file2.md"
     end
 
     test "finds files with wildcard pattern" do
-      assert {:ok, text} = FS.glob_project_files(%{"pattern" => "**/*.ex"})
+      assert {:ok, text} = FS.list_project_files(%{"glob_pattern" => "*.ex"})
 
       assert text =~ "file3.ex"
       assert text =~ "file4.ex"
       refute text =~ "file1.txt"
+    end
+
+    test "respects .gitignore, but can ignore if necessary" do
+      File.write!(".gitignore", "*.txt")
+      assert {:error, text} = FS.list_project_files(%{"glob_pattern" => "*.txt"})
+      assert text =~ "No files found"
+      assert text =~ "try again with no_gitignore"
+
+      assert {:ok, text} =
+               FS.list_project_files(%{"glob_pattern" => "*.txt", "no_gitignore" => true})
+
+      assert text =~ "file1.txt"
     end
   end
 end
