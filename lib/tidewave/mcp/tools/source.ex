@@ -87,13 +87,13 @@ defmodule Tidewave.MCP.Tools.Source do
 
     case result do
       {_source_file, _module_pair, {fun_file, fun_line}} ->
-        {:ok, "#{fun_file}:#{fun_line}"}
+        {:ok, "#{Path.relative_to(fun_file, MCP.root())}:#{fun_line}"}
 
       {_source_file, {module_file, module_line}, nil} ->
         {:ok, "#{Path.relative_to(module_file, MCP.root())}:#{module_line}"}
 
       {source_file, nil, nil} ->
-        {:ok, source_file}
+        {:ok, Path.relative_to(source_file, MCP.root())}
 
       {:error, error} ->
         {:error, "Failed to get source location: #{inspect(error)}"}
