@@ -48,10 +48,11 @@ defmodule Tidewave.MCP.Tools.FSTest do
     end
 
     test "successfully reads an existing file", %{path: path, content: content} do
-      assert {:ok, ^content, new_state} =
+      assert {:ok, ^content, new_state, metadata} =
                FS.read_project_file(%{"path" => path}, %{})
 
       assert %{read_timestamps: %{^path => _}} = new_state
+      assert %{mtime: _} = metadata
     end
 
     test "returns error for non-existent file" do
@@ -75,7 +76,7 @@ defmodule Tidewave.MCP.Tools.FSTest do
 
       on_exit(fn -> File.rm(file_path) end)
 
-      assert {:ok, truncated_content, _} =
+      assert {:ok, truncated_content, _state, _metadata} =
                FS.read_project_file(%{"path" => file_path}, %{})
 
       assert truncated_content =~ "a [100 characters truncated] ..."
@@ -89,7 +90,7 @@ defmodule Tidewave.MCP.Tools.FSTest do
 
       on_exit(fn -> File.rm(file_path) end)
 
-      assert {:ok, read_content, _} =
+      assert {:ok, read_content, _state, _metadata} =
                FS.read_project_file(%{"path" => file_path, "raw" => true}, %{})
 
       refute read_content =~ "a [100 characters truncated] ..."
@@ -102,16 +103,17 @@ defmodule Tidewave.MCP.Tools.FSTest do
       content = Enum.map_join(1..1000, "\n", &to_string/1) <> "\nmore content\n"
       File.write!(file_path, content)
 
-      assert {:ok, "1\n2\n3\n4\n5\n6", _state} =
+      assert {:ok, "1\n2\n3\n4\n5\n6", _state, _metadata} =
                FS.read_project_file(%{"path" => file_path, "count" => 6}, %{})
 
-      assert {:ok, "501\n502\n503\n504\n505", _state} =
+      assert {:ok, "501\n502\n503\n504\n505", _state, _metadata} =
                FS.read_project_file(
                  %{"path" => file_path, "line_offset" => 500, "count" => 5},
                  %{}
                )
 
-      assert {:ok, "991\n992\n993\n994\n995\n996\n997\n998\n999\n1000\nmore content\n", _state} =
+      assert {:ok, "991\n992\n993\n994\n995\n996\n997\n998\n999\n1000\nmore content\n", _state,
+              _metadata} =
                FS.read_project_file(%{"path" => file_path, "line_offset" => 990}, %{})
     end
   end
@@ -130,7 +132,7 @@ defmodule Tidewave.MCP.Tools.FSTest do
     end
 
     test "successfully writes to a file", %{path: path, content: content} do
-      assert {:ok, "Success!", %{read_timestamps: %{^path => _}}} =
+      assert {:ok, "Success!", %{read_timestamps: %{^path => _}}, %{mtime: _}} =
                FS.write_project_file(%{"path" => path, "content" => content}, %{})
 
       assert File.read!(path) == content
@@ -142,10 +144,24 @@ defmodule Tidewave.MCP.Tools.FSTest do
       assert {:error, message} =
                FS.write_project_file(
                  %{"path" => path, "content" => content},
-                 %{read_timestamps: %{path => {{2025, 01, 01}, {0, 0, 0}}}}
+                 %{read_timestamps: %{path => 0}}
                )
 
       assert message =~ "File has been modified since last read"
+    end
+
+    test "prefers given atime", %{path: path, content: content} do
+      File.write!(path, "Modified content")
+      stat = File.stat!(path, time: :posix)
+
+      assert {:ok, "Success!", %{read_timestamps: %{^path => _}}, %{mtime: new_mtime}} =
+               FS.write_project_file(
+                 %{"path" => path, "content" => content, "atime" => stat.mtime},
+                 %{}
+               )
+
+      stat = File.stat!(path, time: :posix)
+      assert new_mtime == stat.mtime
     end
 
     test "fails when file was not read yet", %{path: path, content: content} do
@@ -169,7 +185,7 @@ defmodule Tidewave.MCP.Tools.FSTest do
 
       path = Path.relative_to_cwd(file_path)
 
-      assert {:ok, _result, %{read_timestamps: %{^path => _}}} =
+      assert {:ok, _result, %{read_timestamps: %{^path => _}}, _metadata} =
                FS.write_project_file(%{"path" => file_path, "content" => content}, %{})
 
       assert File.exists?(file_path)
@@ -197,7 +213,7 @@ defmodule Tidewave.MCP.Tools.FSTest do
       end
       """
 
-      assert {:ok, "Success!", %{read_timestamps: %{^file_path => _}}} =
+      assert {:ok, "Success!", %{read_timestamps: %{^file_path => _}}, %{mtime: _}} =
                FS.write_project_file(%{"path" => file_path, "content" => content}, %{})
 
       assert File.read!(file_path) == """
@@ -228,7 +244,7 @@ defmodule Tidewave.MCP.Tools.FSTest do
       end
       """
 
-      assert {:ok, "Success!", %{read_timestamps: %{^file_path => _}}} =
+      assert {:ok, "Success!", %{read_timestamps: %{^file_path => _}}, %{mtime: _}} =
                FS.write_project_file(%{"path" => file_path, "content" => content}, %{
                  autoformat: false
                })
@@ -239,7 +255,7 @@ defmodule Tidewave.MCP.Tools.FSTest do
     test "writes with crlf line endings if default line endings are crlf", %{path: path} do
       content = "Hello\nWorld"
 
-      assert {:ok, "Success!", %{read_timestamps: %{^path => _}}} =
+      assert {:ok, "Success!", %{read_timestamps: %{^path => _}}, %{mtime: _}} =
                FS.write_project_file(%{"path" => path, "content" => content}, %{
                  default_line_endings: :crlf
                })
@@ -253,7 +269,8 @@ defmodule Tidewave.MCP.Tools.FSTest do
       content = "Hello\nWorld"
 
       # this repo uses LF
-      assert {:ok, "Success!", %{read_timestamps: %{^path => _}, default_line_endings: :lf}} =
+      assert {:ok, "Success!", %{read_timestamps: %{^path => _}, default_line_endings: :lf},
+              _metadata} =
                FS.write_project_file(%{"path" => path, "content" => content}, %{})
 
       assert File.read!(path) == content
@@ -291,7 +308,7 @@ defmodule Tidewave.MCP.Tools.FSTest do
         end
       """
 
-      assert {:ok, "Success!", %{read_timestamps: %{^path => _}}} =
+      assert {:ok, "Success!", %{read_timestamps: %{^path => _}}, %{mtime: _}} =
                FS.edit_project_file(
                  %{"path" => path, "old_string" => old_string, "new_string" => new_string},
                  %{read_timestamps: %{path => File.stat!(path).mtime}}
@@ -306,10 +323,29 @@ defmodule Tidewave.MCP.Tools.FSTest do
       assert {:error, message} =
                FS.edit_project_file(
                  %{"path" => path, "old_string" => "foo", "new_string" => "bar"},
-                 %{read_timestamps: %{path => {{2025, 01, 01}, {0, 0, 0}}}}
+                 %{read_timestamps: %{path => 0}}
                )
 
       assert message =~ "File has been modified since last read"
+    end
+
+    test "prefers given atime", %{path: path} do
+      File.write!(path, "Modified content")
+      stat = File.stat!(path, time: :posix)
+
+      assert {:ok, "Success!", %{read_timestamps: %{^path => _}}, %{mtime: new_mtime}} =
+               FS.edit_project_file(
+                 %{
+                   "path" => path,
+                   "old_string" => "Modified",
+                   "new_string" => "New",
+                   "atime" => stat.mtime
+                 },
+                 %{read_timestamps: %{}}
+               )
+
+      stat = File.stat!(path, time: :posix)
+      assert new_mtime == stat.mtime
     end
 
     test "fails when patch cannot be applied", %{path: path} do

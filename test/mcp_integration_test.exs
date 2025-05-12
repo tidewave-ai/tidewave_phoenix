@@ -115,6 +115,49 @@ defmodule Tidewave.MCPIntegrationTest do
     assert "Hello, world! again" = File.read!("test.txt")
   end
 
+  test "fs tools return mtime as metadata", %{request: request} do
+    assert %{resp: resp, endpoint_url: endpoint_url} = request
+
+    on_exit(fn ->
+      File.rm("test.txt")
+    end)
+
+    File.write!("test.txt", "Hello, world!")
+
+    write_id = System.unique_integer([:positive])
+
+    send_message(endpoint_url, %{
+      "jsonrpc" => "2.0",
+      "id" => write_id,
+      "method" => "tools/call",
+      "params" => %{
+        "name" => "write_project_file",
+        "arguments" => %{
+          "path" => "test.txt",
+          "content" => "Hello, world! again",
+          "atime" => File.stat!("test.txt", time: :posix).mtime
+        }
+      }
+    })
+
+    assert %{
+             data: %{
+               "id" => ^write_id,
+               "result" => %{
+                 "content" => [
+                   %{"text" => "Success!", "type" => "text"}
+                 ],
+                 "_meta" => %{
+                   "mtime" => mtime
+                 }
+               }
+             }
+           } = receive_sse_message(resp)
+
+    assert "Hello, world! again" = File.read!("test.txt")
+    assert mtime == File.stat!("test.txt", time: :posix).mtime
+  end
+
   test "stores logs but ignores logs from MCP itself", %{request: request} do
     assert %{resp: resp, endpoint_url: endpoint_url, tools: tools} = request
 

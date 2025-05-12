@@ -185,6 +185,9 @@ defmodule Tidewave.MCP.Connection do
         {:ok, result, new_assigns} ->
           {:reply, {:ok, result}, %{state | assigns: new_assigns}}
 
+        {:ok, result, new_assigns, metadata} ->
+          {:reply, {:ok, result, metadata}, %{state | assigns: new_assigns}}
+
         {:error, reason, new_assigns} ->
           {:reply, {:error, reason}, %{state | assigns: new_assigns}}
 

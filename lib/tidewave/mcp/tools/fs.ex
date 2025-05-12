@@ -69,7 +69,7 @@ defmodule Tidewave.MCP.Tools.FS do
         description: """
         Writes a file to the file system. If the file already exists, it will be overwritten.
 
-        Note that this tool will fail if the file wasn't previously read with the `read_project_file` tool.
+        Before writing to a file, ensure it was read using the `read_project_file` tool.
         """,
         inputSchema: %{
           type: "object",
@@ -192,7 +192,7 @@ defmodule Tidewave.MCP.Tools.FS do
         count = Map.get(args, "count")
 
         with {:ok, content} <- get_file_content(path, line_offset, count, !args["raw"]) do
-          stat = File.stat!(path)
+          stat = File.stat!(path, time: :posix)
 
           assigns =
             Map.update(
@@ -202,7 +202,7 @@ defmodule Tidewave.MCP.Tools.FS do
               &Map.put(&1, path, stat.mtime)
             )
 
-          {:ok, content, assigns}
+          {:ok, content, assigns, %{mtime: stat.mtime}}
         end
 
       _ ->
@@ -223,7 +223,7 @@ defmodule Tidewave.MCP.Tools.FS do
   end
 
   defp check_stale(path, read_timestamps, allow_not_found \\ false) do
-    case File.stat(path) do
+    case File.stat(path, time: :posix) do
       {:error, :enoent} ->
         if allow_not_found, do: :ok, else: {:error, "File does not exist"}
 
@@ -246,7 +246,7 @@ defmodule Tidewave.MCP.Tools.FS do
   def write_project_file(args, assigns) do
     case args do
       %{"path" => path, "content" => content} ->
-        read_timestamps = Map.get(assigns, :read_timestamps, %{})
+        read_timestamps = timestamps_from_args_or_assigns(args, assigns)
 
         with {:ok, path} <- safe_path(path),
              :ok <- check_stale(path, read_timestamps, true) do
@@ -264,7 +264,7 @@ defmodule Tidewave.MCP.Tools.FS do
       ) do
     case args do
       %{"path" => path, "old_string" => old_string, "new_string" => new_string} ->
-        read_timestamps = Map.get(assigns, :read_timestamps, %{})
+        read_timestamps = timestamps_from_args_or_assigns(args, assigns)
 
         with {:ok, path} <- safe_path(path),
              :ok <- check_stale(path, read_timestamps),
@@ -276,6 +276,18 @@ defmodule Tidewave.MCP.Tools.FS do
 
       _ ->
         {:error, :invalid_arguments}
+    end
+  end
+
+  defp timestamps_from_args_or_assigns(args, assigns) do
+    read_timestamps = Map.get(assigns, :read_timestamps, %{})
+
+    case args do
+      %{"atime" => posix} when is_integer(posix) ->
+        Map.put(read_timestamps, args["path"], posix)
+
+      _ ->
+        read_timestamps
     end
   end
 
@@ -307,7 +319,7 @@ defmodule Tidewave.MCP.Tools.FS do
     try do
       content = maybe_autoformat(assigns, path, content)
       File.write!(path, content)
-      stat = File.stat!(path)
+      stat = File.stat!(path, time: :posix)
 
       assigns =
         Map.update(
@@ -317,7 +329,7 @@ defmodule Tidewave.MCP.Tools.FS do
           &Map.put(&1, path, stat.mtime)
         )
 
-      {:ok, "Success!", assigns}
+      {:ok, "Success!", assigns, %{mtime: stat.mtime}}
     rescue
       e -> {:error, "Failed to format file: #{Exception.format(:error, e, __STACKTRACE__)}"}
     end

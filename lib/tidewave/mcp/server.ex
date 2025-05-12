@@ -59,6 +59,8 @@ defmodule Tidewave.MCP.Server do
   #
   #   * `{:ok, result}` if the callback does not receive state
   #   * `{:ok, result, new_state}` if the callback receives state (i.e. if it is of arity 2)
+  #   * `{:ok, result, metadata}` if the callback is of arity 1 and returns metadata (returned as `_meta`)
+  #   * `{:ok, result, new_state, metadata}` if the callback is of arity 2 and returns metadata (returned as `_meta`)
   #   * `{:error, reason}` for any error
   #   * `{:error, reason, new_state}` for any error that should also update the state
   #
@@ -127,6 +129,11 @@ defmodule Tidewave.MCP.Server do
   def handle_call_tool(request_id, %{"name" => name} = params, state_pid) do
     args = Map.get(params, "arguments", %{})
     result_or_error(request_id, dispatch(name, args, state_pid))
+  end
+
+  defp result_or_error(request_id, {:ok, text, metadata})
+       when is_binary(text) and is_map(metadata) do
+    result_or_error(request_id, {:ok, %{content: [%{type: "text", text: text}], _meta: metadata}})
   end
 
   defp result_or_error(request_id, {:ok, text}) when is_binary(text) do
