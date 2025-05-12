@@ -18,19 +18,15 @@ defmodule Tidewave.MCP.Tools.FS do
         are not ignored by .gitignore.
 
         Optionally, a glob_pattern can be passed to filter this list. When a pattern is passed,
-        the gitignore check can be skipped.
+        the gitignore check will be skipped.
         """,
         inputSchema: %{
           type: "object",
           properties: %{
             glob_pattern: %{
               type: "string",
-              description: "Optional: a glob pattern to filter the listed files."
-            },
-            no_gitignore: %{
-              type: "boolean",
               description:
-                "Optional: whether to ignore .gitignore. Defaults to false. Can only be used in combination with glob_pattern."
+                "Optional: a glob pattern to filter the listed files. If a pattern is passed, the .gitignore check will be skipped."
             }
           },
           required: []
@@ -168,23 +164,16 @@ defmodule Tidewave.MCP.Tools.FS do
   def list_project_files(args) do
     case args do
       %{"glob_pattern" => glob_pattern} ->
-        git_ls_files(glob_pattern, Map.get(args, "no_gitignore", false))
-
-      %{"no_gitignore" => _} ->
-        {:error, "no_gitignore can only be used in combination with glob_pattern"}
+        git_ls_files(glob_pattern)
 
       _ ->
-        git_ls_files(nil, false)
+        git_ls_files(nil)
     end
   end
 
-  defp git_ls_files(glob_pattern, no_gitignore) do
-    with {:ok, files} <- GitLS.list_files(glob_pattern, no_gitignore) do
+  defp git_ls_files(glob_pattern) do
+    with {:ok, files} <- GitLS.list_files(glob_pattern) do
       case files do
-        [] when not no_gitignore ->
-          {:error,
-           "No files found. It could be that all files are ignored. You can try again with no_gitignore."}
-
         [] ->
           {:ok, "No files found."}
 
