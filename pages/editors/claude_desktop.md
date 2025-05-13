@@ -1,8 +1,4 @@
-# Claude
-
-You can use Tidewave with Claude Desktop and Claude Code.
-
-## Claude Desktop
+# Claude Desktop
 
 To use Tidewave with Claude Desktop, you must first install
 a [`mcp-proxy`](../guides/mcp_proxy.md).
@@ -45,20 +41,3 @@ as Claude Desktop does not support any filesystem operation out of the box.
 If your application uses a SQL database, you can verify it all works
 by asking it to run `SELECT 1` as database query. If it fails,
 check out [our Troubleshooting guide](troubleshooting.md).
-
-## Claude Code
-
-Adding Tidewave to [Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview)
-is straight-forward, just run:
-
-```shell
-$ claude mcp add --transport sse tidewave http://localhost:$PORT/tidewave/mcp
-```
-
-To use it with [the `mcp-proxy`](guides/mcp_proxy.md), run:
-
-```shell
-$ claude mcp add --transport stdio tidewave /path/to/mcp-proxy http://localhost:$PORT/tidewave/mcp
-```
-
-Where `$PORT` is the port your web application is running on. And you are good to go!
