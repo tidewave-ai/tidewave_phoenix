@@ -428,31 +428,32 @@ defmodule Tidewave.MCP.Tools.Source do
   end
 
   defp alias_aware_distance(search, candidate) do
-    # prefer matches that could be an alias, e.g. a user querying for the User module,
-    # and we find MyApp.Accounts.User
-    parts = String.split(inspect(search), ".") |> Enum.count()
+    search = inspect(search)
+    candidate = inspect(candidate)
+    search_parts = String.split(search, ".")
+    search_parts_count = Enum.count(search_parts)
+    candidate_parts = String.split(candidate, ".")
+    candidate_parts_count = Enum.count(candidate_parts)
 
-    # TODO: we should prefer matches with the exact length if they exist
-    # to prevent
-    # iex> Tidewave.MCP.Tools.Source.get_source_location(%{"reference" => "Plug.Con"})
-    # candidates #=> [
-    #   {0.9629629629629629, Inspect.Plug.Conn},
-    #   {0.9629629629629629, Plug.Conn},
-    #   {0.8194444444444445, Plug.Session},
-    #   {0.8333333333333334, Plug},
-    #   {0.837121212121212, Plug.Crypto}
-    # ]
-    # {:error, "Did not find exact match. Did you mean: Inspect.Plug.Conn"}
-
+    # we get the suffix of the candidate that matches the length of the search;
+    # for example if someone searches for User.Token, we consider
+    # MyApp.Accounts.User.Token as a good match
     candidate_suffix =
-      String.split(inspect(candidate), ".")
+      candidate_parts
       |> Enum.reverse()
-      |> Enum.take(parts)
+      |> Enum.take(search_parts_count)
       |> Enum.reverse()
       |> Enum.join(".")
 
-    String.jaro_distance(inspect(search), candidate_suffix)
+    jaro_score = String.jaro_distance(search, candidate_suffix)
+    length_diff = abs(candidate_parts_count - search_parts_count)
+
+    # apply a penalty for longer module paths
+    # to make shorter matches preferred when Jaro scores are equal
+    length_penalty = 1 / (1 + length_diff)
+    jaro_score * (0.9 + 0.1 * length_penalty)
   end
+
 
   defp all_functions(module) do
     with [_ | _] = beam <- :code.which(module),
