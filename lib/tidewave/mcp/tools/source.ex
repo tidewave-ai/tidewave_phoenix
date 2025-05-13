@@ -415,24 +415,16 @@ defmodule Tidewave.MCP.Tools.Source do
   end
 
   defp project_modules do
-    files =
-      Mix.Project.compile_path()
-      |> File.ls!()
-      |> Enum.sort()
-
-    for file <- files, [basename, ""] <- [:binary.split(file, ".beam")] do
-      String.to_atom(basename)
-    end
+    otp_app = Mix.Project.config()[:app]
+    Application.spec(otp_app, :modules)
   end
 
   defp all_modules do
-    # we only want modules from the current project or dependencies,
-    # no standard library modules, so we use the project's build path
-    files = Mix.Project.build_path() |> Path.join("**/*.beam") |> Path.wildcard()
-
-    for file <- files, basename = Path.basename(file, ".beam") do
-      String.to_atom(basename)
-    end
+    for {app, _, _} <- Application.loaded_applications(),
+        # exclude core apps
+        app not in @apps,
+        mod <- Application.spec(app, :modules),
+        do: mod
   end
 
   defp alias_aware_distance(search, candidate) do
