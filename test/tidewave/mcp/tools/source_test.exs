@@ -41,6 +41,25 @@ defmodule Tidewave.MCP.Tools.SourceTest do
       assert {:ok, text} = result
       assert text =~ "source.ex"
     end
+
+    test "fuzzy suggestions" do
+      assert {:error, "Did not find exact match. Did you mean: Tidewave.MCP"} =
+               Source.get_source_location(%{"reference" => "Tidewav.MCP"})
+
+      assert {:error, "Did not find exact match. Did you mean: Tidewave.MCP.init/1"} =
+               Source.get_source_location(%{"reference" => "Tidewave.MCP.iniz"})
+
+      assert {:error, "Did not find exact match. Did you mean: Tidewave.MCP.init/1"} =
+               Source.get_source_location(%{"reference" => "Tidewave.MCP.init/2"})
+
+      # finds aliases (prefers same project)
+      assert {:error, "Did not find exact match. Did you mean: Tidewave.MCP.Tools.Source"} =
+                Source.get_source_location(%{"reference" => "Source"})
+
+      # prefers short matches (there's also Inspect.Plug.Conn)
+      assert {:error, "Did not find exact match. Did you mean: Plug.Conn"} =
+                  Source.get_source_location(%{"reference" => "Plug.Con"})
+    end
   end
 
   describe "get_package_location/1" do

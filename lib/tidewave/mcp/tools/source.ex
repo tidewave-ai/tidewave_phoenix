@@ -135,21 +135,29 @@ defmodule Tidewave.MCP.Tools.Source do
   defp parse_module(_mod, _fun, _arity),
     do: :error
 
-  defp find_source_for_mfa(mod, function, arity) do
+  defp find_source_for_mfa(mod, function, arity, fuzzy? \\ true) do
     result = open_mfa(mod, function, arity)
 
     case result do
       {_source_file, _module_pair, {fun_file, fun_line}} ->
         {:ok, "#{Path.relative_to(fun_file, MCP.root())}:#{fun_line}"}
 
-      {_source_file, {module_file, module_line}, nil} ->
+      {_source_file, {module_file, module_line}, nil} when is_nil(function) ->
         {:ok, "#{Path.relative_to(module_file, MCP.root())}:#{module_line}"}
 
-      {source_file, nil, nil} ->
+      {source_file, nil, nil} when is_nil(function) ->
         {:ok, Path.relative_to(source_file, MCP.root())}
 
-      {:error, error} ->
-        {:error, "Failed to get source location: #{inspect(error)}"}
+      {:error, :core_library} ->
+        {:error,
+         "Cannot get source of core libraries, use the eval_project tool with the `h(...)` helper to read documentation instead."}
+
+      _ ->
+        if fuzzy? do
+          fuzzy_find_source_for_mfa(mod, function, arity)
+        else
+          {:error, "Failed to get source location. No candidates found."}
+        end
     end
   end
 
@@ -217,8 +225,7 @@ defmodule Tidewave.MCP.Tools.Source do
   defp rewrite_source(module, source) do
     case :application.get_application(module) do
       {:ok, app} when app in @apps ->
-        {:error,
-         "Cannot get source of core libraries, use the eval_project tool with the `h(...)` helper to read documentation instead."}
+        {:error, :core_library}
 
       _ ->
         beam_path = :code.which(module)
@@ -241,4 +248,160 @@ defmodule Tidewave.MCP.Tools.Source do
 
     Path.join([lib_or_src | Enum.reverse(in_app)])
   end
+
+  defp fuzzy_find_source_for_mfa(mod, function, arity, type \\ :project) do
+    modules =
+      case type do
+        :project -> project_modules()
+        _ -> all_modules()
+      end
+
+    candidates =
+      for candidate <- modules,
+          distance = alias_aware_distance(mod, candidate),
+          distance > 0.8,
+          do: {distance, candidate}
+
+    candidates =
+      candidates
+      |> Enum.sort_by(fn {distance, _} -> distance end, :desc)
+      |> Enum.take(3)
+      |> Enum.map(fn {_, candidate} -> candidate end)
+
+    try_find_and_halt = fn mod, fun, arity, acc ->
+      with :error <- okay_if_only_searching_module(mod, fun),
+           :error <- find_same_function_different_arity(mod, fun, arity),
+           :error <- find_similar_function(mod, fun, arity) do
+        {:cont, acc}
+      else
+        {:ok, result} -> {:halt, {:ok, result}}
+      end
+    end
+
+    result =
+      Enum.reduce_while(
+        candidates,
+        {:error, "Failed to get source location. No candidates found."},
+        fn candidate, acc ->
+          try_find_and_halt.(candidate, function, arity, acc)
+        end
+      )
+
+    case result do
+      {:ok, {new_mod, new_fun, new_arity}} ->
+        {:error,
+         "Did not find exact match. Did you mean: #{format_mfa(new_mod, new_fun, new_arity)}"}
+
+      {:error, error} ->
+        if type == :project do
+          # try looking into dependencies as well
+          fuzzy_find_source_for_mfa(mod, function, arity, :all)
+        else
+          {:error, error}
+        end
+    end
+  end
+
+  defp project_modules do
+    otp_app = Mix.Project.config()[:app]
+    Application.spec(otp_app, :modules)
+  end
+
+  defp all_modules do
+    for {app, _, _} <- Application.loaded_applications(),
+        # exclude core apps
+        app not in @apps,
+        mod <- Application.spec(app, :modules),
+        do: mod
+  end
+
+  defp alias_aware_distance(search, candidate) do
+    search = inspect(search)
+    candidate = inspect(candidate)
+    search_parts = String.split(search, ".")
+    search_parts_count = Enum.count(search_parts)
+    candidate_parts = String.split(candidate, ".")
+    candidate_parts_count = Enum.count(candidate_parts)
+
+    # we get the suffix of the candidate that matches the length of the search;
+    # for example if someone searches for User.Token, we consider
+    # MyApp.Accounts.User.Token as a good match
+    candidate_suffix =
+      candidate_parts
+      |> Enum.reverse()
+      |> Enum.take(search_parts_count)
+      |> Enum.reverse()
+      |> Enum.join(".")
+
+    jaro_score = String.jaro_distance(search, candidate_suffix)
+    length_diff = abs(candidate_parts_count - search_parts_count)
+
+    # apply a penalty for longer module paths
+    # to make shorter matches preferred when Jaro scores are equal
+    length_penalty = 1 / (1 + length_diff)
+    jaro_score * (0.9 + 0.1 * length_penalty)
+  end
+
+
+  defp all_functions(module) do
+    with [_ | _] = beam <- :code.which(module),
+         {:ok, {_, [abstract_code: abstract_code]}} <- :beam_lib.chunks(beam, [:abstract_code]),
+         {:raw_abstract_v1, code} <- abstract_code do
+      for {:function, _ann, ann_fun, ann_arity, _} <- code do
+        {ann_fun, ann_arity}
+      end
+    else
+      _ -> []
+    end
+  end
+
+  defp okay_if_only_searching_module(mod, nil) do
+    {:ok, {mod, nil, :*}}
+  end
+
+  defp okay_if_only_searching_module(_mod, _), do: :error
+
+  defp find_same_function_different_arity(_mod, _fun, :*), do: :error
+
+  defp find_same_function_different_arity(mod, fun, _arity) do
+    functions = all_functions(mod)
+
+    if {fun, arity} = Enum.find(functions, fn {candidate_fun, _} -> candidate_fun == fun end) do
+      {:ok, {mod, fun, arity}}
+    else
+      :error
+    end
+  end
+
+  defp find_similar_function(mod, fun, arity) do
+    functions = all_functions(mod)
+
+    mapper =
+      case arity do
+        :* -> fn fun, _arity -> "#{fun}" end
+        _ -> fn fun, arity -> "#{fun}/#{arity}" end
+      end
+
+    candidates =
+      for {candidate_fun, candidate_arity} <- functions,
+          distance =
+            String.jaro_distance(mapper.(fun, arity), mapper.(candidate_fun, candidate_arity)) >
+              0.8,
+          do: {distance, {candidate_fun, candidate_arity}}
+
+    case candidates
+         |> Enum.sort_by(fn {distance, _} -> distance end, :desc)
+         |> Enum.take(1)
+         |> Enum.map(fn {_, candidate} -> candidate end) do
+      [{fun, arity}] ->
+        {:ok, {mod, fun, arity}}
+
+      _ ->
+        :error
+    end
+  end
+
+  defp format_mfa(mod, nil, _), do: inspect(mod)
+  defp format_mfa(mod, fun, :*), do: "#{inspect(mod)}.#{fun}"
+  defp format_mfa(mod, fun, arity), do: "#{inspect(mod)}.#{fun}/#{arity}"
 end
