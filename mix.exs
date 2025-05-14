@@ -57,7 +57,7 @@ defmodule Tidewave.MixProject do
         "pages/installation.md",
         "pages/editors/mcp.md",
         "pages/editors/claude_code.md",
-        "pages/editors/claude_desktop.md",
+        "pages/editors/claude.md",
         "pages/editors/cursor.md",
         "pages/editors/neovim.md",
         "pages/editors/vscode.md",
