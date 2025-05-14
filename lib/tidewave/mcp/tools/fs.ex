@@ -380,19 +380,22 @@ defmodule Tidewave.MCP.Tools.FS do
   defp maybe_apply_offset_and_count(content, 0, nil), do: content
 
   defp maybe_apply_offset_and_count(content, offset, count) do
-    splitter_and_joiner =
-      case Utils.detect_line_endings(content) do
-        :lf -> "\n"
-        :crlf -> "\r\n"
-      end
-
-    lines = String.split(content, splitter_and_joiner)
-
-    lines
+    content
+    |> lines(<<>>)
     |> Enum.drop(offset)
     |> take_all_or(count)
-    |> Enum.join(splitter_and_joiner)
+    |> IO.iodata_to_binary()
   end
+
+  # TODO: Use String.lines/1 when we require Elixir v1.19+
+  defp lines(<<?\n, rest::binary>>, acc),
+    do: [<<acc::binary, ?\n>> | lines(rest, <<>>)]
+
+  defp lines(<<char, rest::binary>>, acc),
+    do: lines(rest, <<acc::binary, char>>)
+
+  defp lines(<<>>, acc),
+    do: [acc]
 
   defp take_all_or(list, nil), do: list
   defp take_all_or(list, count), do: Enum.take(list, count)

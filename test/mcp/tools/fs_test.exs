@@ -103,10 +103,10 @@ defmodule Tidewave.MCP.Tools.FSTest do
       content = Enum.map_join(1..1000, "\n", &to_string/1) <> "\nmore content\n"
       File.write!(file_path, content)
 
-      assert {:ok, "1\n2\n3\n4\n5\n6", _state, _metadata} =
+      assert {:ok, "1\n2\n3\n4\n5\n6\n", _state, _metadata} =
                FS.read_project_file(%{"path" => file_path, "count" => 6}, %{})
 
-      assert {:ok, "501\n502\n503\n504\n505", _state, _metadata} =
+      assert {:ok, "501\n502\n503\n504\n505\n", _state, _metadata} =
                FS.read_project_file(
                  %{"path" => file_path, "line_offset" => 500, "count" => 5},
                  %{}
