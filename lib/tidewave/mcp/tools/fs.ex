@@ -387,7 +387,7 @@ defmodule Tidewave.MCP.Tools.FS do
     |> IO.iodata_to_binary()
   end
 
-  # TODO: Use String.lines/1 when we require Elixir v1.19+
+  # TODO: Use Code.lines/1 when we require Elixir v1.19+
   defp lines(<<?\n, rest::binary>>, acc),
     do: [<<acc::binary, ?\n>> | lines(rest, <<>>)]
 
