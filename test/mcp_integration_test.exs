@@ -7,7 +7,8 @@ defmodule Tidewave.MCPIntegrationTest do
   @moduletag :capture_log
 
   setup_all do
-    start_supervised!({Bandit, plug: Tidewave, port: 9100, startup_log: false},
+    start_supervised!(
+      {Bandit, plug: {Tidewave, []}, port: 9100, startup_log: false},
       shutdown: :brutal_kill
     )
 

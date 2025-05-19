@@ -39,7 +39,6 @@ defmodule Tidewave.MCP.Server do
 
   @doc false
   def tools({connect_params, opts}) do
-    tool_opts = opts[:tools]
     {tools, _} = tools_and_dispatch()
 
     listable? = fn
@@ -52,8 +51,8 @@ defmodule Tidewave.MCP.Server do
 
     for tool <- tools,
         listable?.(tool),
-        is_nil(tool_opts[:include]) or tool.name in tool_opts[:include],
-        is_nil(tool_opts[:exclude]) or tool.name not in tool_opts[:exclude] do
+        is_nil(opts[:include_tools]) or tool.name in opts[:include_tools],
+        tool.name not in opts[:exclude_tools] do
       tool
       |> Map.put(:description, String.trim(tool.description))
       |> Map.drop([:callback, :listable])
