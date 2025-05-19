@@ -37,7 +37,9 @@ defmodule Tidewave.MCP.Server do
     |> List.flatten()
   end
 
-  defp tools(connect_params) do
+  @doc false
+  def tools({connect_params, opts}) do
+    tool_opts = opts[:tools]
     {tools, _} = tools_and_dispatch()
 
     listable? = fn
@@ -48,7 +50,10 @@ defmodule Tidewave.MCP.Server do
         true
     end
 
-    for tool <- tools, listable?.(tool) do
+    for tool <- tools,
+        listable?.(tool),
+        is_nil(tool_opts[:include]) or tool.name in tool_opts[:include],
+        is_nil(tool_opts[:exclude]) or tool.name not in tool_opts[:exclude] do
       tool
       |> Map.put(:description, String.trim(tool.description))
       |> Map.drop([:callback, :listable])
@@ -113,7 +118,7 @@ defmodule Tidewave.MCP.Server do
                name: "Tidewave MCP Server",
                version: @vsn
              },
-             tools: tools(Connection.connect_params(state_pid))
+             tools: tools(Connection.connect_params_and_opts(state_pid))
            }
          }}
 
@@ -123,7 +128,10 @@ defmodule Tidewave.MCP.Server do
   end
 
   def handle_list_tools(request_id, _params, state_pid) do
-    result_or_error(request_id, {:ok, %{tools: tools(Connection.connect_params(state_pid))}})
+    result_or_error(
+      request_id,
+      {:ok, %{tools: tools(Connection.connect_params_and_opts(state_pid))}}
+    )
   end
 
   def handle_call_tool(request_id, %{"name" => name} = params, state_pid) do
