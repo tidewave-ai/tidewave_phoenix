@@ -81,6 +81,12 @@ The following options are available:
 
   * `:inspect_opts` - Custom options passed to `Kernel.inspect/2` when formatting some tool results. Defaults to: `[charlists: :as_lists, limit: 50, pretty: true]`
 
+  * `:tools` - Configuration for the tools that are included/excluded from the MCP server.
+
+    * `:include` - A list of tools to be included in the MCP. Defaults to `nil`, meaning all tools are included.
+
+    * `:exclude` - A list of tools to be excluded from the MCP. Defaults to `[]`. Supercedes `:include` if both are set.
+
 ## License
 
 Copyright (c) 2025 Dashbit
