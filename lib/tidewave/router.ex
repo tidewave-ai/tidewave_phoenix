@@ -121,7 +121,12 @@ defmodule Tidewave.Router do
     credentials = Application.get_env(:tidewave, :credentials, [])
     credentials = Keyword.merge(default_credentials(), credentials)
 
-    config = %{credentials: Map.new(credentials)}
+    config = %{
+      credentials: Map.new(credentials),
+      framework: %{
+        type: "phoenix"
+      }
+    }
 
     # We return a basic page that loads script from Tidewave server to
     # bootstrap the client app. Note that the script name does not
