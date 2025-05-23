@@ -118,7 +118,7 @@ defmodule Tidewave.MCP.Tools.Ecto do
       for module <- project_modules(),
           Code.ensure_loaded?(module),
           function_exported?(module, :__changeset__, 0) do
-        case Source.get_source_location(%{"module" => inspect(module)}) do
+        case Source.get_source_location(%{"reference" => inspect(module)}) do
           {:ok, source_file} ->
             %{module: inspect(module), source_file: source_file}
 
