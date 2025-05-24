@@ -12,12 +12,14 @@ defmodule Tidewave.MCP.ToolsTest do
 
   test "tools are hidden from the list when excluded" do
     refute Enum.any?(
-             Tidewave.MCP.Server.tools({%{}, %{exclude_tools: ["project_eval"]}}),
+             Tidewave.MCP.Server.tools(
+               {%{}, %{exclude_tools: ["project_eval"], include_tools: nil}}
+             ),
              &(&1.name == "project_eval")
            )
 
     assert Enum.any?(
-             Tidewave.MCP.Server.tools({%{}, %{exclude_tools: []}}),
+             Tidewave.MCP.Server.tools({%{}, %{exclude_tools: [], include_tools: nil}}),
              &(&1.name == "project_eval")
            )
 
