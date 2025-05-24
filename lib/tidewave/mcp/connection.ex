@@ -86,8 +86,8 @@ defmodule Tidewave.MCP.Connection do
     GenServer.call(pid, {:handle_result, id})
   end
 
-  def connect_params_and_opts(pid) do
-    GenServer.call(pid, :connect_params_and_opts)
+  def connect_params_and_assigns(pid) do
+    GenServer.call(pid, :connect_params_and_assigns)
   end
 
   def dispatch(pid, callback, args) do
@@ -173,8 +173,8 @@ defmodule Tidewave.MCP.Connection do
     {:reply, result, %{state | requests: Map.delete(state.requests, id)}}
   end
 
-  def handle_call(:connect_params_and_opts, _from, state) do
-    {:reply, {state.conn.query_params, state.conn.assigns[:router_opts]}, state}
+  def handle_call(:connect_params_and_assigns, _from, state) do
+    {:reply, {state.conn.query_params, state.assigns}, state}
   end
 
   def handle_call({:dispatch, callback, args}, _from, state) do

@@ -1,7 +1,7 @@
 defmodule Tidewave.Router do
   @moduledoc false
 
-  use Plug.Router, copy_opts_to_assign: :router_opts
+  use Plug.Router
 
   import Plug.Conn
   alias Tidewave.MCP

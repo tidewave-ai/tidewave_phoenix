@@ -185,6 +185,7 @@ defmodule Tidewave.MCP.SSE do
       Connection.init({session_id, conn})
     catch
       :exit, :normal -> conn
+      :exit, :shutdown -> conn
       :exit, {:shutdown, _} -> conn
     after
       # Bandit re-uses the same process for new requests,

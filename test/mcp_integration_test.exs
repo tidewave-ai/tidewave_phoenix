@@ -6,16 +6,22 @@ defmodule Tidewave.MCPIntegrationTest do
 
   @moduletag :capture_log
 
-  setup_all do
+  setup context do
     start_supervised!(
-      {Bandit, plug: {Tidewave, []}, port: 9100, startup_log: false},
-      shutdown: :brutal_kill
+      {Bandit, plug: {Tidewave, context[:plug_opts] || []}, port: 9100, startup_log: false},
+      shutdown: 10
     )
 
-    :ok
-  end
+    assert Stream.interval(10)
+           |> Stream.take(10)
+           |> Enum.reduce_while(nil, fn _, _ ->
+             case Req.post("http://127.0.0.1:9100") do
+               {:ok, _} -> {:halt, true}
+               _ -> {:cont, false}
+             end
+           end),
+           "server not listening"
 
-  setup context do
     %{request: connect_and_initialize(context[:base_url] || @base_url)}
   end
 
@@ -35,6 +41,15 @@ defmodule Tidewave.MCPIntegrationTest do
     assert is_list(tools)
     assert tool_names = Enum.map(tools, & &1["name"])
     assert "list_project_files" in tool_names
+  end
+
+  @tag plug_opts: [tools: [exclude: [:write_project_file]]]
+  test "can exclude tools via plug opts", %{request: request} do
+    assert %{tools: tools} = request
+    assert is_list(tools)
+    assert tool_names = Enum.map(tools, & &1["name"])
+    assert "list_project_files" in tool_names
+    refute "write_project_file" in tool_names
   end
 
   test "write to file needs read first", %{request: request} do

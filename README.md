@@ -85,7 +85,7 @@ The following options are available:
 
     * `:include` - A list of tools to be included in the MCP. Defaults to `nil`, meaning all tools are included.
 
-    * `:exclude` - A list of tools to be excluded from the MCP. Defaults to `[]`. Supercedes `:include` if both are set.
+    * `:exclude` - A list of tools to be excluded from the MCP. Defaults to `[]`. Supersedes `:include` if both are set.
 
 ## License
 
