@@ -28,6 +28,7 @@ Here is a baseline comparison of the tools supported by different frameworks/lan
 | `package_docs_search`        | ✅                    |                   |
 | `get_docs`                   | ✅                    |                   |
 | `get_source_location`        | ✅                    | ✅                 |
+| `get_package_location`       | ✅                    | ✅                 |
 | `get_logs`                   | ✅                    | ✅                 |
 | `get_models` / `get_schemas` | ✅                    | ✅                 |
 | `execute_sql_query`          | ✅                    | ✅                 |
@@ -46,7 +47,6 @@ you must not enable the Tidewave ones, except for assistants like Claude Desktop
 | `read_project_file`        | ✅                    | ✅                 |
 | `edit_project_file`        | ✅                    | ✅                 |
 | `write_project_file`       | ✅                    | ✅                 |
-| `glob_project_files`       | ✅                    | ✅                 |
 | `grep_project_files`       | ✅                    | ✅                 |
 | Syntax validation          | ✅                    | ✅                 |
 | Automatic formatting       | ✅                    |                   |
