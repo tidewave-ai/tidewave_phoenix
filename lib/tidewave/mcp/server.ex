@@ -52,7 +52,7 @@ defmodule Tidewave.MCP.Server do
     for tool <- tools,
         listable?.(tool),
         is_nil(assigns.include_tools) or tool.name in assigns.include_tools,
-        tool.name not in assigns[:exclude_tools] do
+        tool.name not in assigns.exclude_tools do
       tool
       |> Map.put(:description, String.trim(tool.description))
       |> Map.drop([:callback, :listable])
