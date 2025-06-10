@@ -28,8 +28,7 @@ defmodule Tidewave.MCP.Tools.Logs do
   def get_logs(args) do
     case args do
       %{"tail" => n} ->
-        {:ok,
-         "The last #{n} log entries are:\n\n#{Enum.join(Tidewave.MCP.Logger.get_logs(n), "\n")}"}
+        {:ok, Enum.join(Tidewave.MCP.Logger.get_logs(n), "\n")}
 
       _ ->
         {:error, :invalid_arguments}
