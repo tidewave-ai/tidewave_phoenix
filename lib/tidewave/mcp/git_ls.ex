@@ -3,8 +3,8 @@ defmodule Tidewave.MCP.GitLS do
 
   alias Tidewave.MCP
 
-  def list_files(glob_pattern \\ nil) do
-    execute_git(fn git_dir -> list_files(git_dir, glob_pattern) end)
+  def list_files(opts \\ []) do
+    execute_git(fn git_dir -> list_files(git_dir, opts) end)
   end
 
   def detect_line_endings do
@@ -32,10 +32,18 @@ defmodule Tidewave.MCP.GitLS do
     end
   end
 
-  defp list_files(git_dir, glob_pattern) do
+  defp list_files(git_dir, opts) do
+    glob_pattern = Keyword.get(opts, :glob)
+    include_hidden = Keyword.get(opts, :include_hidden, false)
+
     args = if git_dir, do: ["--git-dir", git_dir], else: []
     args = args ++ ["ls-files", "--cached", "--others"]
-    args = if glob_pattern, do: args ++ [glob_pattern], else: args ++ ["--exclude-standard"]
+
+    # Add glob pattern if provided
+    args = if glob_pattern, do: args ++ [glob_pattern], else: args
+
+    # Add --exclude-standard unless include_hidden is true
+    args = if include_hidden, do: args, else: args ++ ["--exclude-standard"]
 
     with {result, 0} <- System.cmd("git", args, cd: MCP.root()) do
       {:ok, String.split(result, "\n", trim: true)}

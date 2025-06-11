@@ -17,16 +17,19 @@ defmodule Tidewave.MCP.Tools.FS do
         By default, when no arguments are passed, it returns all files in the project that
         are not ignored by .gitignore.
 
-        Optionally, a glob_pattern can be passed to filter this list. When a pattern is passed,
-        the gitignore check will be skipped.
+        Optionally, a glob_pattern can be passed to filter this list.
         """,
         inputSchema: %{
           type: "object",
           properties: %{
             glob_pattern: %{
               type: "string",
+              description: "Optional: a glob pattern to filter the listed files."
+            },
+            include_hidden: %{
+              type: "boolean",
               description:
-                "Optional: a glob pattern to filter the listed files. If a pattern is passed, the .gitignore check will be skipped."
+                "Optional: whether to include files that are ignored by .gitignore. Defaults to false. WARNING: Use with targeted glob patterns to avoid listing excessive files from dependencies or build directories."
             }
           },
           required: []
@@ -164,17 +167,18 @@ defmodule Tidewave.MCP.Tools.FS do
   end
 
   def list_project_files(args) do
-    case args do
-      %{"glob_pattern" => glob_pattern} ->
-        git_ls_files(glob_pattern)
+    glob_pattern = Map.get(args, "glob_pattern")
+    include_hidden = Map.get(args, "include_hidden", false)
 
-      _ ->
-        git_ls_files(nil)
-    end
+    opts = []
+    opts = if glob_pattern, do: Keyword.put(opts, :glob, glob_pattern), else: opts
+    opts = if include_hidden, do: Keyword.put(opts, :include_hidden, include_hidden), else: opts
+
+    git_ls_files(opts)
   end
 
-  defp git_ls_files(glob_pattern) do
-    with {:ok, files} <- GitLS.list_files(glob_pattern) do
+  defp git_ls_files(opts) do
+    with {:ok, files} <- GitLS.list_files(opts) do
       case files do
         [] ->
           {:ok, "No files found."}

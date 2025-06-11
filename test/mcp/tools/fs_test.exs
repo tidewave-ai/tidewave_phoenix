@@ -31,6 +31,41 @@ defmodule Tidewave.MCP.Tools.FSTest do
       assert text =~ "README.md\n"
       assert text =~ "lib/tidewave/mcp/tools/fs.ex\n"
     end
+
+    test "excludes hidden files by default" do
+      assert {:ok, text} = FS.list_project_files(%{})
+
+      # Should not include files from deps/ or _build/
+      refute text =~ "_build/"
+      refute text =~ "deps/"
+    end
+
+    test "includes hidden files when include_hidden is true" do
+      assert {:ok, text} = FS.list_project_files(%{"include_hidden" => true})
+
+      # Should still include normal files
+      assert text =~ "mix.exs\n"
+      assert text =~ "README.md\n"
+    end
+
+    test "respects both glob_pattern and include_hidden" do
+      assert {:ok, text} =
+               FS.list_project_files(%{
+                 "glob_pattern" => "*.exs",
+                 "include_hidden" => false
+               })
+
+      # Should include .exs files but still exclude hidden ones
+      assert text =~ "mix.exs\n"
+      refute text =~ "_build/"
+    end
+
+    test "works with glob_pattern only (backwards compatibility)" do
+      assert {:ok, text} = FS.list_project_files(%{"glob_pattern" => "*.md"})
+
+      assert text =~ "README.md\n"
+      refute text =~ "mix.exs\n"
+    end
   end
 
   describe "read_project_file/1" do

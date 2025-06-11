@@ -123,11 +123,23 @@ defmodule Tidewave.MCP.Tools.FSSyncTest do
       refute text =~ "file1.txt"
     end
 
-    test "ignores .gitignore when passing a glob_pattern" do
+    test "respects .gitignore by default even with glob_pattern" do
       File.write!(".gitignore", "*.txt")
 
       assert {:ok, text} =
                FS.list_project_files(%{"glob_pattern" => "*.txt"})
+
+      refute text =~ "file1.txt"
+    end
+
+    test "ignores .gitignore when include_hidden is true" do
+      File.write!(".gitignore", "*.txt")
+
+      assert {:ok, text} =
+               FS.list_project_files(%{
+                 "glob_pattern" => "*.txt",
+                 "include_hidden" => true
+               })
 
       assert text =~ "file1.txt"
     end
