@@ -39,10 +39,7 @@ defmodule Tidewave.MCP.GitLS do
     args = if git_dir, do: ["--git-dir", git_dir], else: []
     args = args ++ ["ls-files", "--cached", "--others"]
 
-    # Add glob pattern if provided
     args = if glob_pattern, do: args ++ [glob_pattern], else: args
-
-    # Add --exclude-standard unless include_hidden is true
     args = if include_hidden, do: args, else: args ++ ["--exclude-standard"]
 
     with {result, 0} <- System.cmd("git", args, cd: MCP.root()) do
