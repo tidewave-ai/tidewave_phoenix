@@ -170,9 +170,7 @@ defmodule Tidewave.MCP.Tools.FS do
     glob_pattern = Map.get(args, "glob_pattern")
     include_hidden = Map.get(args, "include_hidden", false)
 
-    opts = []
-    opts = if glob_pattern, do: Keyword.put(opts, :glob, glob_pattern), else: opts
-    opts = if include_hidden, do: Keyword.put(opts, :include_hidden, include_hidden), else: opts
+    opts = [glob: glob_pattern, include_hidden: include_hidden]
 
     git_ls_files(opts)
   end
