@@ -26,7 +26,7 @@ defmodule Tidewave.MCP.Tools.FS do
               type: "string",
               description: "Optional: a glob pattern to filter the listed files."
             },
-            include_hidden: %{
+            include_ignored: %{
               type: "boolean",
               description:
                 "Optional: whether to include files that are ignored by .gitignore. Defaults to false. WARNING: Use with targeted glob patterns to avoid listing excessive files from dependencies or build directories."
@@ -168,9 +168,9 @@ defmodule Tidewave.MCP.Tools.FS do
 
   def list_project_files(args) do
     glob_pattern = Map.get(args, "glob_pattern")
-    include_hidden = Map.get(args, "include_hidden", false)
+    include_ignored = Map.get(args, "include_ignored", false)
 
-    opts = [glob: glob_pattern, include_hidden: include_hidden]
+    opts = [glob: glob_pattern, include_ignored: include_ignored]
 
     git_ls_files(opts)
   end

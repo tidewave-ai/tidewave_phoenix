@@ -34,13 +34,13 @@ defmodule Tidewave.MCP.GitLS do
 
   defp list_files(git_dir, opts) do
     glob_pattern = Keyword.get(opts, :glob)
-    include_hidden = Keyword.get(opts, :include_hidden, false)
+    include_ignored = Keyword.get(opts, :include_ignored, false)
 
     args = if git_dir, do: ["--git-dir", git_dir], else: []
     args = args ++ ["ls-files", "--cached", "--others"]
 
     args = if glob_pattern, do: args ++ [glob_pattern], else: args
-    args = if include_hidden, do: args, else: args ++ ["--exclude-standard"]
+    args = if include_ignored, do: args, else: args ++ ["--exclude-standard"]
 
     with {result, 0} <- System.cmd("git", args, cd: MCP.root()) do
       {:ok, String.split(result, "\n", trim: true)}

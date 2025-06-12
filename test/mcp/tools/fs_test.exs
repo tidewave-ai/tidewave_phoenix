@@ -40,19 +40,19 @@ defmodule Tidewave.MCP.Tools.FSTest do
       refute text =~ "deps/"
     end
 
-    test "includes hidden files when include_hidden is true" do
-      assert {:ok, text} = FS.list_project_files(%{"include_hidden" => true})
+    test "includes hidden files when include_ignored is true" do
+      assert {:ok, text} = FS.list_project_files(%{"include_ignored" => true})
 
       # Should still include normal files
       assert text =~ "mix.exs\n"
       assert text =~ "README.md\n"
     end
 
-    test "respects both glob_pattern and include_hidden" do
+    test "respects both glob_pattern and include_ignored" do
       assert {:ok, text} =
                FS.list_project_files(%{
                  "glob_pattern" => "*.exs",
-                 "include_hidden" => false
+                 "include_ignored" => false
                })
 
       # Should include .exs files but still exclude hidden ones
