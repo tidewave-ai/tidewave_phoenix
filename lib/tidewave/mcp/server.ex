@@ -55,7 +55,73 @@ defmodule Tidewave.MCP.Server do
         tool.name not in assigns.exclude_tools do
       tool
       |> Map.put(:description, String.trim(tool.description))
+      |> Map.put_new(:annotations, default_annotations_for_tool(tool.name))
       |> Map.drop([:callback, :listable])
+    end
+  end
+
+   # Default annotations for MCP tools based on their functionality
+   defp default_annotations_for_tool(tool_name) do
+    case tool_name do
+      # Read-only, non-destructive tools
+      "get_logs" ->
+        %{title: "Get Logs", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false}
+
+      "get_source_location" ->
+        %{title: "Get Source Location", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false}
+
+      "get_ecto_schemas" ->
+        %{title: "Get Ecto Schemas", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false}
+
+      "get_process_info" ->
+        %{title: "Get Process Info", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false}
+
+      "list_project_files" ->
+        %{title: "List Project Files", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false}
+
+      "read_project_file" ->
+        %{title: "Read Project File", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false}
+
+      "glob_project_files" ->
+        %{title: "Glob Project Files", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false}
+
+      "grep_project_files" ->
+        %{title: "Grep Project Files", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false}
+
+      # External API tools (read-only but with external world access)
+      "package_docs_search" ->
+        %{title: "Package Docs Search", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true}
+
+      "package_search" ->
+        %{title: "Package Search", readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: true}
+
+      # Dynamic/non-idempotent read-only tools
+      "list_liveview_pages" ->
+        %{title: "List LiveView Pages", readOnlyHint: true, destructiveHint: false, idempotentHint: false, openWorldHint: false}
+
+      "trace_process" ->
+        %{title: "Trace Process", readOnlyHint: true, destructiveHint: false, idempotentHint: false, openWorldHint: false}
+
+      # Potentially destructive tools
+      "project_eval" ->
+        %{title: "Project Eval", readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: false}
+
+      "shell_eval" ->
+        %{title: "Shell Eval", readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: true}
+
+      "execute_sql_query" ->
+        %{title: "Execute SQL Query", readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: false}
+
+      "write_project_file" ->
+        %{title: "Write Project File", readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: false}
+
+      "edit_project_file" ->
+        %{title: "Edit Project File", readOnlyHint: false, destructiveHint: true, idempotentHint: false, openWorldHint: false}
+
+      # Default for unknown tools
+      _ ->
+        %{title: String.replace(tool_name, "_", " ") |> String.split() |> Enum.map(&String.capitalize/1) |> Enum.join(" "),
+          readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false}
     end
   end
 
