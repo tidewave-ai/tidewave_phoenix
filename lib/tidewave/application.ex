@@ -1,12 +1,17 @@
 defmodule Tidewave.Application do
   @moduledoc false
   use Application
+  require Logger
 
   @impl true
   def start(_type, _args) do
-    children = [
-      Tidewave.MCP
-    ]
+    children =
+      if Application.spec(:mix, :vsn) do
+        [Tidewave.MCP]
+      else
+        Logger.warning("application :tidewave is not starting because Mix is not running")
+        []
+      end
 
     opts = [strategy: :one_for_one, name: Tidewave.Supervisor]
     Supervisor.start_link(children, opts)
