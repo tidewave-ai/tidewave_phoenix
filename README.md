@@ -87,6 +87,32 @@ The following options are available:
 
     * `:exclude` - A list of tools to be excluded from the MCP. Defaults to `[]`. Supersedes `:include` if both are set.
 
+## Using in non-Phoenix applications
+
+You'll want to ensure that bandit is available. If your project isn't web-enabled, use bandit (and tidewave) in dev mode in `mix.exs`
+```
+{:tidewave, "~> 0.1", only: :dev},
+{:bandit, "~> 1.0", only: :dev},
+```
+
+In your main `start()` function, add
+`maybe_tidewave_server()`
+
+In that file, add the following:
+```
+  # Conditionally start Tidewave server for development
+  defp maybe_tidewave_server do
+    # Only start in dev environment 
+    if Mix.env() == :dev and Code.ensure_loaded?(Tidewave) and Code.ensure_loaded?(Bandit) do
+      Logger.info("Starting Tidewave server on port 4000 for development")
+      {Bandit, plug: Tidewave, port: 4000}
+    else
+      nil
+    end
+  end
+```
+
+
 ## License
 
 Copyright (c) 2025 Dashbit
