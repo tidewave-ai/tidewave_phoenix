@@ -15,12 +15,18 @@ defmodule Tidewave.MCP.Server do
     tools = raw_tools()
     dispatch_map = Map.new(tools, fn tool -> {tool.name, tool.callback} end)
 
-    :persistent_term.put({__MODULE__, :tools_and_dispatch}, {tools, dispatch_map})
+    # TODO: switch back to persistent_term when we don't support OTP 27 any more
+    # :persistent_term.put({__MODULE__, :tools_and_dispatch}, {tools, dispatch_map})
+    :ets.new(:tidewave_tools, [:set, :named_table, read_concurrency: true])
+    :ets.insert(:tidewave_tools, {:tools, {tools, dispatch_map}})
   end
 
   @doc false
   def tools_and_dispatch do
-    :persistent_term.get({__MODULE__, :tools_and_dispatch})
+    # TODO: switch back to persistent_term when we don't support OTP 27 any more
+    # :persistent_term.get({__MODULE__, :tools_and_dispatch})
+    [{:tools, tools}] = :ets.lookup(:tidewave_tools, :tools)
+    tools
   end
 
   defp raw_tools do
