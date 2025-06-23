@@ -23,7 +23,7 @@ On Windows:
 c:\path\to\mcp-proxy.exe http://localhost:$PORT/tidewave/mcp
 ```
 
-Where `$PORT` is the port your web application is running on.
+Where `$PORT` is the port your web application is running on and `/path/to/mcp-proxy` should be replaced with the absolute path to your mcp-proxy executable.
 
 And you are good to go! Now Zed will list all tools from Tidewave available.
 If your application uses a SQL database, you can verify it all works by asking
