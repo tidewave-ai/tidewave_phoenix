@@ -94,7 +94,7 @@ defmodule Tidewave.MCP.Connection do
     timeout =
       case args do
         %{"timeout" => timeout} when is_integer(timeout) ->
-          timeout
+          timeout + 1000
 
         _ ->
           30000
