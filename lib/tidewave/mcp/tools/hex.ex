@@ -103,10 +103,20 @@ defmodule Tidewave.MCP.Tools.Hex do
   end
 
   defp filter_from_mix_lock do
-    current_otp_app = Mix.Project.config()[:app]
+    apps =
+      if apps_paths = Mix.Project.apps_paths() do
+        Enum.filter(Mix.Project.deps_apps(), &is_map_key(apps_paths, &1))
+      else
+        [Mix.Project.config()[:app]]
+      end
 
     filter =
-      Application.spec(current_otp_app, :applications)
+      apps
+      |> Enum.flat_map(fn app ->
+        Application.load(app)
+        Application.spec(app, :applications)
+      end)
+      |> Enum.uniq()
       |> Enum.map(fn app ->
         "#{app}-#{Application.spec(app, :vsn)}"
       end)
