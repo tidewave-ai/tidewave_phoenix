@@ -134,12 +134,27 @@ defmodule Tidewave.MCP.Tools.Ecto do
   end
 
   defp ecto_repos do
-    otp_app = Mix.Project.config()[:app]
+    # this is the same code ecto uses to find repos for tasks like mix ecto.migrate
+    # https://github.com/elixir-ecto/ecto/blob/cd0f70b4cdd949767ea7cbe7d635e70917384b38/lib/mix/ecto.ex#L24-L52
+    apps =
+      if apps_paths = Mix.Project.apps_paths() do
+        Enum.filter(Mix.Project.deps_apps(), &is_map_key(apps_paths, &1))
+      else
+        [Mix.Project.config()[:app]]
+      end
 
-    if otp_app do
-      Application.get_env(otp_app, :ecto_repos) || []
-    else
-      []
+    apps
+    |> Enum.flat_map(fn app ->
+      Application.load(app)
+      Application.get_env(app, :ecto_repos, [])
+    end)
+    |> Enum.uniq()
+    |> case do
+      [] ->
+        []
+
+      repos ->
+        repos
     end
   end
 
