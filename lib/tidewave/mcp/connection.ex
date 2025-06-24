@@ -91,7 +91,16 @@ defmodule Tidewave.MCP.Connection do
   end
 
   def dispatch(pid, callback, args) do
-    GenServer.call(pid, {:dispatch, callback, args})
+    timeout =
+      case args do
+        %{"timeout" => timeout} when is_integer(timeout) ->
+          timeout
+
+        _ ->
+          30000
+      end
+
+    GenServer.call(pid, {:dispatch, callback, args}, timeout)
   end
 
   def send_sse_message(pid, message) do
@@ -196,7 +205,9 @@ defmodule Tidewave.MCP.Connection do
       end
     catch
       kind, reason ->
-        {:error, "Failed to call tool: #{Exception.format(kind, reason, __STACKTRACE__)}"}
+        {:reply,
+         {:error, "Failed to call tool: #{Exception.format(kind, reason, __STACKTRACE__)}"},
+         state}
     end
   end
 
