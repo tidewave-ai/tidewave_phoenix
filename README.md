@@ -11,7 +11,7 @@ assistant to your web framework runtime via [MCP](https://modelcontextprotocol.i
 Tidewave provides tools that allow your LLM of choice to:
 
 - get documentation
-- inspect your application logs to help debugging errors
+- inspect your application logs to help debug errors
 - inspect and trace processes
 - execute SQL queries and inspect your database
 - evaluate custom Elixir code in the context of your project
@@ -65,7 +65,7 @@ In particular, the MCP is located by default at http://localhost:4000/tidewave/m
 
 ### Usage in non-Phoenix applications
 
-Tidewave is a regular Plug, so you can use it in any Elixir project, as long as you run a webserver. For example, you can use `bandit` (and `tidewave`) in dev mode in your `mix.exs`:
+Tidewave is a regular Plug, so you can use it in any Elixir project, as long as you run a web server. For example, you can use `bandit` (and `tidewave`) in dev mode in your `mix.exs`:
 
 ```elixir
 {:tidewave, "~> 0.1", only: :dev},
@@ -100,7 +100,7 @@ The following options are available:
 
   * `:allow_remote_access` - Tidewave only allows requests from localhost by default, even if your server listens on other interfaces as well. If you trust your network and need to access Tidewave from a different machine, this configuration can be set to `true`.
 
-  * `:autoformat` - When writing Elixir source files, Tidewave will automatically format them with `mix format` by default. Setting this option to `false` disabled autoformatting.
+  * `:autoformat` - When writing Elixir source files, Tidewave will automatically format them with `mix format` by default. Setting this option to `false` disables autoformatting.
 
   * `:inspect_opts` - Custom options passed to `Kernel.inspect/2` when formatting some tool results. Defaults to: `[charlists: :as_lists, limit: 50, pretty: true]`
 
