@@ -11,6 +11,8 @@ manually add Tidewave:
 
 ### MCP Proxy (recommended)
 
+See the [MCP proxy documentation](guides/mcp_proxy.md).
+
 On macOS/Linux:
 
 ```json
