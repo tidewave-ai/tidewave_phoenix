@@ -129,12 +129,12 @@ defmodule Tidewave.Router do
     credentials = Keyword.merge(default_credentials(), credentials)
 
     config = %{
-      tidewave_version: package_version(:tidewave),
       project_name: MCP.project_name(),
       credentials: Map.new(credentials),
       framework: %{
         type: "phoenix",
-        version: package_version(:phoenix),
+        tidewave_version: package_version(:tidewave),
+        phoenix_version: package_version(:phoenix),
         live_view_version: package_version(:phoenix_live_view)
       }
     }
