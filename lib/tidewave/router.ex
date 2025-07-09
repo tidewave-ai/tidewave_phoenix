@@ -129,9 +129,13 @@ defmodule Tidewave.Router do
     credentials = Keyword.merge(default_credentials(), credentials)
 
     config = %{
+      tidewave_version: package_version(:tidewave),
+      project_name: MCP.project_name(),
       credentials: Map.new(credentials),
       framework: %{
-        type: "phoenix"
+        type: "phoenix",
+        version: package_version(:phoenix),
+        live_view_version: package_version(:phoenix_live_view)
       }
     }
 
@@ -161,5 +165,11 @@ defmodule Tidewave.Router do
     ]
 
     Enum.filter(credentials, fn {_key, value} -> value end)
+  end
+
+  defp package_version(app) do
+    if vsn = Application.spec(app)[:vsn] do
+      List.to_string(vsn)
+    end
   end
 end
