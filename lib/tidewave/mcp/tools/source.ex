@@ -36,6 +36,7 @@ defmodule Tidewave.MCP.Tools.Source do
 
         This works for modules and functions in the current project, as well as dependencies.
         The reference can be a module name, a Module.function or Module.function/arity.
+        You may also prepend a "c:" to the reference to get docs for a callback.
         """,
         inputSchema: %{
           type: "object",
@@ -98,11 +99,17 @@ defmodule Tidewave.MCP.Tools.Source do
   def get_docs(args) do
     case args do
       %{"reference" => ref} ->
+        {ref, lookup} =
+          case ref do
+            "c:" <> ref -> {ref, [:callback]}
+            _ -> {ref, [:function, :macro]}
+          end
+
         case parse_reference(ref) do
           {:ok, mod, fun, arity} ->
             case Code.ensure_loaded(mod) do
               {:module, _} ->
-                get_docs_for_mfa(mod, fun, arity)
+                find_docs_for_mfa(mod, fun, arity, lookup)
 
               {:error, reason} ->
                 {:error, "Could not load module #{inspect(mod)}, got: #{reason}"}
@@ -285,7 +292,7 @@ defmodule Tidewave.MCP.Tools.Source do
     Path.join([lib_or_src | Enum.reverse(in_app)])
   end
 
-  defp get_docs_for_mfa(mod, nil, :*) do
+  defp find_docs_for_mfa(mod, nil, :*, _lookup) do
     case Code.fetch_docs(mod) do
       {:docs_v1, _, _, "text/markdown", %{"en" => content}, _, _} ->
         {:ok, "# #{inspect(mod)}\n\n#{content}"}
@@ -298,9 +305,9 @@ defmodule Tidewave.MCP.Tools.Source do
     end
   end
 
-  defp get_docs_for_mfa(mod, fun, arity) do
+  defp find_docs_for_mfa(mod, fun, arity, lookup) do
     mod
-    |> get_function_docs([:function, :macro])
+    |> get_function_docs(lookup)
     |> filter_function_docs(fun, arity)
     |> case do
       [] ->
@@ -308,8 +315,8 @@ defmodule Tidewave.MCP.Tools.Source do
 
       docs ->
         formatted_docs =
-          Enum.map(docs, fn {{_, fun, arity}, _, signature, doc, metadata} ->
-            format_function_docs(mod, fun, arity, signature, doc, metadata)
+          Enum.map(docs, fn {{type, fun, arity}, _, signature, doc, metadata} ->
+            format_function_docs(type, mod, fun, arity, signature, doc, metadata)
           end)
 
         {:ok, Enum.join(formatted_docs, "\n\n")}
@@ -354,9 +361,17 @@ defmodule Tidewave.MCP.Tools.Source do
     end)
   end
 
-  defp format_function_docs(mod, fun, arity, signature, %{"en" => content}, _metadata) do
-    header = "# #{inspect(mod)}.#{fun}/#{arity}\n\n"
-    snippet = "```elixir\n#{Enum.join(signature, "\n")}\n```\n\n"
-    header <> snippet <> content
+  defp format_function_docs(type, mod, fun, arity, signature, %{"en" => content}, _metadata) do
+    prefix = if type == :callback, do: "c:", else: ""
+
+    """
+    # #{prefix}#{inspect(mod)}.#{fun}/#{arity}
+
+    ```elixir
+    #{Enum.join(signature, "\n")}
+    ```
+
+    #{content}\
+    """
   end
 end

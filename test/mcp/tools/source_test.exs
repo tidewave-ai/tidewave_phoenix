@@ -142,5 +142,11 @@ defmodule Tidewave.MCP.Tools.SourceTest do
       assert {:ok, text} = result
       assert text =~ "# Kernel.def/2"
     end
+
+    test "handles callback documentation" do
+      result = Source.get_docs(%{"reference" => "c:GenServer.handle_call/3"})
+      assert {:ok, text} = result
+      assert text =~ "# c:GenServer.handle_call/3"
+    end
   end
 end
