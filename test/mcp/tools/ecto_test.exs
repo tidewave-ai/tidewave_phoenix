@@ -150,7 +150,7 @@ defmodule Tidewave.MCP.Tools.EctoTest do
         )
 
       assert text =~ "Query returned 100 rows. Only the first 10 rows are included in the result."
-      assert text =~ "6, 7, 8"
+      assert text =~ "5, 6, 7"
     end
   end
 
