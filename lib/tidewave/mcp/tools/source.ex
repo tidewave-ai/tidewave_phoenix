@@ -30,6 +30,27 @@ defmodule Tidewave.MCP.Tools.Source do
         callback: &get_source_location/1
       },
       %{
+        name: "get_docs",
+        description: """
+        Returns the documentation for the given reference.
+
+        This works for modules and functions in the current project, as well as dependencies.
+        The reference can be a module name, a Module.function or Module.function/arity.
+        """,
+        inputSchema: %{
+          type: "object",
+          required: ["reference"],
+          properties: %{
+            reference: %{
+              type: "string",
+              description:
+                "The reference to get documentation for. Can be a module name, a Module.function or Module.function/arity."
+            }
+          }
+        },
+        callback: &get_docs/1
+      },
+      %{
         name: "get_package_location",
         description: """
         Returns the location of dependency packages.
@@ -64,6 +85,28 @@ defmodule Tidewave.MCP.Tools.Source do
         case parse_reference(ref) do
           {:ok, mod, fun, arity} ->
             find_source_for_mfa(mod, fun, arity)
+
+          :error ->
+            {:error, "Failed to parse reference: #{inspect(ref)}"}
+        end
+
+      _ ->
+        {:error, :invalid_arguments}
+    end
+  end
+
+  def get_docs(args) do
+    case args do
+      %{"reference" => ref} ->
+        case parse_reference(ref) do
+          {:ok, mod, fun, arity} ->
+            case Code.ensure_loaded(mod) do
+              {:module, _} ->
+                get_docs_for_mfa(mod, fun, arity)
+
+              {:error, reason} ->
+                {:error, "Could not load module #{inspect(mod)}, got: #{reason}"}
+            end
 
           :error ->
             {:error, "Failed to parse reference: #{inspect(ref)}"}
@@ -240,5 +283,80 @@ defmodule Tidewave.MCP.Tools.Source do
       |> Enum.split_while(&(&1 not in ["lib", "src"]))
 
     Path.join([lib_or_src | Enum.reverse(in_app)])
+  end
+
+  defp get_docs_for_mfa(mod, nil, :*) do
+    case Code.fetch_docs(mod) do
+      {:docs_v1, _, _, "text/markdown", %{"en" => content}, _, _} ->
+        {:ok, "# #{inspect(mod)}\n\n#{content}"}
+
+      {:docs_v1, _, _, _, _, _, _} ->
+        {:error, "Documentation not found for #{inspect(mod)}"}
+
+      _ ->
+        {:error, "No documentation available for #{inspect(mod)}"}
+    end
+  end
+
+  defp get_docs_for_mfa(mod, fun, arity) do
+    mod
+    |> get_function_docs([:function, :macro])
+    |> filter_function_docs(fun, arity)
+    |> case do
+      [] ->
+        {:error, "Documentation not found for #{inspect(mod)}.#{fun}/#{arity}"}
+
+      docs ->
+        formatted_docs =
+          Enum.map(docs, fn {{_, fun, arity}, _, signature, doc, metadata} ->
+            format_function_docs(mod, fun, arity, signature, doc, metadata)
+          end)
+
+        {:ok, Enum.join(formatted_docs, "\n\n")}
+    end
+  end
+
+  defp get_function_docs(mod, kinds) do
+    case Code.fetch_docs(mod) do
+      {:docs_v1, _, _, "text/markdown", _, _, docs} ->
+        for {{kind, _, _}, _, _, _, _} = doc <- docs, kind in kinds, do: doc
+
+      {:error, _} ->
+        []
+    end
+  end
+
+  defp filter_function_docs(docs, fun, arity) when is_integer(arity) do
+    doc =
+      Enum.find(docs, &match?({{_, ^fun, ^arity}, _, _, _, _}, &1)) ||
+        find_doc_defaults(docs, fun, arity)
+
+    case doc do
+      {_, _, _, %{"en" => _}, _} -> [doc]
+      _ -> []
+    end
+  end
+
+  defp filter_function_docs(docs, fun, :*) do
+    Enum.filter(docs, fn
+      {{_, ^fun, _}, _, _, %{"en" => _}, _} -> true
+      _ -> false
+    end)
+  end
+
+  defp find_doc_defaults(docs, function, min) do
+    Enum.find(docs, fn
+      {{_, ^function, arity}, _, _, _, %{defaults: defaults}} when arity > min ->
+        arity <= min + defaults
+
+      _ ->
+        false
+    end)
+  end
+
+  defp format_function_docs(mod, fun, arity, signature, %{"en" => content}, _metadata) do
+    header = "# #{inspect(mod)}.#{fun}/#{arity}\n\n"
+    snippet = "```elixir\n#{Enum.join(signature, "\n")}\n```\n\n"
+    header <> snippet <> content
   end
 end
