@@ -20,11 +20,9 @@ defmodule Tidewave.MCP.Tools.Eval do
         something. The tool also returns anything written to standard
         output. DO NOT use shell tools to evaluate Elixir code.
 
-        It also includes IEx helpers in the evaluation context. Thus,
-        to get documentation for a module or function, use this tool
-        and execute the `h` helper, for example:
-
-        h Enum.map/2
+        It also includes IEx helpers in the evaluation context.
+        For example, to get all functions in a module, call
+        `exports(String)`.
         """,
         inputSchema: %{
           type: "object",
