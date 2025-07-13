@@ -23,9 +23,10 @@ defmodule Tidewave.MCP.Tools.Ecto do
           using LIMIT and OFFSET in the query. If you know that only specific columns are relevant,
           only include those in the SELECT clause.
 
-          You can use this tool to select user data, manipulating entries, and introspect the application data domain.
-          Always ensure to use the correct SQL commands for the database you are using. The description of the
-          repo parameter includes a list of available repositories and their adapters.
+          You can use this tool to introspect the database, select and manipulate user data.
+          Keep in mind data is returned using a low-level format, for example, UUIDs are represented
+          using 16-byte binaries. You may need to cast them to text when using Postgres
+          (such as id::text) or use BIN_TO_UUID(id) on databases like MySQL.
           """,
           inputSchema: %{
             type: "object",
@@ -41,6 +42,7 @@ defmodule Tidewave.MCP.Tools.Ecto do
                 #{Jason.encode!(repos, pretty: true)}
 
                 If no repository is specified, the first repository is used:
+
                 #{Jason.encode!(default_repo, pretty: true)}
                 """
               },
@@ -134,7 +136,7 @@ defmodule Tidewave.MCP.Tools.Ecto do
   end
 
   defp ecto_repos do
-    # this is the same code ecto uses to find repos for tasks like mix ecto.migrate
+    # This is the same code ecto uses to find repos for tasks like mix ecto.migrate
     # https://github.com/elixir-ecto/ecto/blob/cd0f70b4cdd949767ea7cbe7d635e70917384b38/lib/mix/ecto.ex#L24-L52
     apps =
       if apps_paths = Mix.Project.apps_paths() do
@@ -150,11 +152,8 @@ defmodule Tidewave.MCP.Tools.Ecto do
     end)
     |> Enum.uniq()
     |> case do
-      [] ->
-        []
-
-      repos ->
-        repos
+      [] -> []
+      repos -> repos
     end
   end
 
