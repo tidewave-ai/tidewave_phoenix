@@ -119,17 +119,17 @@ defmodule Tidewave.MCP.Tools.Ecto do
           Code.ensure_loaded?(module),
           function_exported?(module, :__changeset__, 0) do
         case Source.get_source_location(%{"reference" => inspect(module)}) do
-          {:ok, source_file} ->
-            %{module: inspect(module), source_file: source_file}
+          {:ok, source_location} ->
+            "* #{inspect(module)} at #{source_location}"
 
           _ ->
-            %{module: inspect(module), source_file: nil}
+            "* #{inspect(module)}"
         end
       end
 
     case schemas do
       [] -> {:error, "No Ecto schemas found in the project"}
-      schemas -> {:ok, Jason.encode!(schemas)}
+      schemas -> {:ok, Enum.join(schemas, "\n")}
     end
   end
 

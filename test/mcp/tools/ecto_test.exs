@@ -173,10 +173,7 @@ defmodule Tidewave.MCP.Tools.EctoTest do
       end)
 
       {:ok, text} = Ecto.get_ecto_schemas(%{})
-
-      assert Jason.decode!(text) == [
-               %{"module" => "TestSchema", "source_file" => "test/mcp/tools/ecto_test.exs"}
-             ]
+      assert text == "* TestSchema at test/mcp/tools/ecto_test.exs"
     end
   end
 end
