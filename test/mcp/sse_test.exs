@@ -18,7 +18,9 @@ defmodule Tidewave.MCP.SSETest do
         |> Map.put(:port, 9000)
 
       # Start the SSE connection in a separate process to avoid blocking the test
-      :proc_lib.spawn_link(fn -> Tidewave.call(conn, Tidewave.init([])) end)
+      Task.start_link(fn ->
+        Tidewave.call(conn, Tidewave.init([]))
+      end)
 
       # Wait briefly for the connection to be established
       :timer.sleep(100)
@@ -37,8 +39,8 @@ defmodule Tidewave.MCP.SSETest do
         |> Map.put(:port, 9000)
         |> Plug.Conn.fetch_query_params()
 
-      state_pid =
-        :proc_lib.spawn_link(fn ->
+      {:ok, state_pid} =
+        Task.start_link(fn ->
           Tidewave.call(sse_conn, Tidewave.init([]))
         end)
 

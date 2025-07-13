@@ -170,8 +170,8 @@ defmodule Tidewave.MCP.SSE do
   end
 
   defp send_initial_message(conn, session_id) do
-    endpoint =
-      "#{conn.scheme}://#{conn.host}:#{conn.port}/tidewave/mcp/message?sessionId=#{session_id}"
+    path = Enum.join(conn.script_name ++ ["mcp/message"], "/")
+    endpoint = "#{conn.scheme}://#{conn.host}:#{conn.port}/#{path}?sessionId=#{session_id}"
 
     case chunk(conn, "event: endpoint\ndata: #{endpoint}\n\n") do
       {:ok, conn} -> conn
