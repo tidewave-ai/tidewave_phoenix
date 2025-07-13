@@ -24,9 +24,9 @@ defmodule Tidewave.MCP.Tools.Ecto do
           only include those in the SELECT clause.
 
           You can use this tool to introspect the database, select and manipulate user data.
-          Keep in mind data is returned using a low-level format, for example, UUIDs are represented
-          using 16-byte binaries. You may need to cast them to text when using Postgres
-          (such as id::text) or use BIN_TO_UUID(id) on databases like MySQL.
+          Keep in mind data is returned in a low-level representation. For example, UUIDs are
+          16-byte binaries. If you run into issues, you may want to cast them, such as `id::text`
+          in PostgreSQL or using `BIN_TO_UUID(column)` on databases like MySQL.
           """,
           inputSchema: %{
             type: "object",
