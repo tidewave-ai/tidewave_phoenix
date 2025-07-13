@@ -2,6 +2,7 @@ defmodule Tidewave.MCP.Tools.Ecto do
   @moduledoc false
 
   alias Tidewave.MCP.Tools.Source
+  @limit 50
 
   def tools do
     if repos_configured?() do
@@ -19,9 +20,9 @@ defmodule Tidewave.MCP.Tools.Ecto do
           Executes the given SQL query against the given default or specified Ecto repository.
           Returns the result as an Elixir data structure.
 
-          Note that the output is limited to 50 rows at a time. If you need to see more, perform additional calls
-          using LIMIT and OFFSET in the query. If you know that only specific columns are relevant,
-          only include those in the SELECT clause.
+          Note that the output is limited to #{@limit} rows at a time. If you need to see more,
+          perform additional calls using LIMIT and OFFSET in the query. If you know that only
+          specific columns are relevant, only include those in the SELECT clause.
 
           You can use this tool to select user data, manipulating entries, and introspect the application data domain.
           Always ensure to use the correct SQL commands for the database you are using. The description of the
@@ -89,20 +90,24 @@ defmodule Tidewave.MCP.Tools.Ecto do
         repo -> Module.concat([repo])
       end
 
-    limit = Keyword.get(assigns.inspect_opts, :limit, 50)
-
     case repo.query(query, args["arguments"] || []) do
       {:ok, result} ->
-        preamble =
+        {preamble, result} =
           case result do
-            %{num_rows: num_rows} when num_rows > limit ->
-              "Query returned #{num_rows} rows. Only the first #{limit} rows are included in the result. Use LIMIT + OFFSET in your query to show more rows if applicable.\n\n"
+            %{num_rows: num_rows, rows: rows} when num_rows > @limit ->
+              {"""
+               Query returned #{num_rows} rows. Only the first #{@limit} rows \
+               are included in the result. Use LIMIT + OFFSET in your query \
+               to show more rows if applicable.\n\n\
+               """, %{result | rows: Enum.take(rows, 50)}}
 
             _ ->
-              ""
+              {"", result}
           end
 
-        {:ok, preamble <> inspect(result, assigns.inspect_opts)}
+        # We already limited the results above
+        inspect_opts = Keyword.put(assigns.inspect_opts, :limit, :infinity)
+        {:ok, preamble <> inspect(result, inspect_opts)}
 
       {:error, reason} ->
         {:error, "Failed to execute query: #{inspect(reason, assigns.inspect_opts)}"}

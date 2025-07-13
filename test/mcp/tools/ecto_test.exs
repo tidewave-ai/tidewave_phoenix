@@ -146,11 +146,11 @@ defmodule Tidewave.MCP.Tools.EctoTest do
             "query" => "SELECT lotsofrows",
             "arguments" => []
           },
-          Tidewave.init(inspect_opts: [limit: 10])
+          Tidewave.init([])
         )
 
-      assert text =~ "Query returned 100 rows. Only the first 10 rows are included in the result."
-      assert text =~ "5, 6, 7"
+      assert text =~ "Query returned 100 rows. Only the first 50 rows are included in the result."
+      refute text =~ "51"
     end
   end
 
