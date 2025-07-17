@@ -156,10 +156,6 @@ defmodule Tidewave.MCP.Tools.Ecto do
       Application.get_env(app, :ecto_repos, [])
     end)
     |> Enum.uniq()
-    |> case do
-      [] -> []
-      repos -> repos
-    end
   end
 
   defp repos_configured? do
