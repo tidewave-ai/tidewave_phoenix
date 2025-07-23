@@ -8,19 +8,30 @@ top right (see image below):
 
 ![Zed AI panel](assets/zed.png)
 
-In the new pane, select "Add Custom Server" to open a new dialog. Fill in
-the name of your choice and the following command.
+In the new pane, select "Add Custom Server" to open a new dialog. Fill in with the following.
 
 On macOS/Linux:
 
 ```text
-/path/to/mcp-proxy http://localhost:$PORT/tidewave/mcp
+{
+  "tidewave-mcp": {
+    "command": "/path/to/mcp-proxy",
+    "args": ["http://localhost:$PORT/tidewave/mcp"],
+    "env": {}
+  }
+}
 ```
 
 On Windows:
 
 ```text
-c:\path\to\mcp-proxy.exe http://localhost:$PORT/tidewave/mcp
+{
+  "tidewave-mcp": {
+    "command": "c:\path\to\mcp-proxy.exe",
+    "args": ["http://localhost:$PORT/tidewave/mcp"],
+    "env": {}
+  }
+}
 ```
 
 Where `$PORT` is the port your web application is running on and `/path/to/mcp-proxy` should be replaced with the absolute path to your mcp-proxy executable.
