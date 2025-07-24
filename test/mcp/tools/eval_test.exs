@@ -104,8 +104,11 @@ defmodule Tidewave.MCP.Tools.EvalTest do
       assert {:ok, result, %{}} =
                Eval.project_eval(%{"code" => code, "json" => true}, Tidewave.init([]))
 
-      assert result =~ "\"result\":2"
-      assert result =~ "\"success\":true"
+      assert Jason.decode!(result) == %{
+               "result" => 2,
+               "success" => true,
+               "stdout" => ""
+             }
     end
 
     test "returns formatted errors for exceptions" do
@@ -114,19 +117,10 @@ defmodule Tidewave.MCP.Tools.EvalTest do
       assert {:ok, error, %{}} =
                Eval.project_eval(%{"code" => code, "json" => true}, Tidewave.init([]))
 
-      assert error =~ "ArithmeticError"
-      assert error =~ "bad argument in arithmetic expression"
-      assert error =~ "\"success\":false"
-    end
-
-    test "can use IEx helpers" do
-      code = "h Tidewave"
-
-      assert {:ok, docs, %{}} =
-               Eval.project_eval(%{"code" => code, "json" => true}, Tidewave.init([]))
-
-      assert docs =~ "Tidewave"
-      assert docs =~ "\"success\":true"
+      decoded = Jason.decode!(error)
+      assert decoded["success"] == false
+      assert decoded["result"] =~ "ArithmeticError"
+      assert decoded["result"] =~ "bad argument in arithmetic expression"
     end
 
     test "catches exits" do
@@ -152,9 +146,10 @@ defmodule Tidewave.MCP.Tools.EvalTest do
                  Tidewave.init([])
                )
 
-      assert result =~ "Hello!"
-      assert result =~ "ArithmeticError"
-      assert result =~ "\"success\":false"
+      decoded = Jason.decode!(result)
+      assert decoded["success"] == false
+      assert decoded["stdout"] =~ "Hello!"
+      assert decoded["result"] =~ "ArithmeticError"
     end
 
     test "captures standard_error" do
@@ -164,8 +159,9 @@ defmodule Tidewave.MCP.Tools.EvalTest do
                  Tidewave.init([])
                )
 
-      assert result =~ "undefined variable \\\"hello\\\""
-      assert result =~ "\"success\":false"
+      decoded = Jason.decode!(result)
+      assert decoded["success"] == false
+      assert decoded["stdout"] =~ "undefined variable \"hello\""
     end
 
     test "suports arguments" do
@@ -175,8 +171,11 @@ defmodule Tidewave.MCP.Tools.EvalTest do
                  Tidewave.init([])
                )
 
-      assert result =~ "\"result\":[1,\"2\"]"
-      assert result =~ "\"success\":true"
+      assert Jason.decode!(result) == %{
+               "result" => [1, "2"],
+               "success" => true,
+               "stdout" => ""
+             }
     end
   end
 
