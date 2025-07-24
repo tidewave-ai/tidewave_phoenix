@@ -98,44 +98,41 @@ defmodule Tidewave.MCP.Tools.EvalTest do
   end
 
   describe "project_eval/2 (structured)" do
-    test "evaluates simple Elixir expressions" do
+    test "evaluates Elixir expressions" do
       code = "1 + 1"
 
-      assert {:ok, "2", %{}} = Eval.project_eval(%{"code" => code}, Tidewave.init([]))
-    end
+      assert {:ok, result, %{}} =
+               Eval.project_eval(%{"code" => code, "json" => true}, Tidewave.init([]))
 
-    test "evaluates complex Elixir expressions" do
-      code = """
-      defmodule Temp do
-        def add(a, b), do: a + b
-      end
-
-      Temp.add(40, 2)
-      """
-
-      assert {:ok, "42", %{}} = Eval.project_eval(%{"code" => code}, Tidewave.init([]))
+      assert result =~ "\"result\":2"
+      assert result =~ "\"success\":true"
     end
 
     test "returns formatted errors for exceptions" do
       code = "1 / 0"
 
-      assert {:ok, error, %{}} = Eval.project_eval(%{"code" => code}, Tidewave.init([]))
+      assert {:ok, error, %{}} =
+               Eval.project_eval(%{"code" => code, "json" => true}, Tidewave.init([]))
+
       assert error =~ "ArithmeticError"
       assert error =~ "bad argument in arithmetic expression"
+      assert error =~ "\"success\":false"
     end
 
     test "can use IEx helpers" do
       code = "h Tidewave"
 
-      assert {:ok, docs, %{}} = Eval.project_eval(%{"code" => code}, Tidewave.init([]))
+      assert {:ok, docs, %{}} =
+               Eval.project_eval(%{"code" => code, "json" => true}, Tidewave.init([]))
 
       assert docs =~ "Tidewave"
+      assert docs =~ "\"success\":true"
     end
 
     test "catches exits" do
       assert {:error, "Failed to evaluate code. Process exited with reason: :brutal_kill"} =
                Eval.project_eval(
-                 %{"code" => "Process.exit(self(), :brutal_kill)"},
+                 %{"code" => "Process.exit(self(), :brutal_kill)", "json" => true},
                  Tidewave.init([])
                )
     end
@@ -143,37 +140,43 @@ defmodule Tidewave.MCP.Tools.EvalTest do
     test "times out" do
       assert {:error, "Evaluation timed out after 50 milliseconds."} =
                Eval.project_eval(
-                 %{"code" => "Process.sleep(10_000)", "timeout" => 50},
+                 %{"code" => "Process.sleep(10_000)", "timeout" => 50, "json" => true},
                  Tidewave.init([])
                )
     end
 
     test "returns IO up to exception" do
       assert {:ok, result, %{}} =
-               Eval.project_eval(%{"code" => ~s[IO.puts("Hello!"); 1 / 0]}, Tidewave.init([]))
+               Eval.project_eval(
+                 %{"code" => ~s[IO.puts("Hello!"); 1 / 0], "json" => true},
+                 Tidewave.init([])
+               )
 
       assert result =~ "Hello!"
       assert result =~ "ArithmeticError"
+      assert result =~ "\"success\":false"
     end
 
     test "captures standard_error" do
       assert {:ok, result, %{}} =
                Eval.project_eval(
-                 %{"code" => "hello"},
+                 %{"code" => "hello", "json" => true},
                  Tidewave.init([])
                )
 
-      assert result =~ "undefined variable \"hello\""
+      assert result =~ "undefined variable \\\"hello\\\""
+      assert result =~ "\"success\":false"
     end
 
     test "suports arguments" do
       assert {:ok, result, %{}} =
                Eval.project_eval(
-                 %{"code" => "arguments", "arguments" => [1, "2"]},
+                 %{"code" => "arguments", "arguments" => [1, "2"], "json" => true},
                  Tidewave.init([])
                )
 
-      assert result == "[1, \"2\"]"
+      assert result =~ "\"result\":[1,\"2\"]"
+      assert result =~ "\"success\":true"
     end
   end
 
