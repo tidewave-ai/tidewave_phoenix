@@ -133,6 +133,8 @@ defmodule Tidewave.Router do
       credentials: Map.new(credentials),
       framework: %{
         type: "phoenix",
+        elixir_version: System.version(),
+        otp_version: System.otp_release(),
         tidewave_version: package_version(:tidewave),
         phoenix_version: package_version(:phoenix),
         live_view_version: package_version(:phoenix_live_view)
