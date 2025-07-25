@@ -32,6 +32,12 @@ defmodule Tidewave.MCP.Tools.Eval do
               type: "string",
               description: "The Elixir code to evaluate."
             },
+            arguments: %{
+              type: "array",
+              description:
+                "The arguments to pass to evaluation. They are available inside the evaluated code as `arguments`.",
+              items: %{}
+            },
             timeout: %{
               type: "integer",
               description: """
@@ -86,23 +92,31 @@ defmodule Tidewave.MCP.Tools.Eval do
   """
   def project_eval(args, assigns) do
     case args do
-      %{"code" => code} -> eval_code(code, Map.get(args, "timeout", 30_000), assigns)
-      _ -> {:error, :invalid_arguments}
+      %{"code" => code} ->
+        arguments = Map.get(args, "arguments", [])
+        timeout = Map.get(args, "timeout", 30_000)
+        json? = Map.get(args, "json", false)
+        eval_code(code, arguments, timeout, json?, assigns)
+
+      _ ->
+        {:error, :invalid_arguments}
     end
   end
 
-  defp eval_code(code, timeout, assigns) do
+  defp eval_code(code, arguments, timeout, json?, assigns) do
     parent = self()
 
     if endpoint = assigns[:phoenix_endpoint] do
       Phoenix.CodeReloader.reload(endpoint)
     end
 
+    inspect_opts = assigns.inspect_opts
+
     {pid, ref} =
       spawn_monitor(fn ->
         # we need to set the logger metadata again
         Logger.metadata(tidewave_mcp: true)
-        send(parent, {:result, eval_with_captured_io(code, assigns.inspect_opts)})
+        send(parent, {:result, eval_with_captured_io(code, arguments, json?, inspect_opts)})
       end)
 
     receive do
@@ -120,24 +134,24 @@ defmodule Tidewave.MCP.Tools.Eval do
     end
   end
 
-  defp eval_with_captured_io(code, inspect_opts) do
-    result =
+  defp eval_with_captured_io(code, arguments, json?, inspect_opts) do
+    {{success?, result}, io} =
       capture_io(fn ->
         IOForwardGL.with_forwarded_io(:standard_error, fn ->
           try do
-            {result, _bindings} = Code.eval_string(code, [], env())
-            result
+            {result, _bindings} = Code.eval_string(code, [arguments: arguments], env())
+            {true, result}
           catch
-            kind, reason -> Exception.format(kind, reason, __STACKTRACE__)
+            kind, reason -> {false, Exception.format(kind, reason, __STACKTRACE__)}
           end
         end)
       end)
 
     case result do
-      # this is returned by IEx helpers
-      {:"do not show this result in output", io} -> io
-      {result, ""} -> inspect(result, inspect_opts)
-      {result, io} -> "IO:\n\n#{io}\n\nResult:\n\n#{inspect(result, inspect_opts)}"
+      _ when json? -> Jason.encode!(%{result: result, success: success?, stdout: io})
+      :"do not show this result in output" -> io
+      _ when io == "" -> inspect(result, inspect_opts)
+      _ -> "IO:\n\n#{io}\n\nResult:\n\n#{inspect(result, inspect_opts)}"
     end
   end
 
