@@ -140,17 +140,18 @@ defmodule Tidewave.MCP.Tools.Ecto do
     end
   end
 
-  defp ecto_repos do
+  defp apps do
     # This is the same code ecto uses to find repos for tasks like mix ecto.migrate
     # https://github.com/elixir-ecto/ecto/blob/cd0f70b4cdd949767ea7cbe7d635e70917384b38/lib/mix/ecto.ex#L24-L52
-    apps =
-      if apps_paths = Mix.Project.apps_paths() do
-        Enum.filter(Mix.Project.deps_apps(), &is_map_key(apps_paths, &1))
-      else
-        [Mix.Project.config()[:app]]
-      end
+    if apps_paths = Mix.Project.apps_paths() do
+      Enum.filter(Mix.Project.deps_apps(), &is_map_key(apps_paths, &1))
+    else
+      [Mix.Project.config()[:app]]
+    end
+  end
 
-    apps
+  defp ecto_repos do
+    apps()
     |> Enum.flat_map(fn app ->
       Application.load(app)
       Application.get_env(app, :ecto_repos, [])
@@ -163,10 +164,14 @@ defmodule Tidewave.MCP.Tools.Ecto do
   end
 
   defp project_modules do
+    build_path = Mix.Project.build_path()
+
     files =
-      Mix.Project.compile_path()
-      |> File.ls!()
-      |> Enum.sort()
+      apps()
+      |> Enum.flat_map(fn app ->
+        File.ls!(Path.join(build_path, "lib/#{app}/ebin"))
+      end)
+      |> :lists.usort()
 
     for file <- files, [basename, ""] <- [:binary.split(file, ".beam")] do
       String.to_atom(basename)
