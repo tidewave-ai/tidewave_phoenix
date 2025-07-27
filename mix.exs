@@ -64,6 +64,7 @@ defmodule Tidewave.MixProject do
         "pages/editors/claude.md",
         "pages/editors/cursor.md",
         "pages/editors/neovim.md",
+        "pages/editors/opencode.md",
         "pages/editors/vscode.md",
         "pages/editors/windsurf.md",
         "pages/editors/zed.md",
