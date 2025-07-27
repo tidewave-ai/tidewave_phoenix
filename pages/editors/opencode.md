@@ -11,7 +11,7 @@ You can use Tidewave with [opencode](https://opencode.ai/) by adding the followi
 
 See the [MCP proxy documentation](guides/mcp_proxy.md).
 
-On macOs/Linux:
+On macOS/Linux:
 
 ```json
 {
