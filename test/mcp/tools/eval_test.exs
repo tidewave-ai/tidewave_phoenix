@@ -86,7 +86,7 @@ defmodule Tidewave.MCP.Tools.EvalTest do
       assert result =~ "undefined variable \"hello\""
     end
 
-    test "suports arguments" do
+    test "supports arguments" do
       assert {:ok, result, %{}} =
                Eval.project_eval(
                  %{"code" => "arguments", "arguments" => [1, "2"]},
