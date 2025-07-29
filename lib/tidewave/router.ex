@@ -79,7 +79,7 @@ defmodule Tidewave.Router do
         end
 
       _ ->
-        raise "response body too large"
+        raise "request body too large"
     end
   end
 
