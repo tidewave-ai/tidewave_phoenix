@@ -87,11 +87,62 @@ defmodule TidewaveTest do
     assert conn.status == 200
   end
 
-  test "405 when POSTing to /mcp" do
-    conn =
-      conn(:post, "/tidewave/mcp")
-      |> Tidewave.call(Tidewave.init([]))
+  describe "/mcp" do
+    test "405 when POSTing" do
+      conn =
+        conn(:post, "/tidewave/mcp")
+        |> Tidewave.call(Tidewave.init([]))
 
-    assert conn.status == 405
+      assert conn.status == 405
+    end
+  end
+
+  describe "/shell" do
+    test "executes simple command and returns output with status" do
+      conn =
+        conn(:post, "/tidewave/shell", "echo 'hello world'")
+        |> Tidewave.call(Tidewave.init([]))
+
+      assert conn.status == 200
+
+      assert conn.resp_body == """
+             hello world
+
+             TIDEWAVE STATUS: 0\
+             """
+    end
+
+    test "handles command with non-zero exit status" do
+      conn =
+        conn(:post, "/tidewave/shell", "exit 42")
+        |> Tidewave.call(Tidewave.init([]))
+
+      assert conn.status == 200
+
+      assert conn.resp_body == """
+
+             TIDEWAVE STATUS: 42\
+             """
+    end
+
+    test "handles multiline commands" do
+      cmd = """
+      echo 'line 1'
+      echo 'line 2'
+      """
+
+      conn =
+        conn(:post, "/tidewave/shell", cmd)
+        |> Tidewave.call(Tidewave.init([]))
+
+      assert conn.status == 200
+
+      assert conn.resp_body == """
+             line 1
+             line 2
+
+             TIDEWAVE STATUS: 0\
+             """
+    end
   end
 end
