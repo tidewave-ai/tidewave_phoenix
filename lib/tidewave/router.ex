@@ -175,18 +175,10 @@ defmodule Tidewave.Router do
   defp tidewave_html() do
     client_url = Application.get_env(:tidewave, :client_url, "https://tidewave.ai")
 
-    credentials = Application.get_env(:tidewave, :credentials, [])
-    credentials = Keyword.merge(default_credentials(), credentials)
-
     config = %{
       project_name: MCP.project_name(),
-      credentials: Map.new(credentials),
-      framework: %{
-        type: "phoenix",
-        tidewave_version: package_version(:tidewave),
-        phoenix_version: package_version(:phoenix),
-        live_view_version: package_version(:phoenix_live_view)
-      }
+      framework_type: "phoenix",
+      tidewave_version: package_version(:tidewave)
     }
 
     # We return a basic page that loads script from Tidewave server to
@@ -205,16 +197,6 @@ defmodule Tidewave.Router do
       <body></body>
     </html>
     """
-  end
-
-  defp default_credentials() do
-    credentials = [
-      anthropic: System.get_env("ANTHROPIC_API_KEY"),
-      openai: System.get_env("OPENAI_API_KEY"),
-      google: System.get_env("GOOGLE_AI_API_KEY")
-    ]
-
-    Enum.filter(credentials, fn {_key, value} -> value end)
   end
 
   defp package_version(app) do
