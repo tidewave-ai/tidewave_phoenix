@@ -107,7 +107,8 @@ defmodule Tidewave.MCP.Tools.EvalTest do
       assert Jason.decode!(result) == %{
                "result" => 2,
                "success" => true,
-               "stdout" => ""
+               "stdout" => "",
+               "stderr" => ""
              }
     end
 
@@ -174,7 +175,8 @@ defmodule Tidewave.MCP.Tools.EvalTest do
       assert Jason.decode!(result) == %{
                "result" => [1, "2"],
                "success" => true,
-               "stdout" => ""
+               "stdout" => "",
+               "stderr" => ""
              }
     end
   end

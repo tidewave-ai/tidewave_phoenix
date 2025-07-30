@@ -148,7 +148,7 @@ defmodule Tidewave.MCP.Tools.Eval do
       end)
 
     case result do
-      _ when json? -> Jason.encode!(%{result: result, success: success?, stdout: io})
+      _ when json? -> Jason.encode!(%{result: result, success: success?, stdout: io, stderr: ""})
       :"do not show this result in output" -> io
       _ when io == "" -> inspect(result, inspect_opts)
       _ -> "IO:\n\n#{io}\n\nResult:\n\n#{inspect(result, inspect_opts)}"
