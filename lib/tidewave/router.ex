@@ -59,7 +59,9 @@ defmodule Tidewave.Router do
     # Finding shell command logic from :os.cmd in OTP
     # https://github.com/erlang/otp/blob/8deb96fb1d017307e22d2ab88968b9ef9f1b71d0/lib/kernel/src/os.erl#L184
     case Plug.Conn.read_body(conn) do
-      {:ok, cmd, conn} ->
+      {:ok, body, conn} ->
+        %{"command" => cmd} = Jason.decode!(body)
+
         case :os.type() do
           {:unix, _} ->
             shell_path = :os.find_executable(~c"sh") || raise "missing sh"
@@ -86,7 +88,13 @@ defmodule Tidewave.Router do
   defp shell(port_init, args, conn) do
     args = [:exit_status, :binary, :hide, :use_stdio, :stderr_to_stdout] ++ args
     port = Port.open(port_init, args)
-    shell(port, send_chunked(conn, 200))
+
+    conn =
+      conn
+      |> put_resp_header("content-type", "text/plain")
+      |> send_chunked(200)
+
+    shell(port, conn)
   end
 
   defp shell(port, conn) do
@@ -95,12 +103,12 @@ defmodule Tidewave.Router do
         shell(port, conn)
 
       {^port, {:data, data}} ->
-        {:ok, conn} = chunk(conn, data)
+        {:ok, conn} = chunk(conn, [0, <<byte_size(data)::32-unsigned-integer-big>>, data])
         shell(port, conn)
 
       {^port, {:exit_status, status}} ->
-        {:ok, conn} = chunk(conn, "\nTIDEWAVE STATUS: #{status}")
-        {:ok, conn} = chunk(conn, "")
+        data = ~s|{"status":#{status}}|
+        {:ok, conn} = chunk(conn, [1, <<byte_size(data)::32-unsigned-integer-big>>, data])
         conn
     end
   end

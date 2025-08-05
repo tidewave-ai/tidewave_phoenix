@@ -99,50 +99,48 @@ defmodule TidewaveTest do
 
   describe "/shell" do
     test "executes simple command and returns output with status" do
+      body = %{command: "echo 'hello world'"}
+
       conn =
-        conn(:post, "/tidewave/shell", "echo 'hello world'")
+        conn(:post, "/tidewave/shell", Jason.encode!(body))
         |> Tidewave.call(Tidewave.init([]))
 
       assert conn.status == 200
 
-      assert conn.resp_body == """
-             hello world
-
-             TIDEWAVE STATUS: 0\
-             """
+      assert conn.resp_body ==
+               <<0, 0, 0, 0, 12, "hello world\n", 1, 0, 0, 0, 12, ~S|{"status":0}|>>
     end
 
     test "handles command with non-zero exit status" do
+      body = %{command: "exit 42"}
+
       conn =
-        conn(:post, "/tidewave/shell", "exit 42")
+        conn(:post, "/tidewave/shell", Jason.encode!(body))
         |> Tidewave.call(Tidewave.init([]))
 
       assert conn.status == 200
 
-      assert conn.resp_body == """
-
-             TIDEWAVE STATUS: 42\
-             """
+      assert conn.resp_body == <<1, 0, 0, 0, 13, ~S|{"status":42}|>>
     end
 
     test "handles multiline commands" do
-      cmd = """
-      echo 'line 1'
-      echo 'line 2'
-      """
+      body = %{
+        command: """
+        echo 'line 1'
+        sleep 0.1
+        echo 'line 2'
+        """
+      }
 
       conn =
-        conn(:post, "/tidewave/shell", cmd)
+        conn(:post, "/tidewave/shell", Jason.encode!(body))
         |> Tidewave.call(Tidewave.init([]))
 
       assert conn.status == 200
 
-      assert conn.resp_body == """
-             line 1
-             line 2
-
-             TIDEWAVE STATUS: 0\
-             """
+      assert conn.resp_body ==
+               <<0, 0, 0, 0, 7, "line 1\n", 0, 0, 0, 0, 7, "line 2\n", 1, 0, 0, 0, 12,
+                 ~S|{"status":0}|>>
     end
   end
 end
