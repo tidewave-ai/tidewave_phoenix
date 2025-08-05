@@ -33,22 +33,3 @@ Here is a baseline comparison of the tools supported by different frameworks/lan
 | `get_models` / `get_schemas` | ✅                    | ✅                 |
 | `execute_sql_query`          | ✅                    | ✅                 |
 | `search_package_docs`        | ✅                    |                   |
-
-### Filesystem tools
-
-Our MCP servers may also accept `/tidewave/mcp?include_fs_tools=true` option,
-which enables your assistant to run shell commands as well as list, read and write
-files. Writing and editing files may also perform syntax validation and automatic
-formatting.
-
-Most editors and CLI tools already provide this functionality which are better
-integrated into their specific environments. The ones below are kept minimal
-and mentioned here for documentation purposes:
-
-| Features                   | Tidewave for Phoenix | Tidewave for Rails |
-| :------------------------- | :------------------: | :----------------: |
-| `shell_eval`               | ✅                    | ✅                 |
-| `read_project_file`        | ✅                    | ✅                 |
-| `write_project_file`       | ✅                    | ✅                 |
-| Syntax validation          | ✅                    | ✅                 |
-| Automatic formatting       | ✅                    |                   |
