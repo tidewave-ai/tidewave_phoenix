@@ -103,11 +103,12 @@ defmodule Tidewave.Router do
         shell(port, conn)
 
       {^port, {:data, data}} ->
-        {:ok, conn} = chunk(conn, data)
+        {:ok, conn} = chunk(conn, [0, <<byte_size(data)::32-unsigned-integer-big>>, data])
         shell(port, conn)
 
       {^port, {:exit_status, status}} ->
-        {:ok, conn} = chunk(conn, ~s|\n<tidewave_done>{"status":#{status}}|)
+        data = ~s|{"status":#{status}}|
+        {:ok, conn} = chunk(conn, [1, <<byte_size(data)::32-unsigned-integer-big>>, data])
         conn
     end
   end
