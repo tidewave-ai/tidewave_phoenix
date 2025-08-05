@@ -107,11 +107,8 @@ defmodule TidewaveTest do
 
       assert conn.status == 200
 
-      assert conn.resp_body == """
-             hello world
-
-             <tidewave_done>{"status":0}\
-             """
+      assert conn.resp_body ==
+               <<0, 0, 0, 0, 12, "hello world\n", 1, 0, 0, 0, 12, ~S|{"status":0}|>>
     end
 
     test "handles command with non-zero exit status" do
@@ -123,16 +120,14 @@ defmodule TidewaveTest do
 
       assert conn.status == 200
 
-      assert conn.resp_body == """
-
-             <tidewave_done>{"status":42}\
-             """
+      assert conn.resp_body == <<1, 0, 0, 0, 13, ~S|{"status":42}|>>
     end
 
     test "handles multiline commands" do
       body = %{
         command: """
         echo 'line 1'
+        sleep 0.1
         echo 'line 2'
         """
       }
@@ -143,12 +138,9 @@ defmodule TidewaveTest do
 
       assert conn.status == 200
 
-      assert conn.resp_body == """
-             line 1
-             line 2
-
-             <tidewave_done>{"status":0}\
-             """
+      assert conn.resp_body ==
+               <<0, 0, 0, 0, 7, "line 1\n", 0, 0, 0, 0, 7, "line 2\n", 1, 0, 0, 0, 12,
+                 ~S|{"status":0}|>>
     end
   end
 end
