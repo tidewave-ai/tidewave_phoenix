@@ -91,7 +91,7 @@ defmodule Tidewave.Router do
 
     conn =
       conn
-      |> put_resp_header("content-type", "text/plain")
+      |> put_resp_content_type("application/octet-stream")
       |> send_chunked(200)
 
     shell(port, conn)
