@@ -43,15 +43,6 @@ defmodule Tidewave.MCPIntegrationTest do
     assert "list_project_files" in tool_names
   end
 
-  @tag plug_opts: [tools: [exclude: [:write_project_file]]]
-  test "can exclude tools via plug opts", %{request: request} do
-    assert %{tools: tools} = request
-    assert is_list(tools)
-    assert tool_names = Enum.map(tools, & &1["name"])
-    assert "list_project_files" in tool_names
-    refute "write_project_file" in tool_names
-  end
-
   test "write to file needs to be recent", %{request: request} do
     assert %{resp: resp, endpoint_url: endpoint_url, tools: tools} = request
     assert "write_project_file" in Enum.map(tools, & &1["name"])

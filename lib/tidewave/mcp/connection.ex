@@ -86,21 +86,8 @@ defmodule Tidewave.MCP.Connection do
     GenServer.call(pid, {:handle_result, id})
   end
 
-  def connect_params_and_assigns(pid) do
-    GenServer.call(pid, :connect_params_and_assigns)
-  end
-
-  def dispatch(pid, callback, args) do
-    timeout =
-      case args do
-        %{"timeout" => timeout} when is_integer(timeout) ->
-          timeout + 1000
-
-        _ ->
-          30000
-      end
-
-    GenServer.call(pid, {:dispatch, callback, args}, timeout)
+  def connect_params(pid) do
+    GenServer.call(pid, :connect_params)
   end
 
   def send_sse_message(pid, message) do
@@ -182,23 +169,8 @@ defmodule Tidewave.MCP.Connection do
     {:reply, result, %{state | requests: Map.delete(state.requests, id)}}
   end
 
-  def handle_call(:connect_params_and_assigns, _from, state) do
-    {:reply, {state.conn.query_params, state.assigns}, state}
-  end
-
-  def handle_call({:dispatch, callback, args}, _from, state) do
-    # TODO: this should be moved out of the connection process
-    try do
-      callback.(args, state.assigns)
-    catch
-      kind, reason ->
-        {:reply,
-         {:error, "Failed to call tool: #{Exception.format(kind, reason, __STACKTRACE__)}"},
-         state}
-    else
-      response ->
-        {:reply, response, state}
-    end
+  def handle_call(:connect_params, _from, state) do
+    {:reply, state.conn.query_params, state}
   end
 
   @impl GenServer

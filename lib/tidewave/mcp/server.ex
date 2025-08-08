@@ -3,7 +3,6 @@ defmodule Tidewave.MCP.Server do
 
   require Logger
 
-  alias Tidewave.MCP
   alias Tidewave.MCP.Connection
   alias Tidewave.MCP.Tools
 
@@ -43,7 +42,7 @@ defmodule Tidewave.MCP.Server do
   end
 
   @doc false
-  def tools({connect_params, assigns}) do
+  def tools(connect_params) do
     {tools, _} = tools_and_dispatch()
 
     listable? = fn
@@ -54,10 +53,7 @@ defmodule Tidewave.MCP.Server do
         true
     end
 
-    for tool <- tools,
-        listable?.(tool),
-        is_nil(assigns.include_tools) or tool.name in assigns.include_tools,
-        tool.name not in assigns.exclude_tools do
+    for tool <- tools, listable?.(tool) do
       tool
       |> Map.put(:description, String.trim(tool.description))
       |> Map.drop([:callback, :listable])
@@ -73,12 +69,12 @@ defmodule Tidewave.MCP.Server do
   #   * `{:error, reason}` for any error
   #   * `{:error, reason, new_state}` for any error that should also update the state
   #
-  defp dispatch(name, args, state_pid) do
+  defp dispatch(name, args, assigns) do
     {_tools, dispatch} = tools_and_dispatch()
 
     case dispatch do
       %{^name => callback} when is_function(callback, 2) ->
-        MCP.Connection.dispatch(state_pid, callback, args)
+        callback.(args, assigns)
 
       %{^name => callback} when is_function(callback, 1) ->
         callback.(args)
@@ -122,7 +118,7 @@ defmodule Tidewave.MCP.Server do
                name: "Tidewave MCP Server",
                version: @vsn
              },
-             tools: tools(Connection.connect_params_and_assigns(state_pid))
+             tools: tools(Connection.connect_params(state_pid))
            }
          }}
 
@@ -134,13 +130,13 @@ defmodule Tidewave.MCP.Server do
   def handle_list_tools(request_id, _params, state_pid) do
     result_or_error(
       request_id,
-      {:ok, %{tools: tools(Connection.connect_params_and_assigns(state_pid))}}
+      {:ok, %{tools: tools(Connection.connect_params(state_pid))}}
     )
   end
 
-  def handle_call_tool(request_id, %{"name" => name} = params, state_pid) do
+  def handle_call_tool(request_id, %{"name" => name} = params, assigns) do
     args = Map.get(params, "arguments", %{})
-    result_or_error(request_id, dispatch(name, args, state_pid))
+    result_or_error(request_id, dispatch(name, args, assigns))
   end
 
   defp result_or_error(request_id, {:ok, text, metadata})
@@ -205,13 +201,13 @@ defmodule Tidewave.MCP.Server do
   ## handle_message function for SSE plug
 
   # Built-in message routing
-  def handle_message(%{"method" => "notifications/initialized"} = message, _state_pid) do
+  def handle_message(%{"method" => "notifications/initialized"} = message, _state_pid, _assigns) do
     Logger.info("Received initialized notification")
     Logger.debug("Full message: #{inspect(message, pretty: true)}")
     {:ok, nil}
   end
 
-  def handle_message(%{"method" => method, "id" => id} = message, state_pid) do
+  def handle_message(%{"method" => method, "id" => id} = message, state_pid, assigns) do
     Logger.info("Routing MCP message - Method: #{method}, ID: #{id}")
     Logger.debug("Full message: #{inspect(message, pretty: true)}")
 
@@ -236,7 +232,7 @@ defmodule Tidewave.MCP.Server do
           "Handling tool call request with params: #{inspect(message["params"], pretty: true)}"
         )
 
-        safe_call_tool(id, message["params"], state_pid)
+        safe_call_tool(id, message["params"], assigns)
 
       other ->
         Logger.warning("Received unsupported method: #{other}")
@@ -273,8 +269,8 @@ defmodule Tidewave.MCP.Server do
      }}
   end
 
-  defp safe_call_tool(request_id, params, state_pid) do
-    handle_call_tool(request_id, params, state_pid)
+  defp safe_call_tool(request_id, params, assigns) do
+    handle_call_tool(request_id, params, assigns)
   catch
     kind, reason ->
       # tool exceptions should be treated as successful response with isError: true

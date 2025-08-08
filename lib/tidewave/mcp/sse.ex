@@ -59,7 +59,7 @@ defmodule Tidewave.MCP.SSE do
           Logger.debug("Full message: #{inspect(msg, pretty: true)}")
           Connection.handle_initialize(connection_pid)
 
-          case Tidewave.MCP.Server.handle_message(msg, connection_pid) do
+          case Server.handle_message(msg, connection_pid, conn.private.tidewave_config) do
             {:ok, response} ->
               Logger.debug("Sending SSE response: #{inspect(response, pretty: true)}")
               Connection.send_sse_message(connection_pid, response)
@@ -92,7 +92,7 @@ defmodule Tidewave.MCP.SSE do
             # Handle requests that expect responses
             # TODO: we can always directly reply with 202 Accepted here, the response
             # is sent over the SSE connection
-            case Server.handle_message(message, connection_pid) do
+            case Server.handle_message(message, connection_pid, conn.private.tidewave_config) do
               {:ok, nil} ->
                 conn |> put_status(202) |> send_json(%{status: "ok"})
 

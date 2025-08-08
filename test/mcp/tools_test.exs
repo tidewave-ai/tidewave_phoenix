@@ -10,27 +10,6 @@ defmodule Tidewave.MCP.ToolsTest do
     end
   end
 
-  test "tools are hidden from the list when excluded" do
-    refute Enum.any?(
-             Tidewave.MCP.Server.tools(
-               {%{}, %{exclude_tools: ["project_eval"], include_tools: nil}}
-             ),
-             &(&1.name == "project_eval")
-           )
-
-    assert Enum.any?(
-             Tidewave.MCP.Server.tools({%{}, %{exclude_tools: [], include_tools: nil}}),
-             &(&1.name == "project_eval")
-           )
-
-    assert Enum.map(
-             Tidewave.MCP.Server.tools(
-               {%{}, %{include_tools: ["project_eval"], exclude_tools: []}}
-             ),
-             & &1.name
-           ) == ["project_eval"]
-  end
-
   test "fs tools have listable callback" do
     tools = Tidewave.MCP.Tools.FS.tools()
 

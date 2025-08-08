@@ -10,9 +10,7 @@ defmodule Tidewave do
       allow_remote_access: Keyword.get(opts, :allow_remote_access, false),
       phoenix_endpoint: nil,
       inspect_opts:
-        Keyword.get(opts, :inspect_opts, charlists: :as_lists, limit: 50, pretty: true),
-      exclude_tools: Enum.map(opts[:tools][:exclude] || [], &to_string/1),
-      include_tools: opts[:tools][:include] && Enum.map(opts[:tools][:include], &to_string/1)
+        Keyword.get(opts, :inspect_opts, charlists: :as_lists, limit: 50, pretty: true)
     }
   end
 
