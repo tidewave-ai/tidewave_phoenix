@@ -187,27 +187,17 @@ defmodule Tidewave.MCP.Connection do
   end
 
   def handle_call({:dispatch, callback, args}, _from, state) do
-    # tools that change the state are dispatched inside the Connection server
-    # in order to synchronize state changes
+    # TODO: this should be moved out of the connection process
     try do
-      case callback.(args, state.assigns) do
-        {:ok, result, new_assigns} ->
-          {:reply, {:ok, result}, %{state | assigns: new_assigns}}
-
-        {:ok, result, new_assigns, metadata} ->
-          {:reply, {:ok, result, metadata}, %{state | assigns: new_assigns}}
-
-        {:error, reason, new_assigns} ->
-          {:reply, {:error, reason}, %{state | assigns: new_assigns}}
-
-        other ->
-          {:reply, other, state}
-      end
+      callback.(args, state.assigns)
     catch
       kind, reason ->
         {:reply,
          {:error, "Failed to call tool: #{Exception.format(kind, reason, __STACKTRACE__)}"},
          state}
+    else
+      response ->
+        {:reply, response, state}
     end
   end
 

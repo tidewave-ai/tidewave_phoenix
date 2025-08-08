@@ -62,7 +62,7 @@ defmodule Tidewave.MCP.Tools.FS do
             }
           }
         },
-        callback: &read_project_file/2,
+        callback: &read_project_file/1,
         listable: &listable/1
       },
       %{
@@ -155,7 +155,7 @@ defmodule Tidewave.MCP.Tools.FS do
     end
   end
 
-  def read_project_file(args, assigns) do
+  def read_project_file(args) do
     case args do
       %{"path" => path} ->
         line_offset = Map.get(args, "line_offset", 0)
@@ -163,16 +163,7 @@ defmodule Tidewave.MCP.Tools.FS do
 
         with {:ok, content} <- get_file_content(path, line_offset, count, !args["raw"]) do
           stat = File.stat!(path, time: :posix)
-
-          assigns =
-            Map.update(
-              assigns,
-              :read_timestamps,
-              %{path => stat.mtime},
-              &Map.put(&1, path, stat.mtime)
-            )
-
-          {:ok, content, assigns, %{mtime: stat.mtime}}
+          {:ok, content, %{mtime: stat.mtime}}
         end
 
       _ ->
@@ -192,22 +183,18 @@ defmodule Tidewave.MCP.Tools.FS do
     end
   end
 
-  defp check_stale(path, read_timestamps, allow_not_found \\ false) do
+  defp check_stale(path, args, allow_not_found \\ false) do
     case File.stat(path, time: :posix) do
       {:error, :enoent} ->
         if allow_not_found, do: :ok, else: {:error, "File does not exist"}
 
       {:ok, stat} ->
-        cond do
-          is_nil(read_timestamps[path]) ->
-            {:error,
-             "File has not been read yet. Use read_project_file first to before overwriting it!"}
-
-          stat.mtime > read_timestamps[path] ->
+        case args do
+          %{"atime" => posix} when is_integer(posix) and stat.mtime > posix ->
             {:error,
              "File has been modified since last read. Use read_project_file first to read it again!"}
 
-          true ->
+          _ ->
             :ok
         end
     end
@@ -216,10 +203,8 @@ defmodule Tidewave.MCP.Tools.FS do
   def write_project_file(args, assigns) do
     case args do
       %{"path" => path, "content" => content} ->
-        read_timestamps = timestamps_from_args_or_assigns(args, assigns)
-
         with {:ok, path} <- safe_path(path),
-             :ok <- check_stale(path, read_timestamps, true) do
+             :ok <- check_stale(path, args, true) do
           do_write_file(path, content, assigns)
         end
 
@@ -228,16 +213,11 @@ defmodule Tidewave.MCP.Tools.FS do
     end
   end
 
-  def edit_project_file(
-        args,
-        assigns
-      ) do
+  def edit_project_file(args, assigns) do
     case args do
       %{"path" => path, "old_string" => old_string, "new_string" => new_string} ->
-        read_timestamps = timestamps_from_args_or_assigns(args, assigns)
-
         with {:ok, path} <- safe_path(path),
-             :ok <- check_stale(path, read_timestamps),
+             :ok <- check_stale(path, args),
              old_content = File.read!(path),
              :ok <- ensure_one_match(old_content, old_string) do
           new_content = String.replace(old_content, old_string, new_string)
@@ -246,18 +226,6 @@ defmodule Tidewave.MCP.Tools.FS do
 
       _ ->
         {:error, :invalid_arguments}
-    end
-  end
-
-  defp timestamps_from_args_or_assigns(args, assigns) do
-    read_timestamps = Map.get(assigns, :read_timestamps, %{})
-
-    case args do
-      %{"atime" => posix} when is_integer(posix) ->
-        Map.put(read_timestamps, args["path"], posix)
-
-      _ ->
-        read_timestamps
     end
   end
 
@@ -276,10 +244,8 @@ defmodule Tidewave.MCP.Tools.FS do
   end
 
   defp do_write_file(path, content, assigns) do
-    assigns = ensure_default_line_endings(assigns)
-
     content =
-      case Utils.detect_file_line_endings(path) || assigns.default_line_endings do
+      case Utils.detect_file_line_endings(path) || default_line_endings() do
         :crlf -> String.replace(content, ["\r\n", "\n"], "\r\n")
         :lf -> content
       end
@@ -290,16 +256,7 @@ defmodule Tidewave.MCP.Tools.FS do
       content = maybe_autoformat(assigns, path, content)
       File.write!(path, content)
       stat = File.stat!(path, time: :posix)
-
-      assigns =
-        Map.update(
-          assigns,
-          :read_timestamps,
-          %{path => stat.mtime},
-          &Map.put(&1, path, stat.mtime)
-        )
-
-      {:ok, "Success!", assigns, %{mtime: stat.mtime}}
+      {:ok, "Success!", %{mtime: stat.mtime}}
     rescue
       e -> {:error, "Failed to format file: #{Exception.format(:error, e, __STACKTRACE__)}"}
     end
@@ -370,12 +327,18 @@ defmodule Tidewave.MCP.Tools.FS do
   defp take_all_or(list, nil), do: list
   defp take_all_or(list, count), do: Enum.take(list, count)
 
-  defp ensure_default_line_endings(assigns) do
-    Map.put_new_lazy(assigns, :default_line_endings, fn ->
-      case GitLS.detect_line_endings() do
-        {:ok, default_line_endings} -> default_line_endings
-        {:error, _} -> :lf
-      end
-    end)
+  defp default_line_endings do
+    if line_endings = Application.get_env(:tidewave, :default_line_endings) do
+      line_endings
+    else
+      default =
+        case GitLS.detect_line_endings() do
+          {:ok, default_line_endings} -> default_line_endings
+          {:error, _} -> :lf
+        end
+
+      Application.put_env(:tidewave, :default_line_endings, default)
+      default
+    end
   end
 end

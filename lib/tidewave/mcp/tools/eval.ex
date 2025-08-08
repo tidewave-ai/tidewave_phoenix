@@ -121,7 +121,7 @@ defmodule Tidewave.MCP.Tools.Eval do
 
     receive do
       {:result, result} ->
-        {:ok, result, assigns}
+        {:ok, result}
 
       {:DOWN, ^ref, :process, ^pid, reason} ->
         {:error,

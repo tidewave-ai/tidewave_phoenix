@@ -52,7 +52,7 @@ defmodule Tidewave.MCPIntegrationTest do
     refute "write_project_file" in tool_names
   end
 
-  test "write to file needs read first", %{request: request} do
+  test "write to file needs to be recent", %{request: request} do
     assert %{resp: resp, endpoint_url: endpoint_url, tools: tools} = request
     assert "write_project_file" in Enum.map(tools, & &1["name"])
 
@@ -70,7 +70,7 @@ defmodule Tidewave.MCPIntegrationTest do
       "method" => "tools/call",
       "params" => %{
         "name" => "write_project_file",
-        "arguments" => %{"path" => "test.txt", "content" => "Hello, world!"}
+        "arguments" => %{"path" => "test.txt", "content" => "Hello, world!", "atime" => 0}
       }
     })
 
@@ -82,7 +82,7 @@ defmodule Tidewave.MCPIntegrationTest do
                  "content" => [
                    %{
                      "text" =>
-                       "File has not been read yet. Use read_project_file first to before overwriting it!"
+                       "File has been modified since last read. Use read_project_file first to read it again!"
                    }
                  ]
                }
@@ -90,6 +90,7 @@ defmodule Tidewave.MCPIntegrationTest do
            } = receive_sse_message(resp)
 
     read_id = System.unique_integer([:positive])
+    mtime = File.stat!("test.txt", time: :posix).mtime + 1
 
     send_message(endpoint_url, %{
       "jsonrpc" => "2.0",
@@ -97,7 +98,7 @@ defmodule Tidewave.MCPIntegrationTest do
       "method" => "tools/call",
       "params" => %{
         "name" => "read_project_file",
-        "arguments" => %{"path" => "test.txt"}
+        "arguments" => %{"path" => "test.txt", "atime" => mtime}
       }
     })
 
