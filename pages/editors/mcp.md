@@ -2,8 +2,8 @@
 
 You can integrate Tidewave into any editor or AI assistant that supports the Model Context Protocol (MCP). We have tailored instructions for some of them:
 
-  * [Claude Code](claude.md)
-  * [Claude Desktop](claude_code.md)
+  * [Claude Code](claude_code.md)
+  * [Claude Desktop](claude.md)
   * [Cursor](cursor.md)
   * [Neovim](neovim.md)
   * [opencode](opencode.md)
