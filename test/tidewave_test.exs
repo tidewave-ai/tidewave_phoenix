@@ -10,7 +10,7 @@ defmodule TidewaveTest do
 
   test "validates allowed origins for message requests" do
     conn =
-      conn(:post, "/tidewave/mcp/message")
+      conn(:post, "/tidewave/mcp")
       |> put_req_header("origin", "http://localhost:4001")
       |> put_private(:phoenix_endpoint, Endpoint)
       |> Tidewave.call(Tidewave.init([]))
@@ -18,7 +18,7 @@ defmodule TidewaveTest do
     assert conn.status == 403
 
     conn =
-      conn(:post, "/tidewave/mcp/message")
+      conn(:post, "/tidewave/mcp")
       |> put_req_header("origin", "http://localhost:4000")
       |> put_private(:phoenix_endpoint, Endpoint)
       |> Tidewave.call(Tidewave.init([]))
@@ -31,13 +31,13 @@ defmodule TidewaveTest do
     assert_raise RuntimeError,
                  ~r/You must manually configure the allowed origins/,
                  fn ->
-                   conn(:post, "/tidewave/mcp/message")
+                   conn(:post, "/tidewave/mcp")
                    |> put_req_header("origin", "http://localhost:4000")
                    |> Tidewave.call(Tidewave.init([]))
                  end
 
     conn =
-      conn(:post, "/tidewave/mcp/message")
+      conn(:post, "/tidewave/mcp")
       |> put_req_header("origin", "http://localhost:4000")
       |> Tidewave.call(Tidewave.init(allowed_origins: ["http://localhost:4000"]))
 
@@ -46,7 +46,7 @@ defmodule TidewaveTest do
 
   test "allows requests with no origin header" do
     conn =
-      conn(:post, "/tidewave/mcp/message")
+      conn(:post, "/tidewave/mcp")
       |> Tidewave.call(Tidewave.init([]))
 
     # missing session id
@@ -55,7 +55,7 @@ defmodule TidewaveTest do
 
   test "validates content type" do
     assert_raise Plug.Conn.WrapperError, ~r/Plug.Parsers.UnsupportedMediaTypeError/, fn ->
-      conn(:post, "/tidewave/mcp/message")
+      conn(:post, "/tidewave/mcp")
       |> put_req_header("content-type", "multipart/form-data")
       |> Tidewave.call(Tidewave.init([]))
     end
@@ -88,9 +88,9 @@ defmodule TidewaveTest do
   end
 
   describe "/mcp" do
-    test "405 when POSTing" do
+    test "405 when GETing" do
       conn =
-        conn(:post, "/tidewave/mcp")
+        conn(:get, "/tidewave/mcp")
         |> Tidewave.call(Tidewave.init([]))
 
       assert conn.status == 405
