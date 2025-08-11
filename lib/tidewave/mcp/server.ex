@@ -3,10 +3,9 @@ defmodule Tidewave.MCP.Server do
 
   require Logger
 
-  alias Tidewave.MCP.Connection
   alias Tidewave.MCP.Tools
 
-  @protocol_version "2024-11-05"
+  @protocol_version "2025-03-06"
   @vsn Mix.Project.config()[:version]
 
   @doc false
@@ -100,7 +99,7 @@ defmodule Tidewave.MCP.Server do
      }}
   end
 
-  def handle_initialize(request_id, params, state_pid) do
+  def handle_initialize(request_id, params, connect_params) do
     case validate_protocol_version(params["protocolVersion"]) do
       :ok ->
         {:ok,
@@ -118,7 +117,7 @@ defmodule Tidewave.MCP.Server do
                name: "Tidewave MCP Server",
                version: @vsn
              },
-             tools: tools(Connection.connect_params(state_pid))
+             tools: tools(connect_params)
            }
          }}
 
@@ -127,10 +126,10 @@ defmodule Tidewave.MCP.Server do
     end
   end
 
-  def handle_list_tools(request_id, _params, state_pid) do
+  def handle_list_tools(request_id, _params, connect_params) do
     result_or_error(
       request_id,
-      {:ok, %{tools: tools(Connection.connect_params(state_pid))}}
+      {:ok, %{tools: tools(connect_params)}}
     )
   end
 
@@ -201,13 +200,14 @@ defmodule Tidewave.MCP.Server do
   ## handle_message function for SSE plug
 
   # Built-in message routing
-  def handle_message(%{"method" => "notifications/initialized"} = message, _state_pid, _assigns) do
+  def handle_message(%{"method" => "notifications/initialized"} = message, _assigns) do
     Logger.info("Received initialized notification")
     Logger.debug("Full message: #{inspect(message, pretty: true)}")
     {:ok, nil}
   end
 
-  def handle_message(%{"method" => method, "id" => id} = message, state_pid, assigns) do
+  def handle_message(%{"method" => method, "id" => id} = message, assigns) do
+    connect_params = assigns.connect_params
     Logger.info("Routing MCP message - Method: #{method}, ID: #{id}")
     Logger.debug("Full message: #{inspect(message, pretty: true)}")
 
@@ -221,11 +221,11 @@ defmodule Tidewave.MCP.Server do
           "Handling initialize request with params: #{inspect(message["params"], pretty: true)}"
         )
 
-        handle_initialize(id, message["params"], state_pid)
+        handle_initialize(id, message["params"], connect_params)
 
       "tools/list" ->
         Logger.debug("Handling tools list request")
-        handle_list_tools(id, message["params"], state_pid)
+        handle_list_tools(id, message["params"], connect_params)
 
       "tools/call" ->
         Logger.debug(
@@ -252,7 +252,7 @@ defmodule Tidewave.MCP.Server do
     end
   end
 
-  def handle_message(unknown_message, _state_pid) do
+  def handle_message(unknown_message) do
     Logger.error("Received invalid message format: #{inspect(unknown_message, pretty: true)}")
 
     {:error,

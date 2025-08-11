@@ -28,18 +28,14 @@ defmodule Tidewave.Router do
   get "/mcp" do
     Logger.metadata(tidewave_mcp: true)
 
+    # For GET requests, return 405 Method Not Allowed 
+    # (Tidewave doesn't need to support SSE streaming)
     conn
-    |> MCP.SSE.handle_sse()
+    |> send_resp(405, "Method Not Allowed")
     |> halt()
   end
 
   post "/mcp" do
-    conn
-    |> send_resp(405, "Method not allowed")
-    |> halt()
-  end
-
-  post "/mcp/message" do
     Logger.metadata(tidewave_mcp: true)
 
     opts =
@@ -51,7 +47,7 @@ defmodule Tidewave.Router do
 
     conn
     |> Plug.Parsers.call(opts)
-    |> MCP.SSE.handle_message()
+    |> MCP.HTTP.handle_message()
     |> halt()
   end
 
