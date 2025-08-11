@@ -4,6 +4,8 @@ defmodule TidewaveTest do
   import Plug.Conn
   import Plug.Test
 
+  @moduletag :capture_log
+
   defmodule Endpoint do
     def url, do: "http://localhost:4000"
   end
@@ -23,8 +25,9 @@ defmodule TidewaveTest do
       |> put_private(:phoenix_endpoint, Endpoint)
       |> Tidewave.call(Tidewave.init([]))
 
-    # missing session id
-    assert conn.status == 400
+    # invalid JSON-RPC message (empty body)
+    assert conn.status == 200
+    assert conn.resp_body =~ "Could not parse message"
   end
 
   test "raises when no origin is configured and no endpoint set" do
@@ -41,7 +44,9 @@ defmodule TidewaveTest do
       |> put_req_header("origin", "http://localhost:4000")
       |> Tidewave.call(Tidewave.init(allowed_origins: ["http://localhost:4000"]))
 
-    assert conn.status == 400
+    # invalid JSON-RPC message (empty body)
+    assert conn.status == 200
+    assert conn.resp_body =~ "Could not parse message"
   end
 
   test "allows requests with no origin header" do
@@ -49,8 +54,9 @@ defmodule TidewaveTest do
       conn(:post, "/tidewave/mcp")
       |> Tidewave.call(Tidewave.init([]))
 
-    # missing session id
-    assert conn.status == 400
+    # invalid JSON-RPC message (empty body)
+    assert conn.status == 200
+    assert conn.resp_body =~ "Could not parse message"
   end
 
   test "validates content type" do

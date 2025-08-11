@@ -62,12 +62,12 @@ defmodule Tidewave.MCP.HTTP do
         conn |> put_status(200) |> send_json(response)
 
       %{"method" => "notifications/initialized"} ->
-        send_resp(conn, 202, "")
+        conn |> put_status(202) |> send_json(%{status: "ok"})
 
       %{"method" => "notifications/cancelled"} ->
         # Just log the cancellation notification and return ok
         Logger.info("Request cancelled: #{inspect(message["params"])}")
-        send_resp(conn, 202, "")
+        conn |> put_status(202) |> send_json(%{status: "ok"})
 
       # Handle requests
       _ when is_map_key(message, "id") ->
@@ -75,14 +75,14 @@ defmodule Tidewave.MCP.HTTP do
 
       # For any other notifications without id
       _ ->
-        send_resp(conn, 202, "")
+        conn |> put_status(202) |> send_json(%{status: "ok"})
     end
   end
 
   defp handle_request(conn, message, assigns) do
     case Server.handle_message(message, assigns) do
       {:ok, nil} ->
-        send_resp(conn, 202, "")
+        conn |> put_status(202) |> send_json(%{status: "ok"})
 
       {:ok, response} ->
         Logger.debug("Sending HTTP response: #{inspect(response, pretty: true)}")

@@ -57,7 +57,7 @@ defmodule Tidewave.MCP.HTTPTest do
       response = Tidewave.MCP.HTTP.handle_message(conn)
 
       assert response.status == 202
-      assert response.resp_body == ""
+      assert response.resp_body == "{\"status\":\"ok\"}"
     end
 
     test "handles cancelled notification", %{conn: conn} do
@@ -71,7 +71,7 @@ defmodule Tidewave.MCP.HTTPTest do
       response = Tidewave.MCP.HTTP.handle_message(conn)
 
       assert response.status == 202
-      assert response.resp_body == ""
+      assert response.resp_body == "{\"status\":\"ok\"}"
     end
 
     test "handles tools/list request", %{conn: conn} do
