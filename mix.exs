@@ -62,7 +62,6 @@ defmodule Tidewave.MixProject do
         "pages/guides/containers.md",
         "pages/guides/security.md",
         "pages/mcp/mcp.md",
-        "CHANGELOG.md",
         "pages/mcp/mcp_proxy.md",
         "pages/mcp/mcp_troubleshooting.md",
         "pages/mcp/claude_code.md",
@@ -76,7 +75,7 @@ defmodule Tidewave.MixProject do
       ],
       groups_for_extras: [
         Guides: ~r/(pages\/guides\/.?)/,
-        MCP: ~r/pages\/mcp\/.?|CHANGELOG\.md/
+        MCP: ~r/pages\/mcp\/.?/
       ]
     ]
   end
