@@ -1,6 +1,9 @@
 defmodule Tidewave.MixProject do
   use Mix.Project
 
+  @source_url "https://github.com/tidewave-ai/tidewave_phoenix"
+  @homepage_url "https://tidewave.ai/"
+
   def project do
     [
       app: :tidewave,
@@ -16,8 +19,8 @@ defmodule Tidewave.MixProject do
 
       # Docs
       name: "Tidewave",
-      source_url: "https://github.com/tidewave-ai/tidewave_phoenix",
-      homepage_url: "https://tidewave.ai/",
+      source_url: @source_url,
+      homepage_url: @homepage_url,
       docs: &docs/0
     ]
   end
@@ -34,7 +37,11 @@ defmodule Tidewave.MixProject do
       description: "Tidewave for Phoenix",
       maintainers: ["Steffen Deusch"],
       licenses: ["Apache-2.0"],
-      links: %{"Tidewave" => "https://tidewave.ai"}
+      links: %{
+        "Tidewave" => @homepage_url,
+        "Changelog" => "https://hexdocs.pm/tidewave/changelog.html",
+        "GitHub" => @source_url
+      }
     ]
   end
 
