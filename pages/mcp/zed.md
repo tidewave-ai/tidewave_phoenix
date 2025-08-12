@@ -39,5 +39,5 @@ Where `$PORT` is the port your web application is running on and `/path/to/mcp-p
 And you are good to go! Now Zed will list all tools from Tidewave available.
 If your application uses a SQL database, you can verify it all works by asking
 it to run `SELECT 1` as database query. If it fails, check out
-[our Troubleshooting guide](troubleshooting.md). You can also manage your
+[our MCP Troubleshooting guide](mcp_troubleshooting.md). You can also manage your
 installation, by clicking on the same `⋯` icon and then on "Settings".

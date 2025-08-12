@@ -1,6 +1,6 @@
-# MCP
+# Setting up Tidewave MCP
 
-You can integrate Tidewave into any editor or AI assistant that supports the Model Context Protocol (MCP). We have tailored instructions for some of them:
+You can access some of Tidewave features from your editor via the Model Context Protocol (MCP). We have tailored instructions for some of them:
 
   * [Claude Code](claude_code.md)
   * [Claude Desktop](claude.md)
@@ -11,9 +11,11 @@ You can integrate Tidewave into any editor or AI assistant that supports the Mod
   * [Windsurf](windsurf.md)
   * [Zed](zed.md)
 
+However, features such as contextual browser testing, point and click prompting, page context and more are only available for Tidewave Web under the `/tidewave` route of your application.
+
 ## General instructions
 
-For any other editor/assistant, you need to include Tidewave as MCP of type "sse", pointing to the `/tidewave/mcp` path of port your web application is running on. For example, `http://localhost:4000/tidewave/mcp`.
+Generally speaking, you need to include Tidewave as MCP of type "http" (or "sse"), pointing to the `/tidewave/mcp` path of port your web application is running on. For example, `http://localhost:4000/tidewave/mcp`.
 
 In case your tool of choice does not support "sse" servers, only "io" ones, you can use one of the many available [MCP proxies](../guides/mcp_proxy.md).
 

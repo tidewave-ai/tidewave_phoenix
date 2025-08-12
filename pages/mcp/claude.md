@@ -42,4 +42,4 @@ And you are good to go! Note we enabled filesystem tools by default,
 as Claude Desktop does not support any filesystem operation out of the box.
 If your application uses a SQL database, you can verify it all works
 by asking it to run `SELECT 1` as database query. If it fails,
-check out [our Troubleshooting guide](troubleshooting.md).
+check out [our MCP Troubleshooting guide](mcp_troubleshooting.md).

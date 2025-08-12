@@ -62,6 +62,6 @@ Note, if you restart your dev server, you will need to refresh the MCP connectio
 And you are good to go! Now Windsurf will list all tools from Tidewave
 available. If your application uses a SQL database, you can verify it
 all works by asking it to run `SELECT 1` as database query.
-If it fails, check out [our Troubleshooting guide](troubleshooting.md)
+If it fails, check out [our MCP Troubleshooting guide](mcp_troubleshooting.md)
 or [Windsurf's official docs](https://docs.windsurf.com/windsurf/mcp#configuring-mcp).
 
