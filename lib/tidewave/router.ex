@@ -68,13 +68,11 @@ defmodule Tidewave.Router do
             shell({:spawn_executable, shell_path}, [args: ["-c", "(#{cmd}\n)"]], conn)
 
           {:win32, osname} ->
-            cmd = String.to_charlist(cmd)
-
             cmd =
               case {System.get_env("COMSPEC"), osname} do
-                {nil, :windows} -> ~c"cmd.com /s /c " ++ cmd
-                {nil, _} -> ~c"cmd /s /c " ++ cmd
-                {cmd, _} -> ~c"#{cmd} /s /c " ++ cmd
+                {nil, :windows} -> ~c"cmd.com /s /c #{cmd}"
+                {nil, _} -> ~c"cmd /s /c #{cmd}"
+                {comspec, _} -> ~c"#{comspec} /s /c #{cmd}"
               end
 
             shell({:spawn, cmd}, [], conn)
