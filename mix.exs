@@ -3,11 +3,12 @@ defmodule Tidewave.MixProject do
 
   @source_url "https://github.com/tidewave-ai/tidewave_phoenix"
   @homepage_url "https://tidewave.ai/"
+  @version "0.3.1"
 
   def project do
     [
       app: :tidewave,
-      version: "0.3.0",
+      version: @version,
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -64,11 +65,15 @@ defmodule Tidewave.MixProject do
       main: "installation",
       logo: "logo.svg",
       assets: %{"pages/assets" => "assets"},
+      filter_modules: fn mod, _ ->
+        raise "you forgot to add \"@moduledoc false\" to #{inspect(mod)}"
+      end,
       extras: [
         "pages/installation.md",
         "pages/guides/agentsmd.md",
         "pages/guides/containers.md",
         "pages/guides/security.md",
+        "pages/guides/tips_and_tricks.md",
         "pages/mcp/mcp.md",
         "pages/mcp/mcp_proxy.md",
         "pages/mcp/mcp_troubleshooting.md",

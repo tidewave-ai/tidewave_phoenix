@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1 (2025-08-13)
+
+* Enhancements
+  * Improve error messages when peer or origin is not allowed
+
 ## 0.3.0 (2025-08-05)
 
 * Enhancements
