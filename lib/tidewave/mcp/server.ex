@@ -208,57 +208,26 @@ defmodule Tidewave.MCP.Server do
 
     case validate_jsonrpc_message(params) do
       {:ok, message} ->
-        handle_http_jsonrpc_message(conn, message)
+        assigns = %{connect_params: conn.query_params}
+        assigns = Map.merge(assigns, conn.private.tidewave_config)
+
+        case handle_message(message, assigns) do
+          {:ok, nil} ->
+            # Notifications that don't return a response
+            conn |> put_status(202) |> send_json(%{status: "ok"})
+
+          {:ok, response} ->
+            Logger.debug("Sending HTTP response: #{inspect(response, pretty: true)}")
+            conn |> put_status(200) |> send_json(response)
+
+          {:error, error_response} ->
+            Logger.warning("Error handling message: #{inspect(error_response)}")
+            conn |> put_status(400) |> send_json(error_response)
+        end
 
       {:error, :invalid_jsonrpc} ->
         Logger.warning("Invalid JSON-RPC message format")
         send_jsonrpc_error(conn, nil, -32600, "Could not parse message")
-    end
-  end
-
-  defp handle_http_jsonrpc_message(conn, message) do
-    assigns = %{connect_params: conn.query_params}
-    assigns = Map.merge(assigns, conn.private.tidewave_config)
-
-    case message do
-      # Handle initialization sequence
-      %{"method" => "initialize"} = msg ->
-        Logger.info("Routing MCP message - Method: initialize, ID: #{msg["id"]}")
-        Logger.debug("Full message: #{inspect(msg, pretty: true)}")
-        {:ok, response} = handle_message(msg, assigns)
-
-        conn |> put_status(200) |> send_json(response)
-
-      %{"method" => "notifications/initialized"} ->
-        conn |> put_status(202) |> send_json(%{status: "ok"})
-
-      %{"method" => "notifications/cancelled"} ->
-        # Just log the cancellation notification and return ok
-        Logger.info("Request cancelled: #{inspect(message["params"])}")
-        conn |> put_status(202) |> send_json(%{status: "ok"})
-
-      # Handle requests
-      %{"id" => _} ->
-        handle_http_request(conn, message, assigns)
-
-      # For any other notifications without id
-      _ ->
-        conn |> put_status(202) |> send_json(%{status: "ok"})
-    end
-  end
-
-  defp handle_http_request(conn, message, assigns) do
-    case handle_message(message, assigns) do
-      {:ok, nil} ->
-        conn |> put_status(202) |> send_json(%{status: "ok"})
-
-      {:ok, response} ->
-        Logger.debug("Sending HTTP response: #{inspect(response, pretty: true)}")
-        conn |> put_status(200) |> send_json(response)
-
-      {:error, error_response} ->
-        Logger.warning("Error handling message: #{inspect(error_response)}")
-        conn |> put_status(400) |> send_json(error_response)
     end
   end
 
@@ -318,6 +287,11 @@ defmodule Tidewave.MCP.Server do
   def handle_message(%{"method" => "notifications/initialized"} = message, _assigns) do
     Logger.info("Received initialized notification")
     Logger.debug("Full message: #{inspect(message, pretty: true)}")
+    {:ok, nil}
+  end
+
+  def handle_message(%{"method" => "notifications/cancelled"} = message, _assigns) do
+    Logger.info("Request cancelled: #{inspect(message["params"])}")
     {:ok, nil}
   end
 
