@@ -70,7 +70,7 @@ defmodule Tidewave.MCP.HTTP do
         conn |> put_status(202) |> send_json(%{status: "ok"})
 
       # Handle requests
-      _ when is_map_key(message, "id") ->
+      %{"id" => _} ->
         handle_request(conn, message, assigns)
 
       # For any other notifications without id
