@@ -1,4 +1,4 @@
-defmodule Tidewave.MCP.HTTPTest do
+defmodule Tidewave.MCP.ServerTest do
   use ExUnit.Case, async: true
   import Plug.Test
   import Plug.Conn
@@ -37,7 +37,7 @@ defmodule Tidewave.MCP.HTTPTest do
       }
 
       conn = %{conn | body_params: message}
-      response = Tidewave.MCP.HTTP.handle_message(conn)
+      response = Tidewave.MCP.Server.handle_http_message(conn)
 
       assert response.status == 200
       response_body = Jason.decode!(response.resp_body)
@@ -54,7 +54,7 @@ defmodule Tidewave.MCP.HTTPTest do
       }
 
       conn = %{conn | body_params: message}
-      response = Tidewave.MCP.HTTP.handle_message(conn)
+      response = Tidewave.MCP.Server.handle_http_message(conn)
 
       assert response.status == 202
       assert response.resp_body == "{\"status\":\"ok\"}"
@@ -68,7 +68,7 @@ defmodule Tidewave.MCP.HTTPTest do
       }
 
       conn = %{conn | body_params: message}
-      response = Tidewave.MCP.HTTP.handle_message(conn)
+      response = Tidewave.MCP.Server.handle_http_message(conn)
 
       assert response.status == 202
       assert response.resp_body == "{\"status\":\"ok\"}"
@@ -82,7 +82,7 @@ defmodule Tidewave.MCP.HTTPTest do
       }
 
       conn = %{conn | body_params: message}
-      response = Tidewave.MCP.HTTP.handle_message(conn)
+      response = Tidewave.MCP.Server.handle_http_message(conn)
 
       assert response.status == 200
       response_body = Jason.decode!(response.resp_body)
@@ -97,7 +97,7 @@ defmodule Tidewave.MCP.HTTPTest do
       log =
         capture_log([level: :warning], fn ->
           conn = %{conn | body_params: message}
-          response = Tidewave.MCP.HTTP.handle_message(conn)
+          response = Tidewave.MCP.Server.handle_http_message(conn)
 
           assert response.status == 200
           response_body = Jason.decode!(response.resp_body)
@@ -120,7 +120,7 @@ defmodule Tidewave.MCP.HTTPTest do
       }
 
       conn = %{conn | body_params: message}
-      response = Tidewave.MCP.HTTP.handle_message(conn)
+      response = Tidewave.MCP.Server.handle_http_message(conn)
 
       assert response.status == 200
       response_body = Jason.decode!(response.resp_body)

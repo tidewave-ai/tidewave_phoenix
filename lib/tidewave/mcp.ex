@@ -46,7 +46,6 @@ defmodule Tidewave.MCP do
     if Application.get_env(:tidewave, :debug) do
       :ok
     else
-      Logger.put_module_level(MCP.SSE, :none)
       Logger.put_module_level(MCP.Connection, :none)
       Logger.put_module_level(MCP.Server, :none)
     end
