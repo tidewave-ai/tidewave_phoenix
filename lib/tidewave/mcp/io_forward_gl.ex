@@ -3,6 +3,8 @@
 # https://github.com/livebook-dev/livebook/blob/main/LICENSE
 
 defmodule Tidewave.MCP.IOForwardGL do
+  @moduledoc false
+
   # An IO device process forwarding all requests to sender's group
   # leader.
   #
