@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.2 (2025-08-13)
+
+* Bug fix
+  * Fix shell endpoint on Windows
+
 ## 0.3.1 (2025-08-13)
 
 * Enhancements
