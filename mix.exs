@@ -1,6 +1,9 @@
 defmodule Tidewave.MixProject do
   use Mix.Project
 
+  @source_url "https://github.com/tidewave-ai/tidewave_phoenix"
+  @homepage_url "https://tidewave.ai/"
+
   def project do
     [
       app: :tidewave,
@@ -16,8 +19,8 @@ defmodule Tidewave.MixProject do
 
       # Docs
       name: "Tidewave",
-      source_url: "https://github.com/tidewave-ai/tidewave_phoenix",
-      homepage_url: "https://tidewave.ai/",
+      source_url: @source_url,
+      homepage_url: @homepage_url,
       docs: &docs/0
     ]
   end
@@ -34,7 +37,11 @@ defmodule Tidewave.MixProject do
       description: "Tidewave for Phoenix",
       maintainers: ["Steffen Deusch"],
       licenses: ["Apache-2.0"],
-      links: %{"Tidewave" => "https://tidewave.ai"}
+      links: %{
+        "Tidewave" => @homepage_url,
+        "Changelog" => "https://hexdocs.pm/tidewave/changelog.html",
+        "GitHub" => @source_url
+      }
     ]
   end
 
@@ -59,24 +66,23 @@ defmodule Tidewave.MixProject do
       assets: %{"pages/assets" => "assets"},
       extras: [
         "pages/installation.md",
-        "pages/editors/mcp.md",
-        "pages/editors/claude_code.md",
-        "pages/editors/claude.md",
-        "pages/editors/cursor.md",
-        "pages/editors/neovim.md",
-        "pages/editors/opencode.md",
-        "pages/editors/vscode.md",
-        "pages/editors/windsurf.md",
-        "pages/editors/zed.md",
-        "pages/editors/troubleshooting.md",
-        "pages/guides/mcp_proxy.md",
+        "pages/guides/containers.md",
         "pages/guides/security.md",
-        "pages/guides/tips_and_tricks.md",
-        "CHANGELOG.md"
+        "pages/mcp/mcp.md",
+        "pages/mcp/mcp_proxy.md",
+        "pages/mcp/mcp_troubleshooting.md",
+        "pages/mcp/claude_code.md",
+        "pages/mcp/claude.md",
+        "pages/mcp/cursor.md",
+        "pages/mcp/neovim.md",
+        "pages/mcp/opencode.md",
+        "pages/mcp/vscode.md",
+        "pages/mcp/windsurf.md",
+        "pages/mcp/zed.md"
       ],
       groups_for_extras: [
-        "Editors & Assistants": ~r/pages\/editors\/.?/,
-        Guides: ~r/pages\/guides\/.?/
+        Guides: ~r/(pages\/guides\/.?)/,
+        MCP: ~r/pages\/mcp\/.?/
       ]
     ]
   end

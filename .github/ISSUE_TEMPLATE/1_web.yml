@@ -1,0 +1,54 @@
+---
+name: Tidewave Web
+description: File a bug report related to Tidewave Web
+
+body:
+  - type: markdown
+    attributes:
+      value: >
+        Thanks for taking the time to fill out this bug report.
+
+  - type: input
+    id: os
+    attributes:
+      label: What is your operating system?
+    validations:
+      required: true
+
+  - type: input
+    id: elixir-version
+    attributes:
+      label: What is your Elixir version?
+    validations:
+      required: true
+
+  - type: input
+    id: phoenix-version
+    attributes:
+      label: What is your Phoenix version?
+    validations:
+      required: true
+
+  - type: input
+    id: tidewave-version
+    attributes:
+      label: What is your Tidewave version?
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-behavior
+    attributes:
+      label: Current behavior
+      description: >
+        If reporting a bug, please errors, stacktraces, and reproducing steps.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: A short description on how you expected it to behave.
+    validations:
+      required: true

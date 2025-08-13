@@ -6,18 +6,6 @@ assistant to your web framework runtime via [MCP](https://modelcontextprotocol.i
 
 [See our website](https://tidewave.ai) for more information.
 
-## Key Features
-
-Tidewave provides tools that allow your LLM of choice to:
-
-- get documentation
-- inspect your application logs to help debug errors
-- execute SQL queries and inspect your database
-- evaluate custom Elixir code in the context of your project
-- find Hex packages and search your dependencies
-
-and more.
-
 ## Installation
 
 ### Manually
@@ -67,7 +55,7 @@ In particular, the MCP is located by default at http://localhost:4000/tidewave/m
 Tidewave is a regular Plug, so you can use it in any Elixir project, as long as you run a web server. For example, you can use `bandit` (and `tidewave`) in dev mode in your `mix.exs`:
 
 ```elixir
-{:tidewave, "~> 0.1", only: :dev},
+{:tidewave, "~> 0.2", only: :dev},
 {:bandit, "~> 1.0", only: :dev},
 ```
 
@@ -81,6 +69,20 @@ aliases: [
 ```
 
 Now run `mix tidewave` and Tidewave will be available at `localhost:4000/tidewave`.
+
+## Troubleshooting
+
+Tidewave expects your web application to be running on `localhost`. If you are not running on localhost, you may need to set some additional configuration. In particular, you must pass `allow_remote_access: true` to `plug Tidewave` and optionally configure the origin you are accessing from, for example:
+
+```elixir
+  plug Tidewave,
+   allow_remote_access: true,
+   allowed_origins: ["http://company.local"]
+```
+
+If you want to use Docker for development, you either need to enable the configuration above or automatically redirect the relevant ports, as done by [devcontainers](https://code.visualstudio.com/docs/devcontainers/containers). See our [containars](https://hexdocs.pm/tidewave/containers.html) guide for more information.
+
+If you have enabled Content-Security-Policy, Tidewave Web also requires "unsafe-eval" to be enabled under `script-src` in order for contextual browser testing to work correctly.
 
 ## Configuration
 
@@ -99,12 +101,6 @@ The following options are available:
   * `:autoformat` - When writing Elixir source files, Tidewave will automatically format them with `mix format` by default. Setting this option to `false` disables autoformatting.
 
   * `:inspect_opts` - Custom options passed to `Kernel.inspect/2` when formatting some tool results. Defaults to: `[charlists: :as_lists, limit: 50, pretty: true]`
-
-  * `:tools` - Configuration for the tools that are included/excluded from the MCP server.
-
-    * `:include` - A list of tools to be included in the MCP. Defaults to `nil`, meaning all tools are included.
-
-    * `:exclude` - A list of tools to be excluded from the MCP. Defaults to `[]`. Supersedes `:include` if both are set.
 
 ## License
 

@@ -262,7 +262,6 @@ defmodule Tidewave.MCP.Server do
       Map.has_key?(message, "id") and Map.has_key?(message, "method") ->
         case message["id"] do
           id when is_binary(id) or is_number(id) -> {:ok, message}
-          nil -> {:error, :invalid_jsonrpc}
           _ -> {:error, :invalid_jsonrpc}
         end
 
