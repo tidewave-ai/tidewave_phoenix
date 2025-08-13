@@ -66,6 +66,7 @@ defmodule Tidewave.MixProject do
       assets: %{"pages/assets" => "assets"},
       extras: [
         "pages/installation.md",
+        "pages/guides/agentsmd.md",
         "pages/guides/containers.md",
         "pages/guides/security.md",
         "pages/mcp/mcp.md",
@@ -78,13 +79,11 @@ defmodule Tidewave.MixProject do
         "pages/mcp/opencode.md",
         "pages/mcp/vscode.md",
         "pages/mcp/windsurf.md",
-        "pages/mcp/zed.md",
-        "pages/web/agentsmd.md"
+        "pages/mcp/zed.md"
       ],
       groups_for_extras: [
         Guides: ~r/(pages\/guides\/.?)/,
-        MCP: ~r/pages\/mcp\/.?/,
-        "Tidewave Web": ~r/pages\/web\/.?/
+        MCP: ~r/pages\/mcp\/.?/
       ]
     ]
   end
