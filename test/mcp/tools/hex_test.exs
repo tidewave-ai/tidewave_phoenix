@@ -14,16 +14,29 @@ defmodule Tidewave.MCP.Tools.HexTest do
         assert conn.query_params["filter_by"] =~ "plug"
 
         Req.Test.json(conn, %{
+          "found" => 1,
           "hits" => [
             %{
-              "title" => "Phoenix.Controller",
-              "doc" => "Controller functionality for Phoenix"
+              "document" => %{
+                "title" => "Phoenix.Controller",
+                "package" => "phoenix-1.8.0",
+                "ref" => "Phoenix.Controller.html",
+                "doc" => "Controller functionality for Phoenix"
+              }
             }
           ]
         })
       end)
 
-      assert {:ok, _} = Hex.search_package_docs(%{"q" => "controller"})
+      assert {:ok, result} = Hex.search_package_docs(%{"q" => "controller"})
+
+      assert result == """
+             Results: 1
+
+             <result index="0" package="phoenix-1.8.0" ref="Phoenix.Controller.html" title="Phoenix.Controller">
+             Controller functionality for Phoenix
+             </result>
+             """
     end
 
     test "can provide list of packages" do
@@ -38,10 +51,15 @@ defmodule Tidewave.MCP.Tools.HexTest do
             assert conn.query_params["filter_by"] == "package:=[phoenix-1.7.35]"
 
             Req.Test.json(conn, %{
+              "found" => 1,
               "hits" => [
                 %{
-                  "title" => "Phoenix.Controller",
-                  "doc" => "Controller functionality for Phoenix"
+                  "document" => %{
+                    "title" => "Phoenix.Controller",
+                    "package" => "phoenix-1.8.0",
+                    "ref" => "Phoenix.Controller.html",
+                    "doc" => "Controller functionality for Phoenix"
+                  }
                 }
               ]
             })

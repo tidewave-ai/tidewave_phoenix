@@ -61,7 +61,7 @@ defmodule Tidewave.MCP.Tools.Hex do
 
         case Req.get("https://search.hexdocs.pm/", opts) do
           {:ok, %{status: 200, body: body}} ->
-            {:ok, Jason.encode!(body)}
+            {:ok, format_results(body)}
 
           {:ok, %{status: status, body: body}} ->
             {:error, "HTTP error #{status} - #{inspect(body)}"}
@@ -133,5 +133,32 @@ defmodule Tidewave.MCP.Tools.Hex do
 
   defp req_opts do
     Application.get_env(:tidewave, :hex_req_opts, [])
+  end
+
+  defp format_results(body) do
+    %{"found" => found, "hits" => hits} = body
+
+    result = "Results: #{found}"
+
+    hits
+    |> Enum.with_index()
+    |> Enum.reduce(result, fn {hit, index}, result ->
+      %{
+        "document" => %{
+          "doc" => doc,
+          "package" => package,
+          "ref" => ref,
+          "title" => title
+        }
+      } = hit
+
+      result <>
+        "\n\n" <>
+        """
+        <result index="#{index}" package="#{package}" ref="#{ref}" title="#{title}">
+        #{doc}
+        </result>
+        """
+    end)
   end
 end
