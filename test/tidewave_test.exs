@@ -4,13 +4,15 @@ defmodule TidewaveTest do
   import Plug.Conn
   import Plug.Test
 
+  @moduletag :capture_log
+
   defmodule Endpoint do
     def url, do: "http://localhost:4000"
   end
 
   test "validates allowed origins for message requests" do
     conn =
-      conn(:post, "/tidewave/mcp/message")
+      conn(:post, "/tidewave/mcp")
       |> put_req_header("origin", "http://localhost:4001")
       |> put_private(:phoenix_endpoint, Endpoint)
       |> Tidewave.call(Tidewave.init([]))
@@ -18,44 +20,48 @@ defmodule TidewaveTest do
     assert conn.status == 403
 
     conn =
-      conn(:post, "/tidewave/mcp/message")
+      conn(:post, "/tidewave/mcp")
       |> put_req_header("origin", "http://localhost:4000")
       |> put_private(:phoenix_endpoint, Endpoint)
       |> Tidewave.call(Tidewave.init([]))
 
-    # missing session id
-    assert conn.status == 400
+    # invalid JSON-RPC message (empty body)
+    assert conn.status == 200
+    assert conn.resp_body =~ "Could not parse message"
   end
 
   test "raises when no origin is configured and no endpoint set" do
     assert_raise RuntimeError,
                  ~r/You must manually configure the allowed origins/,
                  fn ->
-                   conn(:post, "/tidewave/mcp/message")
+                   conn(:post, "/tidewave/mcp")
                    |> put_req_header("origin", "http://localhost:4000")
                    |> Tidewave.call(Tidewave.init([]))
                  end
 
     conn =
-      conn(:post, "/tidewave/mcp/message")
+      conn(:post, "/tidewave/mcp")
       |> put_req_header("origin", "http://localhost:4000")
       |> Tidewave.call(Tidewave.init(allowed_origins: ["http://localhost:4000"]))
 
-    assert conn.status == 400
+    # invalid JSON-RPC message (empty body)
+    assert conn.status == 200
+    assert conn.resp_body =~ "Could not parse message"
   end
 
   test "allows requests with no origin header" do
     conn =
-      conn(:post, "/tidewave/mcp/message")
+      conn(:post, "/tidewave/mcp")
       |> Tidewave.call(Tidewave.init([]))
 
-    # missing session id
-    assert conn.status == 400
+    # invalid JSON-RPC message (empty body)
+    assert conn.status == 200
+    assert conn.resp_body =~ "Could not parse message"
   end
 
   test "validates content type" do
     assert_raise Plug.Conn.WrapperError, ~r/Plug.Parsers.UnsupportedMediaTypeError/, fn ->
-      conn(:post, "/tidewave/mcp/message")
+      conn(:post, "/tidewave/mcp")
       |> put_req_header("content-type", "multipart/form-data")
       |> Tidewave.call(Tidewave.init([]))
     end
@@ -88,9 +94,9 @@ defmodule TidewaveTest do
   end
 
   describe "/mcp" do
-    test "405 when POSTing" do
+    test "405 when GETing" do
       conn =
-        conn(:post, "/tidewave/mcp")
+        conn(:get, "/tidewave/mcp")
         |> Tidewave.call(Tidewave.init([]))
 
       assert conn.status == 405

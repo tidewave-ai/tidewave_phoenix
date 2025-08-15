@@ -3,11 +3,26 @@ defmodule Tidewave.MCP.Server do
 
   require Logger
 
-  alias Tidewave.MCP.Connection
+  import Plug.Conn
   alias Tidewave.MCP.Tools
 
-  @protocol_version "2024-11-05"
+  @protocol_version "2025-03-06"
   @vsn Mix.Project.config()[:version]
+
+  ## Tool management functions
+
+  defp raw_tools do
+    [
+      Tools.FS.tools(),
+      Tools.Logs.tools(),
+      Tools.Source.tools(),
+      Tools.Eval.tools(),
+      Tools.Ecto.tools(),
+      Tools.Phoenix.tools(),
+      Tools.Hex.tools()
+    ]
+    |> List.flatten()
+  end
 
   @doc false
   def init_tools do
@@ -28,21 +43,7 @@ defmodule Tidewave.MCP.Server do
     tools
   end
 
-  defp raw_tools do
-    [
-      Tools.FS.tools(),
-      Tools.Logs.tools(),
-      Tools.Source.tools(),
-      Tools.Eval.tools(),
-      Tools.Ecto.tools(),
-      Tools.Phoenix.tools(),
-      Tools.Hex.tools()
-    ]
-    |> List.flatten()
-  end
-
-  @doc false
-  def tools(connect_params) do
+  defp tools(connect_params) do
     {tools, _} = tools_and_dispatch()
 
     listable? = fn
@@ -91,7 +92,23 @@ defmodule Tidewave.MCP.Server do
     end
   end
 
-  def handle_ping(request_id) do
+  ## MCP message processing
+
+  defp validate_protocol_version(client_version) do
+    cond do
+      is_nil(client_version) ->
+        {:error, "Protocol version is required"}
+
+      client_version < unquote(@protocol_version) ->
+        {:error,
+         "Unsupported protocol version. Server supports #{unquote(@protocol_version)} or later"}
+
+      true ->
+        :ok
+    end
+  end
+
+  defp handle_ping(request_id) do
     {:ok,
      %{
        jsonrpc: "2.0",
@@ -100,7 +117,7 @@ defmodule Tidewave.MCP.Server do
      }}
   end
 
-  def handle_initialize(request_id, params, state_pid) do
+  defp handle_initialize(request_id, params, connect_params) do
     case validate_protocol_version(params["protocolVersion"]) do
       :ok ->
         {:ok,
@@ -118,7 +135,7 @@ defmodule Tidewave.MCP.Server do
                name: "Tidewave MCP Server",
                version: @vsn
              },
-             tools: tools(Connection.connect_params(state_pid))
+             tools: tools(connect_params)
            }
          }}
 
@@ -127,16 +144,11 @@ defmodule Tidewave.MCP.Server do
     end
   end
 
-  def handle_list_tools(request_id, _params, state_pid) do
+  defp handle_list_tools(request_id, _params, connect_params) do
     result_or_error(
       request_id,
-      {:ok, %{tools: tools(Connection.connect_params(state_pid))}}
+      {:ok, %{tools: tools(connect_params)}}
     )
-  end
-
-  def handle_call_tool(request_id, %{"name" => name} = params, assigns) do
-    args = Map.get(params, "arguments", %{})
-    result_or_error(request_id, dispatch(name, args, assigns))
   end
 
   defp result_or_error(request_id, {:ok, text, metadata})
@@ -184,30 +196,47 @@ defmodule Tidewave.MCP.Server do
      }}
   end
 
-  defp validate_protocol_version(client_version) do
-    cond do
-      is_nil(client_version) ->
-        {:error, "Protocol version is required"}
-
-      client_version < unquote(@protocol_version) ->
-        {:error,
-         "Unsupported protocol version. Server supports #{unquote(@protocol_version)} or later"}
-
-      true ->
-        :ok
-    end
+  defp handle_call_tool(request_id, %{"name" => name} = params, assigns) do
+    args = Map.get(params, "arguments", %{})
+    result_or_error(request_id, dispatch(name, args, assigns))
   end
 
-  ## handle_message function for SSE plug
+  defp safe_call_tool(request_id, params, assigns) do
+    handle_call_tool(request_id, params, assigns)
+  catch
+    kind, reason ->
+      # tool exceptions should be treated as successful response with isError: true
+      # https://spec.modelcontextprotocol.io/specification/2024-11-05/server/tools/#error-handling
+      {:ok,
+       %{
+         jsonrpc: "2.0",
+         id: request_id,
+         result: %{
+           content: [
+             %{
+               type: "text",
+               text: "Failed to call tool: #{Exception.format(kind, reason, __STACKTRACE__)}"
+             }
+           ],
+           isError: true
+         }
+       }}
+  end
 
   # Built-in message routing
-  def handle_message(%{"method" => "notifications/initialized"} = message, _state_pid, _assigns) do
+  defp handle_message(%{"method" => "notifications/initialized"} = message, _assigns) do
     Logger.info("Received initialized notification")
     Logger.debug("Full message: #{inspect(message, pretty: true)}")
     {:ok, nil}
   end
 
-  def handle_message(%{"method" => method, "id" => id} = message, state_pid, assigns) do
+  defp handle_message(%{"method" => "notifications/cancelled"} = message, _assigns) do
+    Logger.info("Request cancelled: #{inspect(message["params"])}")
+    {:ok, nil}
+  end
+
+  defp handle_message(%{"method" => method, "id" => id} = message, assigns) do
+    connect_params = assigns.connect_params
     Logger.info("Routing MCP message - Method: #{method}, ID: #{id}")
     Logger.debug("Full message: #{inspect(message, pretty: true)}")
 
@@ -221,11 +250,11 @@ defmodule Tidewave.MCP.Server do
           "Handling initialize request with params: #{inspect(message["params"], pretty: true)}"
         )
 
-        handle_initialize(id, message["params"], state_pid)
+        handle_initialize(id, message["params"], connect_params)
 
       "tools/list" ->
         Logger.debug("Handling tools list request")
-        handle_list_tools(id, message["params"], state_pid)
+        handle_list_tools(id, message["params"], connect_params)
 
       "tools/call" ->
         Logger.debug(
@@ -252,42 +281,85 @@ defmodule Tidewave.MCP.Server do
     end
   end
 
-  def handle_message(unknown_message, _state_pid) do
-    Logger.error("Received invalid message format: #{inspect(unknown_message, pretty: true)}")
+  ## HTTP transport functions
 
-    {:error,
-     %{
-       jsonrpc: "2.0",
-       id: nil,
-       error: %{
-         code: -32600,
-         message: "Invalid Request",
-         data: %{
-           received: unknown_message
-         }
-       }
-     }}
+  defp validate_jsonrpc_message(%{"jsonrpc" => "2.0"} = message) do
+    cond do
+      # Request must have method and id (string or number)
+      Map.has_key?(message, "id") and Map.has_key?(message, "method") ->
+        case message["id"] do
+          id when is_binary(id) or is_number(id) -> {:ok, message}
+          _ -> {:error, :invalid_jsonrpc}
+        end
+
+      # Notification must have method but no id
+      not Map.has_key?(message, "id") and Map.has_key?(message, "method") ->
+        {:ok, message}
+
+      # reply (e.g. to ping) with ID + result
+      Map.has_key?(message, "id") and Map.has_key?(message, "result") ->
+        {:ok, message}
+
+      true ->
+        {:error, :invalid_jsonrpc}
+    end
   end
 
-  defp safe_call_tool(request_id, params, assigns) do
-    handle_call_tool(request_id, params, assigns)
-  catch
-    kind, reason ->
-      # tool exceptions should be treated as successful response with isError: true
-      # https://spec.modelcontextprotocol.io/specification/2024-11-05/server/tools/#error-handling
-      {:ok,
-       %{
-         jsonrpc: "2.0",
-         id: request_id,
-         result: %{
-           content: [
-             %{
-               type: "text",
-               text: "Failed to call tool: #{Exception.format(kind, reason, __STACKTRACE__)}"
-             }
-           ],
-           isError: true
-         }
-       }}
+  defp validate_jsonrpc_message(_), do: {:error, :invalid_jsonrpc}
+
+  defp send_json(conn, data) do
+    conn
+    |> put_resp_content_type("application/json")
+    |> send_resp(conn.status || 200, Jason.encode!(data))
+  end
+
+  defp send_jsonrpc_error(conn, id, code, message, data \\ nil) do
+    error = %{
+      code: code,
+      message: message
+    }
+
+    error = if data, do: Map.put(error, :data, data), else: error
+
+    response = %{
+      jsonrpc: "2.0",
+      id: id,
+      error: error
+    }
+
+    conn
+    |> put_resp_content_type("application/json")
+    |> send_resp(200, Jason.encode!(response))
+  end
+
+  def handle_http_message(conn) do
+    Logger.info("Received #{conn.method} message")
+    params = conn.body_params
+    conn = fetch_query_params(conn)
+    Logger.debug("Raw params: #{inspect(params, pretty: true)}")
+
+    case validate_jsonrpc_message(params) do
+      {:ok, message} ->
+        assigns = %{connect_params: conn.query_params}
+        assigns = Map.merge(assigns, conn.private.tidewave_config)
+
+        case handle_message(message, assigns) do
+          {:ok, nil} ->
+            # Notifications that don't return a response
+            conn |> put_status(202) |> send_json(%{status: "ok"})
+
+          {:ok, response} ->
+            Logger.debug("Sending HTTP response: #{inspect(response, pretty: true)}")
+            conn |> put_status(200) |> send_json(response)
+
+          {:error, error_response} ->
+            Logger.warning("Error handling message: #{inspect(error_response)}")
+            conn |> put_status(400) |> send_json(error_response)
+        end
+
+      {:error, :invalid_jsonrpc} ->
+        Logger.warning("Invalid JSON-RPC message format")
+        send_jsonrpc_error(conn, nil, -32600, "Could not parse message")
+    end
   end
 end
