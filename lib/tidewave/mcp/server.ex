@@ -13,12 +13,10 @@ defmodule Tidewave.MCP.Server do
 
   defp raw_tools do
     [
-      Tools.FS.tools(),
       Tools.Logs.tools(),
       Tools.Source.tools(),
       Tools.Eval.tools(),
       Tools.Ecto.tools(),
-      Tools.Phoenix.tools(),
       Tools.Hex.tools()
     ]
     |> List.flatten()
@@ -43,21 +41,13 @@ defmodule Tidewave.MCP.Server do
     tools
   end
 
-  defp tools(connect_params) do
+  defp tools() do
     {tools, _} = tools_and_dispatch()
 
-    listable? = fn
-      %{listable: listable} when is_function(listable, 1) ->
-        listable.(connect_params)
-
-      _tool ->
-        true
-    end
-
-    for tool <- tools, listable?.(tool) do
+    for tool <- tools do
       tool
       |> Map.put(:description, String.trim(tool.description))
-      |> Map.drop([:callback, :listable])
+      |> Map.drop([:callback])
     end
   end
 
@@ -117,7 +107,7 @@ defmodule Tidewave.MCP.Server do
      }}
   end
 
-  defp handle_initialize(request_id, params, connect_params) do
+  defp handle_initialize(request_id, params) do
     case validate_protocol_version(params["protocolVersion"]) do
       :ok ->
         {:ok,
@@ -135,7 +125,7 @@ defmodule Tidewave.MCP.Server do
                name: "Tidewave MCP Server",
                version: @vsn
              },
-             tools: tools(connect_params)
+             tools: tools()
            }
          }}
 
@@ -144,11 +134,8 @@ defmodule Tidewave.MCP.Server do
     end
   end
 
-  defp handle_list_tools(request_id, _params, connect_params) do
-    result_or_error(
-      request_id,
-      {:ok, %{tools: tools(connect_params)}}
-    )
+  defp handle_list_tools(request_id, _params) do
+    result_or_error(request_id, {:ok, %{tools: tools()}})
   end
 
   defp result_or_error(request_id, {:ok, text, metadata})
@@ -236,7 +223,6 @@ defmodule Tidewave.MCP.Server do
   end
 
   defp handle_message(%{"method" => method, "id" => id} = message, assigns) do
-    connect_params = assigns.connect_params
     Logger.info("Routing MCP message - Method: #{method}, ID: #{id}")
     Logger.debug("Full message: #{inspect(message, pretty: true)}")
 
@@ -250,11 +236,11 @@ defmodule Tidewave.MCP.Server do
           "Handling initialize request with params: #{inspect(message["params"], pretty: true)}"
         )
 
-        handle_initialize(id, message["params"], connect_params)
+        handle_initialize(id, message["params"])
 
       "tools/list" ->
         Logger.debug("Handling tools list request")
-        handle_list_tools(id, message["params"], connect_params)
+        handle_list_tools(id, message["params"])
 
       "tools/call" ->
         Logger.debug(
@@ -340,8 +326,7 @@ defmodule Tidewave.MCP.Server do
 
     case validate_jsonrpc_message(params) do
       {:ok, message} ->
-        assigns = %{connect_params: conn.query_params}
-        assigns = Map.merge(assigns, conn.private.tidewave_config)
+        assigns = conn.private.tidewave_config
 
         case handle_message(message, assigns) do
           {:ok, nil} ->

@@ -13,6 +13,7 @@ defmodule Tidewave.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
+      elixirc_paths: if(Mix.env() == :test, do: ["lib", "test/support"], else: ["lib"]),
       aliases: [
         tidewave:
           "run --no-halt -e 'Agent.start(fn -> Bandit.start_link(plug: Tidewave, port: 4000) end)'"
