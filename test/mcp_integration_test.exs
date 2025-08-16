@@ -116,7 +116,7 @@ defmodule Tidewave.MCPIntegrationTest do
         "id" => "init",
         "method" => "initialize",
         "params" => %{
-          "protocolVersion" => "2025-03-06",
+          "protocolVersion" => "2025-03-26",
           "capabilities" => %{}
         }
       })

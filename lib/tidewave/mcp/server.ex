@@ -6,7 +6,7 @@ defmodule Tidewave.MCP.Server do
   import Plug.Conn
   alias Tidewave.MCP.Tools
 
-  @protocol_version "2025-03-06"
+  @protocol_version "2025-03-26"
   @vsn Mix.Project.config()[:version]
 
   ## Tool management functions
