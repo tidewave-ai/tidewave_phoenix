@@ -29,7 +29,7 @@ defmodule Tidewave.MCP.ServerTest do
         "method" => "initialize",
         "id" => "1",
         "params" => %{
-          "protocolVersion" => "2025-03-06",
+          "protocolVersion" => "2025-03-26",
           "capabilities" => %{
             "version" => "1.0"
           }
@@ -43,7 +43,7 @@ defmodule Tidewave.MCP.ServerTest do
       response_body = Jason.decode!(response.resp_body)
       assert response_body["jsonrpc"] == "2.0"
       assert response_body["id"] == "1"
-      assert response_body["result"]["protocolVersion"] == "2025-03-06"
+      assert response_body["result"]["protocolVersion"] == "2025-03-26"
       assert is_list(response_body["result"]["tools"])
     end
 
