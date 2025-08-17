@@ -7,6 +7,7 @@ defmodule Tidewave.Router do
   alias Tidewave.MCP
 
   plug(:match)
+  plug(:check_request_not_parsed)
   plug(:check_remote_ip)
   plug(:check_origin)
   plug(:dispatch)
@@ -28,18 +29,14 @@ defmodule Tidewave.Router do
   get "/mcp" do
     Logger.metadata(tidewave_mcp: true)
 
+    # For GET requests, return 405 Method Not Allowed
+    # (Tidewave doesn't need to support SSE streaming)
     conn
-    |> MCP.SSE.handle_sse()
+    |> send_resp(405, "Method Not Allowed")
     |> halt()
   end
 
   post "/mcp" do
-    conn
-    |> send_resp(405, "Method not allowed")
-    |> halt()
-  end
-
-  post "/mcp/message" do
     Logger.metadata(tidewave_mcp: true)
 
     opts =
@@ -51,7 +48,7 @@ defmodule Tidewave.Router do
 
     conn
     |> Plug.Parsers.call(opts)
-    |> MCP.SSE.handle_message()
+    |> MCP.Server.handle_http_message()
     |> halt()
   end
 
@@ -68,13 +65,11 @@ defmodule Tidewave.Router do
             shell({:spawn_executable, shell_path}, [args: ["-c", "(#{cmd}\n)"]], conn)
 
           {:win32, osname} ->
-            cmd = String.to_charlist(cmd)
-
             cmd =
               case {System.get_env("COMSPEC"), osname} do
-                {nil, :windows} -> ~c"cmd.com /s /c " ++ cmd
-                {nil, _} -> ~c"cmd /s /c " ++ cmd
-                {cmd, _} -> ~c"#{cmd} /s /c " ++ cmd
+                {nil, :windows} -> ~c"cmd.com /s /c #{cmd}"
+                {nil, _} -> ~c"cmd /s /c #{cmd}"
+                {comspec, _} -> ~c"#{comspec} /s /c #{cmd}"
               end
 
             shell({:spawn, cmd}, [], conn)
@@ -110,6 +105,17 @@ defmodule Tidewave.Router do
         data = ~s|{"status":#{status}}|
         {:ok, conn} = chunk(conn, [1, <<byte_size(data)::32-unsigned-integer-big>>, data])
         conn
+    end
+  end
+
+  defp check_request_not_parsed(conn, _opts) do
+    case conn.body_params do
+      %Plug.Conn.Unfetched{} ->
+        conn
+
+      _ ->
+        raise "plug Tidewave is runnning too late, after the request body has been parsed. " <>
+                "Make sure to place \"plug Tidewave\" before the \"if code_reloading? do\" block"
     end
   end
 

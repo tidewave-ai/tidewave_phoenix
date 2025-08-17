@@ -30,6 +30,7 @@ defmodule Tidewave.MCP do
   @doc """
   Returns the working directory.
   """
+  # TC relies on this function for FS operations. Don't remove!
   def root, do: Application.fetch_env!(:tidewave, :root)
 
   @doc """
@@ -46,7 +47,6 @@ defmodule Tidewave.MCP do
     if Application.get_env(:tidewave, :debug) do
       :ok
     else
-      Logger.put_module_level(MCP.SSE, :none)
       Logger.put_module_level(MCP.Connection, :none)
       Logger.put_module_level(MCP.Server, :none)
     end

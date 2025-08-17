@@ -3,7 +3,6 @@ defmodule Tidewave.MCP.Tools.Eval do
 
   @compile {:no_warn_undefined, Phoenix.CodeReloader}
 
-  alias Tidewave.MCP
   alias Tidewave.MCP.IOForwardGL
 
   def tools do
@@ -48,39 +47,6 @@ defmodule Tidewave.MCP.Tools.Eval do
           }
         },
         callback: &project_eval/2
-      },
-      %{
-        name: "shell_eval",
-        description: """
-        Executes a shell command in the project root directory.
-
-        The operating system is of flavor `#{inspect(:os.type())}`.
-
-        Avoid using this tool for manipulating project files.
-        Instead rely on the tools with the name matching `*_project_files`.
-
-        Do not use this tool to evaluate Elixir code. Use `project_eval` instead.
-
-        Do not use this tool for commands that run indefinitely,
-        such as servers (like `mix phx.server` or `npm run dev`),
-        REPLs (`iex`) or file watchers.
-
-        Only use this tool if other means are not available.
-        """,
-        inputSchema: %{
-          type: "object",
-          required: ["command"],
-          properties: %{
-            command: %{
-              type: "string",
-              description:
-                "The shell command to execute. Avoid using this for file operations; use dedicated file system tools instead."
-            }
-          }
-        },
-        callback: &shell_eval/1,
-        # for now, only include the shell tool if FS tools are also enabled
-        listable: fn connect_params -> not is_nil(connect_params["include_fs_tools"]) end
       }
     ]
   end
@@ -175,31 +141,6 @@ defmodule Tidewave.MCP.Tools.Eval do
       Process.group_leader(self(), original_group_leader)
       StringIO.close(pid)
       Application.put_env(:elixir, :ansi_enabled, original)
-    end
-  end
-
-  @doc """
-  Executes a shell command in the project root directory.
-
-  Returns the output of the command.
-  """
-  def shell_eval(args) do
-    case args do
-      %{"command" => "iex " <> _} ->
-        {:error,
-         "Do not use shell_eval to evaluate Elixir code, use the project_eval tool instead"}
-
-      %{"command" => command} ->
-        case System.shell(command, stderr_to_stdout: true, cd: MCP.root()) do
-          {output, 0} ->
-            {:ok, output}
-
-          {output, status} ->
-            {:error, "Command failed with status #{status}:\n\n#{output}"}
-        end
-
-      _ ->
-        {:error, :invalid_arguments}
     end
   end
 end

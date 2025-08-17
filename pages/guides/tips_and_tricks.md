@@ -1,6 +1,6 @@
 # Tips and tricks
 
-Some tips and tricks to use Tidewave and AI assistants and agents effectively.
+Some tips and tricks to use Tidewave effectively.
 
 ## Be specific
 
@@ -10,37 +10,37 @@ exactly what you asked. However, if you are vague, they may try things
 completely different from what you had in mind, sometimes surprising you,
 othertimes leading to work that will have to be discarded.
 
-When it comes to using Tidewave, if you are expecting it to use a particular
-tool, be specific about it. Say use `project_eval` to validate some API
-or to execute a given query using `execute_sql_query`. The listing of all
-tools are available [in the MCP page](../editors/mcp.md).
+## Short chats
+
+In general, you should keep your chats (also known as conversations/threads)
+short.
+
+Once the context window becomes too large, models may become imprecise,
+forget previous instructions, or start running into loops. Furthermore,
+once a model does something wrong, its mistakes remain in the prompt,
+and trying to coax them to fix it often leads them to repeat those mistakes
+in a loop, leading to increasing token/message consumption.
+
+Keeping chats short help address those problems. Tidewave Web will
+include more functionality in the future to help you manage your chats
+and their context.
 
 ## Configure your prompts
 
-Most editors and AI assistants allow you to write down a file that
-is given as context to models. Such files are excellent places to
-document your project's best practices, workflows, and pitfalls.
-Keep this file short and to the point. For example, a Phoenix
-application may write:
+Tidewave allows you to write an AGENTS.md file that is given as context
+to models. We have [a dedicated page to this feature](agentsmd.md),
+where you can learn more.
 
-```text
-This is a Phoenix application, which uses Tailwind and daisyUI.
-Prefer using LiveView instead of regular Controllers.
-Once you are done with changes, run `mix compile` and fix any issues.
-Write tests for your changes and run `mix test` afterwards.
-```
-
-The rules file can also be used to prompt your editor to use certain
-tools above others, so you can steer them towards using your favorite
-Tidewave tools more.
+Such files can also be used to prompt Tidewave to use certain tools
+above others, so you can steer them towards using your favorite
+Tidewave tools more frequently.
 
 ## Use eval: AI's swiss army knife
 
-AI assistants excel at coding. Since Tidewave can evaluate code within your
-project (using the `project_eval` tool), as well as execute commands in the
-terminal (using `shell_eval`), you can ask the AI to execute complex tasks
-through Tidewave's eval without a need for additional tooling. With Tidewave,
-you can:
+Tidewave can evaluate code within your project (using the `project_eval` tool),
+as well as execute commands in the terminal (using `shell_eval`). Therefore,
+you can ask Tidewave to execute complex tasks without a need for additional
+tooling. With Tidewave, you can:
 
   * evaluate code within the project context
   * execute commands in the terminal
@@ -54,29 +54,30 @@ in a more structured format. In this case, remember to be precise and don't shy
 away from telling the exact tool it should use.
 
 Similarly, any API that your application talks to is automatically available
-to agents, which can leverage your established authentication methods and
-access patterns without requiring you to set up and maintain additional
+to Tidewave, which can then leverage your established authentication methods
+and access patterns without requiring you to set up and maintain additional
 development keys.
 
-Furthermore, if you find yourself needing to automate workflows, you can
-implement those as regular functions in your codebase and ask the agent to use
-them, either explicitly or as part of your prompt. This keeps your tooling
-consolidated and makes extending functionality a natural part of your development
-process, like any other code you write.
+If you find yourself needing to automate workflows, you can implement those
+as regular functions in your codebase and ask the agent to use them, by
+explicitly telling Tidewave to "use `project_eval` to invoke function
+`Foo.Bar.baz`". This means extending Tidewave is simply a matter of adding
+new functions/methods to your codebase, like any other code you write, and
+informing Tidewave where this functionality is defined.
 
-In our experience, AI models become less effective when there are too many tools,
-and work best with a few powerful ones. With Tidewave's eval, we make the power
-of full programming languages within the context of your project available to
-AI assistants.
+In our experience, models become less effective when there are too many
+tools, and work best with a few powerful ones. With our eval tools, Tidewave
+has the full power of your programming language within the context of your
+project.
 
 ## Plan and think ahead
 
-Different AI assistants will require different techniques to produce the
-best results but the majority of them will output better code if you ask
-them to plan ahead.
+Different models will require different techniques to produce the best
+results but the majority of them will output better code if you ask them
+to plan ahead.
 
-AI assistants and editors may also provide a "think" tool, which often
-improves the quality too. For example, Claude says:
+In particular, thinking models can be prompted into thinking, at different
+effort levels, by simply asking them to. For example, Claude says:
 
 > We recommend using the word "think" to trigger extended thinking mode,
 > which gives Claude additional computation time to evaluate alternatives

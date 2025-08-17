@@ -3,61 +3,17 @@ defmodule Tidewave.MCP.Tools.EctoTest do
 
   alias Tidewave.MCP.Tools.Ecto
 
-  # Create a mock repo module for testing
-  defmodule MockRepo do
-    def __adapter__ do
-      Ecto.Adapters.Postgres
-    end
-
-    def query("SELECT 1", []) do
-      {:ok, %{rows: [[1]], columns: ["?column?"]}}
-    end
-
-    def query("SELECT $1::text", ["test"]) do
-      {:ok, %{rows: [["test"]], columns: ["?column?"]}}
-    end
-
-    def query("ERROR", _) do
-      {:error, %{message: "Query error"}}
-    end
-
-    def query("SELECT lotsofrows", _) do
-      {:ok, %{rows: Enum.to_list(1..100), num_rows: 100, columns: ["?column?"]}}
-    end
-
-    def query("SELECT charlist", _) do
-      {:ok, %{rows: ~c"abc", num_rows: 3, columns: ["?column?"]}}
-    end
-  end
-
   describe "tools/0" do
-    test "returns empty list when no repos are configured" do
-      assert Ecto.tools() == []
-    end
-
     test "returns list of tools when repos are configured" do
-      Application.put_env(:tidewave, :ecto_repos, [MockRepo])
-
-      on_exit(fn ->
-        Application.delete_env(:tidewave, :ecto_repos)
-      end)
-
       assert tools = Ecto.tools()
       assert execute_sql_query = Enum.find(tools, &(&1.name == "execute_sql_query"))
       assert execute_sql_query.inputSchema.properties.repo.description =~ "MockRepo"
-
       assert Enum.find(tools, &(&1.name == "get_ecto_schemas"))
     end
   end
 
   describe "execute_sql_query/3" do
     test "uses first repo from list of configured repos when no repo is passed" do
-      Application.put_env(:tidewave, :ecto_repos, [MockRepo])
-
-      on_exit(fn ->
-        Application.delete_env(:tidewave, :ecto_repos)
-      end)
-
       assert {:ok, _} =
                Ecto.execute_sql_query(
                  %{"query" => "SELECT 1", "arguments" => []},
@@ -69,7 +25,7 @@ defmodule Tidewave.MCP.Tools.EctoTest do
       {:ok, text} =
         Ecto.execute_sql_query(
           %{
-            "repo" => "Tidewave.MCP.Tools.EctoTest.MockRepo",
+            "repo" => "MockRepo",
             "query" => "SELECT 1",
             "arguments" => []
           },
@@ -84,7 +40,7 @@ defmodule Tidewave.MCP.Tools.EctoTest do
       {:ok, text} =
         Ecto.execute_sql_query(
           %{
-            "repo" => "Tidewave.MCP.Tools.EctoTest.MockRepo",
+            "repo" => "MockRepo",
             "query" => "SELECT $1::text",
             "arguments" => ["test"]
           },
@@ -98,7 +54,7 @@ defmodule Tidewave.MCP.Tools.EctoTest do
       {:ok, text} =
         Ecto.execute_sql_query(
           %{
-            "repo" => "Tidewave.MCP.Tools.EctoTest.MockRepo",
+            "repo" => "MockRepo",
             "query" => "SELECT lotsofrows",
             "arguments" => []
           },
@@ -113,7 +69,7 @@ defmodule Tidewave.MCP.Tools.EctoTest do
       {:error, message} =
         Ecto.execute_sql_query(
           %{
-            "repo" => "Tidewave.MCP.Tools.EctoTest.MockRepo",
+            "repo" => "MockRepo",
             "query" => "ERROR",
             "arguments" => []
           },
@@ -128,7 +84,7 @@ defmodule Tidewave.MCP.Tools.EctoTest do
       {:ok, text} =
         Ecto.execute_sql_query(
           %{
-            "repo" => "Tidewave.MCP.Tools.EctoTest.MockRepo",
+            "repo" => "MockRepo",
             "query" => "SELECT charlist",
             "arguments" => []
           },
@@ -142,7 +98,7 @@ defmodule Tidewave.MCP.Tools.EctoTest do
       {:ok, text} =
         Ecto.execute_sql_query(
           %{
-            "repo" => "Tidewave.MCP.Tools.EctoTest.MockRepo",
+            "repo" => "MockRepo",
             "query" => "SELECT lotsofrows",
             "arguments" => []
           },

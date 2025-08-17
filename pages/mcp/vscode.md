@@ -45,4 +45,4 @@ See the [MCP proxy documentation](guides/mcp_proxy.md).
 And you are good to go! Now the Copilot extension will list all tools from
 Tidewave available. If your application uses a SQL database, you can verify
 it all works by asking it to run `SELECT 1` as database query.
-If it fails, check out [our Troubleshooting guide](troubleshooting.md).
+If it fails, check out [our MCP Troubleshooting guide](mcp_troubleshooting.md).

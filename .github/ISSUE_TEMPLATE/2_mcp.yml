@@ -1,5 +1,5 @@
 ---
-name: Editor/MCP client integration issue
+name: Tidewave MCP/editor integration issue
 description: File a bug report related to Tidewave and your editor/MCP client
 
 body:
@@ -8,7 +8,7 @@ body:
       value: >
         Thanks for taking the time to fill out this bug report.
         Before moving forward, check out
-        [our Troubleshooting guide](https://hexdocs.pm/tidewave/troubleshooting.html).
+        [our MCP Troubleshooting guide](https://hexdocs.pm/tidewave/mcp_troubleshooting.html).
 
   - type: input
     id: mcp-client
