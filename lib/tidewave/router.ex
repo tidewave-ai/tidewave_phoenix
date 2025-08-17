@@ -7,6 +7,7 @@ defmodule Tidewave.Router do
   alias Tidewave.MCP
 
   plug(:match)
+  plug(:check_request_not_parsed)
   plug(:check_remote_ip)
   plug(:check_origin)
   plug(:dispatch)
@@ -28,7 +29,7 @@ defmodule Tidewave.Router do
   get "/mcp" do
     Logger.metadata(tidewave_mcp: true)
 
-    # For GET requests, return 405 Method Not Allowed 
+    # For GET requests, return 405 Method Not Allowed
     # (Tidewave doesn't need to support SSE streaming)
     conn
     |> send_resp(405, "Method Not Allowed")
@@ -104,6 +105,20 @@ defmodule Tidewave.Router do
         data = ~s|{"status":#{status}}|
         {:ok, conn} = chunk(conn, [1, <<byte_size(data)::32-unsigned-integer-big>>, data])
         conn
+    end
+  end
+
+  defp check_request_not_parsed(conn, _opts) do
+    case conn.body_params do
+      %Plug.Conn.Unfetched{} ->
+        conn
+
+      _ ->
+        raise """
+        plug Tidewave is runnning too late, after the request body has been parsed.
+
+        Make sure to place Tidewave before the "if code_reloading? do" block\
+        """
     end
   end
 
