@@ -114,11 +114,8 @@ defmodule Tidewave.Router do
         conn
 
       _ ->
-        raise """
-        plug Tidewave is runnning too late, after the request body has been parsed.
-
-        Make sure to place Tidewave before the "if code_reloading? do" block\
-        """
+        raise "plug Tidewave is runnning too late, after the request body has been parsed. " <>
+                "Make sure to place \"plug Tidewave\" before the \"if code_reloading? do\" block"
     end
   end
 
