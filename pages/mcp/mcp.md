@@ -11,7 +11,7 @@ You can access some of Tidewave features from your editor via the Model Context 
   * [Windsurf](windsurf.md)
   * [Zed](zed.md)
 
-However, features such as contextual browser testing, point and click prompting, page context and more are only available for Tidewave Web under the `/tidewave` route of your application.
+Tidewave MCP includes only a subset of the features in Tidewave. In-browser agents, point and click prompting, and contextual browser testing are part of [Tidewave Web](https://tidewave.ai) and are available under the `/tidewave` route of your application.
 
 ## General instructions
 
@@ -22,8 +22,6 @@ In case your tool of choice does not support "sse" servers, only "io" ones, you 
 ## Available tools
 
 Here is a baseline comparison of the tools supported by different frameworks/languages. Frameworks may support additional features.
-
-### Runtime intelligence
 
 | Features                     | Tidewave for Phoenix | Tidewave for Rails |
 | :--------------------------- | :------------------: | :----------------: |

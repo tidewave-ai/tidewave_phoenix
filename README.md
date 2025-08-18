@@ -1,10 +1,8 @@
 # Tidewave
 
-Tidewave speeds up development with an AI assistant that understands your web application,
-how it runs, and what it delivers. Our current release connects your editor's
-assistant to your web framework runtime via [MCP](https://modelcontextprotocol.io/).
+Tidewave is a coding agent that runs in the browser alongside your web application, deeply integrated with Phoenix. [See our website](https://tidewave.ai) for more information.
 
-[See our website](https://tidewave.ai) for more information.
+This project can also be used as a standalone Model Context Protocol server for your editors.
 
 ## Installation
 
@@ -30,9 +28,7 @@ Then, for Phoenix applications, go to your `lib/my_app_web/endpoint.ex` and righ
    if code_reloading? do
 ```
 
-Tidewave will now run on the same port as your regular Phoenix application.
-In particular, the MCP is located by default at http://localhost:4000/tidewave/mcp.
-[You must configure your editor and AI assistants accordingly](https://hexdocs.pm/tidewave/mcp.html).
+Now access `/tidewave` route of your web application to enjoy Tidewave Web!
 
 ### Using Igniter
 
@@ -46,9 +42,7 @@ mix archive.install hex igniter_new
 mix igniter.install tidewave
 ```
 
-Tidewave will now run on the same port as your regular Phoenix application.
-In particular, the MCP is located by default at http://localhost:4000/tidewave/mcp.
-[You must configure your editor and AI assistants accordingly](https://hexdocs.pm/tidewave/mcp.html).
+Now access `/tidewave` route of your web application to enjoy Tidewave Web!
 
 ### Usage in non-Phoenix applications
 
@@ -68,7 +62,7 @@ aliases: [
 ]
 ```
 
-Now run `mix tidewave` and Tidewave will be available at `localhost:4000/tidewave`.
+Now run `mix tidewave` and Tidewave will be available at `https://localhost:4000/tidewave`.
 
 ## Troubleshooting
 
@@ -82,7 +76,7 @@ Tidewave expects your web application to be running on `localhost`. If you are n
 
 If you want to use Docker for development, you either need to enable the configuration above or automatically redirect the relevant ports, as done by [devcontainers](https://code.visualstudio.com/docs/devcontainers/containers). See our [containars](https://hexdocs.pm/tidewave/containers.html) guide for more information.
 
-If you have enabled Content-Security-Policy, Tidewave Web also requires "unsafe-eval" to be enabled under `script-src` in order for contextual browser testing to work correctly.
+If you have enabled Content-Security-Policy, Tidewave also requires "unsafe-eval" to be enabled under `script-src` in order for contextual browser testing to work correctly.
 
 ## Configuration
 
