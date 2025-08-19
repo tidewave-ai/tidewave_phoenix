@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.0 (2025-08-19)
+
+* Enhancements
+  * Improve the experience if using outdated `phoenix_live_reload`
+  * Improve the experience if Tidewave is plugged too late
+  * Improve results for `search_package_docs` tool
+  * Use new streamable HTTP MCP protocol
+
+* Backwards incompatible changes
+  * Previously deprecated file system tools have been removed
+
 ## 0.3.2 (2025-08-13)
 
 * Bug fix

@@ -3,7 +3,7 @@ defmodule Tidewave.MixProject do
 
   @source_url "https://github.com/tidewave-ai/tidewave_phoenix"
   @homepage_url "https://tidewave.ai/"
-  @version "0.3.2"
+  @version "0.4.0"
 
   def project do
     [
