@@ -13,7 +13,7 @@ You can install Tidewave by adding the `tidewave` package to your list of depend
 ```elixir
 def deps do
   [
-    {:tidewave, "~> 0.2", only: :dev}
+    {:tidewave, "~> 0.4", only: :dev}
   ]
 end
 ```
@@ -49,7 +49,7 @@ Now access `/tidewave` route of your web application to enjoy Tidewave Web!
 Tidewave is a regular Plug, so you can use it in any Elixir project, as long as you run a web server. For example, you can use `bandit` (and `tidewave`) in dev mode in your `mix.exs`:
 
 ```elixir
-{:tidewave, "~> 0.2", only: :dev},
+{:tidewave, "~> 0.4", only: :dev},
 {:bandit, "~> 1.0", only: :dev},
 ```
 
