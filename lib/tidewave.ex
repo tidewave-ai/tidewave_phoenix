@@ -6,7 +6,6 @@ defmodule Tidewave do
   def init(opts) do
     %{
       allowed_origins: Keyword.get(opts, :allowed_origins, nil),
-      sse_keepalive_timeout: Keyword.get(opts, :sse_keepalive_timeout, 15_000),
       allow_remote_access: Keyword.get(opts, :allow_remote_access, false),
       phoenix_endpoint: nil,
       inspect_opts:

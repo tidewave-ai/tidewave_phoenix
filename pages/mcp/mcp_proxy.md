@@ -1,7 +1,7 @@
 # Proxy
 
-Tidewave implements the SSE version of MCP protocol. Some tools may only support the IO
-protocol but we provide a proxy that also handles automatic reconnects when your restart
+Tidewave implements the HTTP versions of MCP protocol. Some tools may only support the IO
+protocol but we provide a proxy that also handles automatic reconnections when your restart
 your dev server. Therefore, we also recommend the proxy in cases where a native SSE implementation
 is available, but doesn't handle reconnecting properly.
 

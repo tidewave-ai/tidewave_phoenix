@@ -41,7 +41,7 @@ On Windows:
 
 Where `$PORT` is the port your web application is running on.
 
-### SSE connection
+### HTTP/SSE connection
 
 ```json
 {

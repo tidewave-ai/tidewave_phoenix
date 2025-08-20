@@ -41,9 +41,9 @@ On Windows:
 
 Where `$PORT` is the port your web application is running on.
 
-### SSE connection
+### HTTP/SSE connection
 
-Windsurf also supports MCP servers through SSE:
+Windsurf also supports MCP servers through HTTP/SSE:
 
 ```json
 {

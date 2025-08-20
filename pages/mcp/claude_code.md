@@ -5,9 +5,21 @@
 Adding Tidewave to [Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview)
 is straight-forward, just run:
 
+<!-- tabs-open -->
+
+### Rails
+
 ```shell
 $ claude mcp add --transport sse tidewave http://localhost:$PORT/tidewave/mcp
 ```
+
+### Phoenix
+
+```shell
+$ claude mcp add --transport http tidewave http://localhost:$PORT/tidewave/mcp
+```
+
+<!-- tabs-close -->
 
 To use it with [the `mcp-proxy`](guides/mcp_proxy.md), run:
 

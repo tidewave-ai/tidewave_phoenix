@@ -15,7 +15,6 @@ defmodule Tidewave.MCP.ServerTest do
         |> put_private(:tidewave_config, %{
           allowed_origins: nil,
           allow_remote_access: false,
-          sse_keepalive_timeout: 15_000,
           phoenix_endpoint: nil,
           inspect_opts: [charlists: :as_lists, limit: 50, pretty: true]
         })

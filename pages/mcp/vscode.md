@@ -32,9 +32,9 @@ See the [MCP proxy documentation](guides/mcp_proxy.md).
 
 3. Add a name of your choice
 
-### SSE connection
+### HTTP/SSE connection
 
-1. Choose "HTTP (Server sent events)"
+1. Choose "HTTP (HTTP or Server-Sent events)"
 
 2. Add the URL your web application is running on with `/tidewave/mcp` at the end, such as `http://localhost:$PORT/tidewave/mcp`, where `$PORT` is the port it is running on
 
