@@ -10,6 +10,15 @@ defmodule TidewaveTest do
     def url, do: "http://localhost:4000"
   end
 
+  defmodule TestOriginValidator do
+    def check_origin(_conn, origin, allowed_port) do
+      origin == "http://localhost:#{allowed_port}"
+    end
+
+    def always_allow(_conn, _origin), do: true
+    def always_deny(_conn, _origin), do: false
+  end
+
   test "validates allowed origins for message requests" do
     conn =
       conn(:post, "/tidewave/mcp")
@@ -57,6 +66,118 @@ defmodule TidewaveTest do
     # invalid JSON-RPC message (empty body)
     assert conn.status == 200
     assert conn.resp_body =~ "Could not parse message"
+  end
+
+  test "validates origins with regex patterns" do
+    # Should reject non-matching origin
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "http://example.com")
+      |> Tidewave.call(Tidewave.init(allowed_origins: [~r/^https?:\/\/localhost/]))
+
+    assert conn.status == 403
+
+    # Should accept matching origin
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "http://localhost:4001")
+      |> Tidewave.call(Tidewave.init(allowed_origins: [~r/^https?:\/\/localhost/]))
+
+    # invalid JSON-RPC message (empty body)
+    assert conn.status == 200
+    assert conn.resp_body =~ "Could not parse message"
+  end
+
+  test "validates origins with MFA tuples" do
+    # MFA with additional arguments
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "http://localhost:5000")
+      |> Tidewave.call(
+        Tidewave.init(
+          allowed_origins: [{TidewaveTest.TestOriginValidator, :check_origin, [5000]}]
+        )
+      )
+
+    assert conn.status == 200
+
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "http://localhost:4000")
+      |> Tidewave.call(
+        Tidewave.init(
+          allowed_origins: [{TidewaveTest.TestOriginValidator, :check_origin, [5000]}]
+        )
+      )
+
+    assert conn.status == 403
+
+    # MFA without additional arguments  
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "http://anything.com")
+      |> Tidewave.call(
+        Tidewave.init(allowed_origins: [{TidewaveTest.TestOriginValidator, :always_allow, []}])
+      )
+
+    assert conn.status == 200
+
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "http://anything.com")
+      |> Tidewave.call(
+        Tidewave.init(allowed_origins: [{TidewaveTest.TestOriginValidator, :always_deny, []}])
+      )
+
+    assert conn.status == 403
+  end
+
+  test "validates origins with mixed patterns" do
+    allowed_origins = [
+      "http://localhost:4000",
+      ~r/^https:\/\/.*\.example\.com$/,
+      {TidewaveTest.TestOriginValidator, :always_allow, []}
+    ]
+
+    # Should accept exact string match
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "http://localhost:4000")
+      |> Tidewave.call(Tidewave.init(allowed_origins: allowed_origins))
+
+    assert conn.status == 200
+
+    # Should accept regex match
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "https://app.example.com")
+      |> Tidewave.call(Tidewave.init(allowed_origins: allowed_origins))
+
+    assert conn.status == 200
+
+    # Should accept MFA match
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "http://anything.test")
+      |> Tidewave.call(Tidewave.init(allowed_origins: allowed_origins))
+
+    assert conn.status == 200
+
+    # Should reject non-matching origin
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "http://evil.com")
+      |> Tidewave.call(
+        Tidewave.init(
+          allowed_origins: [
+            "http://localhost:4000",
+            ~r/^https:\/\/.*\.example\.com$/,
+            {TidewaveTest.TestOriginValidator, :always_deny, []}
+          ]
+        )
+      )
+
+    assert conn.status == 403
   end
 
   test "validates content type" do

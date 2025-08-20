@@ -83,6 +83,11 @@ Tidewave expects your web application to be running on `localhost`. If you are n
   plug Tidewave,
    allow_remote_access: true,
    allowed_origins: ["http://company.local"]
+   
+  # Or use a regex to allow multiple subdomains
+  plug Tidewave,
+   allow_remote_access: true,
+   allowed_origins: [~r/^https?:\/\/.*\.company\.local$/]
 ```
 
 If you want to use Docker for development, you either need to enable the configuration above or automatically redirect the relevant ports, as done by [devcontainers](https://code.visualstudio.com/docs/devcontainers/containers). See our [containars](https://hexdocs.pm/tidewave/containers.html) guide for more information.
@@ -99,7 +104,29 @@ You may configure the `Tidewave` plug using the following syntax:
 
 The following options are available:
 
-  * `:allowed_origins` - if using the MCP from a browser, this can be a list of values matched against the `Origin` header to prevent cross origin and DNS rebinding attacks. When using Phoenix, this defaults to the `Endpoint`'s URL.
+  * `:allowed_origins` - if using the MCP from a browser, this can be a list of values matched against the `Origin` header to prevent cross origin and DNS rebinding attacks. When using Phoenix, this defaults to the `Endpoint`'s URL. Each item in the list can be:
+    * A string for exact match: `"http://localhost:4000"`
+    * A regex pattern: `~r/^https?:\/\/localhost(:\d+)?$/`  
+    * An MFA tuple: `{MyModule, :check_origin, [args]}` where the function receives `conn, origin, args...` and returns `true` to allow, `false` to deny, or a string to match against the origin
+    
+    Examples:
+    ```elixir
+    # Allow multiple specific origins
+    allowed_origins: ["http://localhost:3000", "https://app.example.com"]
+    
+    # Allow any localhost port using regex
+    allowed_origins: [~r/^https?:\/\/localhost(:\d+)?$/]
+    
+    # Use custom validation logic with MFA
+    allowed_origins: [{MyApp.Security, :validate_origin, ["production"]}]
+    
+    # Mix different pattern types
+    allowed_origins: [
+      "http://localhost:4000",
+      ~r/^https:\/\/.*\.example\.com$/,
+      {MyApp.Security, :validate_origin, []}
+    ]
+    ```
 
   * `:allow_remote_access` - Tidewave only allows requests from localhost by default, even if your server listens on other interfaces as well. If you trust your network and need to access Tidewave from a different machine, this configuration can be set to `true`.
 

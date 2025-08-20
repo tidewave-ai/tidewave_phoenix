@@ -151,7 +151,11 @@ defmodule Tidewave.Router do
           log_and_send_403(conn, """
           For security reasons, Tidewave only accepts requests from the same origin your web app is running on.
 
-          If you really want to allow remote connections, configure the Tidewave with the `allowed_origins: [#{inspect(origin)}]` option.
+          If you really want to allow remote connections, configure the Tidewave with the `allowed_origins` option.
+          You can use:
+          - Strings: `allowed_origins: ["#{origin}"]`
+          - Regex: `allowed_origins: [~r/^https?:\\/\\/localhost/]`
+          - MFA: `allowed_origins: [{MyModule, :check_origin, []}]`
           """)
         end
 
@@ -168,9 +172,37 @@ defmodule Tidewave.Router do
         validate_origin_from_endpoint!(conn, origin)
 
       allowed_origins ->
-        origin in allowed_origins
+        check_origin_match(allowed_origins, origin, conn)
     end
   end
+
+  defp check_origin_match(allowed_origins, origin, conn) when is_list(allowed_origins) do
+    Enum.any?(allowed_origins, &origin_matches?(&1, origin, conn))
+  end
+
+  defp check_origin_match(allowed_origin, origin, conn) do
+    origin_matches?(allowed_origin, origin, conn)
+  end
+
+  defp origin_matches?(allowed_origin, origin, _conn) when is_binary(allowed_origin) do
+    allowed_origin == origin
+  end
+
+  defp origin_matches?(%Regex{} = regex, origin, _conn) do
+    Regex.match?(regex, origin)
+  end
+
+  defp origin_matches?({module, function, args}, origin, conn)
+       when is_atom(module) and is_atom(function) and is_list(args) do
+    case apply(module, function, [conn, origin | args]) do
+      true -> true
+      false -> false
+      result when is_binary(result) -> result == origin
+      _ -> false
+    end
+  end
+
+  defp origin_matches?(_, _, _), do: false
 
   defp validate_origin_from_endpoint!(conn, origin) do
     case conn.private do
@@ -184,6 +216,8 @@ defmodule Tidewave.Router do
         option on the Tidewave plug:
 
             plug Tidewave, allowed_origins: ["http://localhost:4000"]
+
+        You can also use regex patterns, MFA tuples, or functions for more flexible matching.
         """
     end
   end
