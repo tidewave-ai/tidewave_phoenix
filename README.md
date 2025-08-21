@@ -99,7 +99,7 @@ You may configure the `Tidewave` plug using the following syntax:
 
 The following options are available:
 
-  * `:allowed_origins` - if using the MCP from a browser, this can be a list of values matched against the `Origin` header to prevent cross origin and DNS rebinding attacks. When using Phoenix, this defaults to the `Endpoint`'s URL.
+  * `:allowed_origins` - a list of values matched against the `Origin` header to prevent cross origin and DNS rebinding attacks. Each value must be a string of shape `[scheme:]//host[:port]`, where both scheme and port are optional. The host may also start with "*". Example: `["//localhost:8000", "//*.test"]`.
 
   * `:allow_remote_access` - Tidewave only allows requests from localhost by default, even if your server listens on other interfaces as well. If you trust your network and need to access Tidewave from a different machine, this configuration can be set to `true`.
 

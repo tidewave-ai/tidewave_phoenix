@@ -145,7 +145,7 @@ defmodule Tidewave.Router do
   defp check_origin(conn, _opts) do
     case get_req_header(conn, "origin") do
       [origin] ->
-        if validate_allowed_origin(conn, origin) do
+        if validate_allowed_origin(conn, URI.parse(origin)) do
           conn
         else
           log_and_send_403(conn, """
@@ -163,19 +163,14 @@ defmodule Tidewave.Router do
   end
 
   defp validate_allowed_origin(conn, origin) do
-    case conn.private.tidewave_config.allowed_origins do
-      nil ->
-        validate_origin_from_endpoint!(conn, origin)
-
-      allowed_origins ->
-        origin in allowed_origins
-    end
+    allowed_origins = conn.private.tidewave_config.allowed_origins || [host_from_endpoint!(conn)]
+    Enum.any?(allowed_origins, &allowed_origin?(origin, parse_allowed_origin!(&1)))
   end
 
-  defp validate_origin_from_endpoint!(conn, origin) do
+  defp host_from_endpoint!(conn) do
     case conn.private do
       %{phoenix_endpoint: endpoint} ->
-        origin == endpoint.url()
+        "//#{endpoint.struct_url().host}"
 
       _ ->
         raise """
@@ -183,10 +178,39 @@ defmodule Tidewave.Router do
         allowed origins for Tidewave by setting the `:allowed_origins` \
         option on the Tidewave plug:
 
-            plug Tidewave, allowed_origins: ["http://localhost:4000"]
+            plug Tidewave, allowed_origins: ["//localhost"]
         """
     end
   end
+
+  defp parse_allowed_origin!(origin) do
+    case URI.parse(origin) do
+      %URI{host: nil} ->
+        raise ArgumentError,
+              "invalid :allowed_origins value: #{inspect(origin)}. " <>
+                "Expected an origin with a host that is parsable by URI.parse/1. For example: " <>
+                "[\"https://example.com\", \"//another.com:888\", \"//other.com\"]"
+
+      %URI{} = uri ->
+        uri
+    end
+  end
+
+  defp allowed_origin?(origin, allowed) do
+    compare?(origin.scheme, allowed.scheme) and
+      compare?(origin.port, allowed.port) and
+      compare_host?(origin.host, allowed.host)
+  end
+
+  defp compare?(request_val, allowed_val) do
+    is_nil(allowed_val) or request_val == allowed_val
+  end
+
+  defp compare_host?(request_host, "*." <> allowed_host),
+    do: request_host == allowed_host or String.ends_with?(request_host, "." <> allowed_host)
+
+  defp compare_host?(request_host, allowed_host),
+    do: request_host == allowed_host
 
   defp log_and_send_403(conn, message) do
     require Logger

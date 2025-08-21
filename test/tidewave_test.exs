@@ -7,17 +7,20 @@ defmodule TidewaveTest do
   @moduletag :capture_log
 
   defmodule Endpoint do
-    def url, do: "http://localhost:4000"
+    def struct_url, do: URI.parse("http://localhost:4000")
   end
 
-  test "validates allowed origins for message requests" do
+  test "validates allowed origins for message requests with endpoint default" do
+    # Default is "//localhost" (host only), so any port on localhost should work
     conn =
       conn(:post, "/tidewave/mcp")
       |> put_req_header("origin", "http://localhost:4001")
       |> put_private(:phoenix_endpoint, Endpoint)
       |> Tidewave.call(Tidewave.init([]))
 
-    assert conn.status == 403
+    # Should pass - same host, different port is allowed
+    assert conn.status == 200
+    assert conn.resp_body =~ "Could not parse message"
 
     conn =
       conn(:post, "/tidewave/mcp")
@@ -25,9 +28,140 @@ defmodule TidewaveTest do
       |> put_private(:phoenix_endpoint, Endpoint)
       |> Tidewave.call(Tidewave.init([]))
 
-    # invalid JSON-RPC message (empty body)
+    # Should pass - same host and port
     assert conn.status == 200
     assert conn.resp_body =~ "Could not parse message"
+
+    # Should fail - different host
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "http://example.com:4000")
+      |> put_private(:phoenix_endpoint, Endpoint)
+      |> Tidewave.call(Tidewave.init([]))
+
+    assert conn.status == 403
+  end
+
+  test "validates allowed origins with explicit configuration" do
+    # Test exact match with scheme and port
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "http://localhost:3000")
+      |> Tidewave.call(Tidewave.init(allowed_origins: ["http://localhost:3000"]))
+
+    assert conn.status == 200
+    assert conn.resp_body =~ "Could not parse message"
+
+    # Test rejection when origin doesn't match
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "http://localhost:4000")
+      |> Tidewave.call(Tidewave.init(allowed_origins: ["http://localhost:3000"]))
+
+    assert conn.status == 403
+  end
+
+  test "validates allowed origins with scheme-less patterns" do
+    # Test scheme-less pattern matching
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "http://localhost:3000")
+      |> Tidewave.call(Tidewave.init(allowed_origins: ["//localhost:3000"]))
+
+    assert conn.status == 200
+
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "https://localhost:3000")
+      |> Tidewave.call(Tidewave.init(allowed_origins: ["//localhost:3000"]))
+
+    assert conn.status == 200
+  end
+
+  test "validates allowed origins with port-less patterns" do
+    # Test port-less pattern matching
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "http://localhost:3000")
+      |> Tidewave.call(Tidewave.init(allowed_origins: ["//localhost"]))
+
+    assert conn.status == 200
+
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "https://localhost:8080")
+      |> Tidewave.call(Tidewave.init(allowed_origins: ["//localhost"]))
+
+    assert conn.status == 200
+  end
+
+  test "validates allowed origins with wildcard patterns" do
+    # Test wildcard subdomain matching
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "http://app.example.com")
+      |> Tidewave.call(Tidewave.init(allowed_origins: ["//*.example.com"]))
+
+    assert conn.status == 200
+
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "https://api.example.com:8443")
+      |> Tidewave.call(Tidewave.init(allowed_origins: ["//*.example.com"]))
+
+    assert conn.status == 200
+
+    # Test exact domain match with wildcard
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "http://example.com")
+      |> Tidewave.call(Tidewave.init(allowed_origins: ["//*.example.com"]))
+
+    assert conn.status == 200
+
+    # Test rejection when wildcard doesn't match
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "http://evil.com")
+      |> Tidewave.call(Tidewave.init(allowed_origins: ["//*.example.com"]))
+
+    assert conn.status == 403
+  end
+
+  test "validates allowed origins with multiple patterns" do
+    allowed_origins = ["//localhost", "//*.test.com", "https://secure.example.org:443"]
+
+    # Test first pattern
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "http://localhost:3000")
+      |> Tidewave.call(Tidewave.init(allowed_origins: allowed_origins))
+
+    assert conn.status == 200
+
+    # Test second pattern
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "http://app.test.com")
+      |> Tidewave.call(Tidewave.init(allowed_origins: allowed_origins))
+
+    assert conn.status == 200
+
+    # Test third pattern
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "https://secure.example.org:443")
+      |> Tidewave.call(Tidewave.init(allowed_origins: allowed_origins))
+
+    assert conn.status == 200
+
+    # Test rejection
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "http://malicious.com")
+      |> Tidewave.call(Tidewave.init(allowed_origins: allowed_origins))
+
+    assert conn.status == 403
   end
 
   test "raises when no origin is configured and no endpoint set" do
@@ -42,11 +176,29 @@ defmodule TidewaveTest do
     conn =
       conn(:post, "/tidewave/mcp")
       |> put_req_header("origin", "http://localhost:4000")
-      |> Tidewave.call(Tidewave.init(allowed_origins: ["http://localhost:4000"]))
+      |> Tidewave.call(Tidewave.init(allowed_origins: ["//localhost:4000"]))
 
     # invalid JSON-RPC message (empty body)
     assert conn.status == 200
     assert conn.resp_body =~ "Could not parse message"
+  end
+
+  test "raises on invalid allowed origin configuration" do
+    assert_raise ArgumentError,
+                 ~r/invalid :allowed_origins value.*Expected an origin with a host/,
+                 fn ->
+                   conn(:post, "/tidewave/mcp")
+                   |> put_req_header("origin", "http://localhost:4000")
+                   |> Tidewave.call(Tidewave.init(allowed_origins: ["invalid-origin"]))
+                 end
+
+    assert_raise ArgumentError,
+                 ~r/invalid :allowed_origins value.*Expected an origin with a host/,
+                 fn ->
+                   conn(:post, "/tidewave/mcp")
+                   |> put_req_header("origin", "http://localhost:4000")
+                   |> Tidewave.call(Tidewave.init(allowed_origins: ["/path/only"]))
+                 end
   end
 
   test "allows requests with no origin header" do
