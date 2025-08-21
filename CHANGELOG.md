@@ -11,6 +11,8 @@
 * Backwards incompatible changes
   * Previously deprecated file system tools have been removed
 
+Important: if you previously configured your editor using the SSE transport instead of using a proxy, you likely need to reconfigure the MCP connection using "HTTP" or "Streamable HTTP" instead.
+
 ## 0.3.2 (2025-08-13)
 
 * Bug fix
