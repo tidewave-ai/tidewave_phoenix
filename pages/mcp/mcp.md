@@ -17,7 +17,9 @@ Tidewave MCP includes only a subset of the features in Tidewave. In-browser agen
 
 ## General instructions
 
-Add the Tidewave MCP server to your editor or agent configuration as the type "http" (for Phoenix) or "sse" (for Rails), pointing to the `/tidewave/mcp` path of port your web application is running on. For example, `http://localhost:4000/tidewave/mcp`.
+Add the Tidewave MCP server to your editor or MCP client configuration as the type "http" (streamable) for Phoenix or "sse" for Rails, pointing to the `/tidewave/mcp` path and port your web application is running on. For example, `http://localhost:4000/tidewave/mcp`.
+
+If your MCP client has an option to use the Streamable HTTP transport, enable it. Otherwise, your client may receive a 'method not allowed' error response.
 
 In case your tool of choice only supports "io" servers, you can use one of the many available [MCP proxies](../guides/mcp_proxy.md).
 

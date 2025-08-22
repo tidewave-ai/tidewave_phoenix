@@ -8,10 +8,18 @@ This page contains several steps to help debug issues when integrating Tidewave 
 
 ## Your web application
 
-In case your editor/MCP client cannot connect to the server, you should try querying the `/tidewave/mcp` endpoint directly using a tool such as `curl`. For example, if your web server is running on port `4000`, you should see something similar to below:
+In case your editor or MCP client cannot connect to the server, you should try querying the `/tidewave/mcp` endpoint directly using a tool such as `curl`. For example:
 
 ```
-$ curl -v http://localhost:4000/tidewave/mcp
+curl -v http://localhost:4000/tidewave/mcp \
+--header 'Content-Type: application/json' \
+--header "Accept: application/json, text/event-stream" \
+--data '{"jsonrpc":"2.0","id":1,"method":"ping"}'
+```
+
+You should see something like:
+
+```
 * Host localhost:4000 was resolved.
 * IPv6: ::1
 * IPv4: 127.0.0.1
@@ -19,33 +27,33 @@ $ curl -v http://localhost:4000/tidewave/mcp
 * connect to ::1 port 4000 from ::1 port 50526 failed: Connection refused
 *   Trying 127.0.0.1:4000...
 * Connected to localhost (127.0.0.1) port 4000
-> GET /tidewave/mcp HTTP/1.1
+* using HTTP/1.x
+> POST /tidewave/mcp HTTP/1.1
 > Host: localhost:4000
-> User-Agent: curl/8.7.1
-> Accept: */*
+> User-Agent: curl/8.14.1
+> Content-Type: application/json
+> Accept: application/json, text/event-stream
+> Content-Length: 40
 >
-* Request completely sent off
+* upload completely sent off: 40 bytes
 < HTTP/1.1 200 OK
-< transfer-encoding: chunked
-< date: Sat, 03 May 2025 06:57:49 GMT
+< date: Fri, 22 Aug 2025 22:15:54 GMT
+< content-length: 36
 < vary: accept-encoding
-< cache-control: no-cache
-< connection: keep-alive
-< content-type: text/event-stream; charset=utf-8
+< cache-control: max-age=0, private, must-revalidate
+< content-type: application/json; charset=utf-8
 <
-event: endpoint
-data: http://localhost:4000/tidewave/mcp/message?sessionId=734c52c4-8aec8eb7-2f3dc8c0
+* Connection #0 to host localhost left intact
+{"id":1,"result":{},"jsonrpc":"2.0"}
 ```
 
-After 30 seconds, you should receive a timeout event, but that's expected. In particular, you want to check that:
+Things to check for:
 
-* The last two lines of the response including `event: endpoint` with a data payload
+* Does `localhost` fail to resolve to an IPv4 or IPv6 address? The example above resolved to IPv4; if `localhost` resolves to IPv6 for you, you need to check that your web server can accept IPv6 connections. Alternatively, use `http://127.0.0.1:$PORT/tidewave/mcp` as your URL instead of using localhost.
 
-* Does `localhost` resolve to an IPv4 or IPv6 address? The example above resolved to IPv4 but, if yours resolved to IPv6, you need to make sure your web server can accept IPv6 connections. Alternatively, use `http://127.0.0.1:$PORT/tidewave/mcp` as your URL instead of using localhost
+* Do the response headers (the lines starting with `<`) include a "transfer-encoding" that indicates compression? Some web servers may automatically compress responses, which may not be handled correctly by your editor or MCP client. In such cases, you may need to disable compression or use an [MCP proxy](../guides/mcp_proxy.md).
 
-* Does the response (the parts starting with `<`) have a "transfer-encoding" (or "Transfer-Encoding") header? Some web servers may automatically compress responses, which may not be handled correctly by all editors or MCP clients. In such cases, you may want to disable compression or use a [MCP proxy](../guides/mcp_proxy.md)
-
-* Are you using Docker or similar? By default, Tidewave and your web server only accept requests coming from localhost. Depending on the bridge mode you use, you need to configure both to allow external connections (but then remember to only expose your Docker ports locally)
+* Are you using Docker or similar? By default, Tidewave and your web server only accept requests coming from localhost. Depending on the bridge mode you use, you need to configure both to allow external connections. (Remember to only expose your Docker ports locally.)
 
 ## The MCP proxy
 
