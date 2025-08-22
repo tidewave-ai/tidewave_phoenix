@@ -8,4 +8,4 @@ Whenever Tidewave renders a file location, you can directly click the filename t
 
 When you click the filename for the first time, Tidewave will open up the "Editor integration" pane on Settings, where you can choose between a few preset editors, or set up a custom URL or a custom command.
 
-You can also use our editor integration alongside the [inspector](inspector.md). Alt+Click or Cmd+Click (macOS) an element with the inspector enabled will automatically open it in your editor.
+You can also use our editor integration alongside the [inspector](inspector.md). Ctrl+Click or Cmd+Click (macOS) an element with the inspector enabled will automatically open it in your editor.
