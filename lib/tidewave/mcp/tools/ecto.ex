@@ -57,8 +57,7 @@ defmodule Tidewave.MCP.Tools.Ecto do
               arguments: %{
                 type: "array",
                 description:
-                  "The arguments to pass to the query. The query must contain corresponding parameters.",
-                items: %{}
+                  "The arguments to pass to the query. The query must contain corresponding parameters."
               }
             }
           },
