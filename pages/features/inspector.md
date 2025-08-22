@@ -16,8 +16,6 @@ If you send a message, Tidewave will include precise information about that elem
 
 ## Shortcuts
 
-The inspector includes two shortcuts:
+The inspector supports the following shortcuts:
 
 * Alt+Click or Cmd+Click (macOS): when hovering an element, you may Alt+Click it, and Tidewave will open up the element in your editor using your configured [editor integration](editors.md)
-
-* Esc: pressing escape will turn off the inspector

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.1 (2025-08-22)
+
+* Enhancements
+  * Allow same host by default in `allowed_origins` (similar to Phoenix)
+  * Support wildcards at the beginning of `allowed_origins`
+  * Support optional ports and schemes in `allowed_origins`
+
 ## 0.4.0 (2025-08-19)
 
 * Enhancements
