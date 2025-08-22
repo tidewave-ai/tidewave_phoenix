@@ -85,7 +85,7 @@ Tidewave expects your web application to be running on `localhost`. If you are n
    allowed_origins: ["http://company.local"]
 ```
 
-If you want to use Docker for development, you either need to enable the configuration above or automatically redirect the relevant ports, as done by [devcontainers](https://code.visualstudio.com/docs/devcontainers/containers). See our [containars](https://hexdocs.pm/tidewave/containers.html) guide for more information.
+If you want to use Docker for development, you either need to enable the configuration above or automatically redirect the relevant ports, as done by [devcontainers](https://code.visualstudio.com/docs/devcontainers/containers). See our [containers](https://hexdocs.pm/tidewave/containers.html) guide for more information.
 
 If you have enabled Content-Security-Policy, Tidewave also requires "unsafe-eval" to be enabled under `script-src` in order for contextual browser testing to work correctly.
 
