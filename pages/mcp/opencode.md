@@ -1,4 +1,4 @@
-# opencode
+# Opencode
 
 You can use Tidewave with [opencode](https://opencode.ai/) by adding the following to your opencode config, either:
 

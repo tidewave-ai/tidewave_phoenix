@@ -72,7 +72,10 @@ defmodule Tidewave.MixProject do
       end,
       extras: [
         "pages/installation.md",
-        "pages/guides/agentsmd.md",
+        "pages/features/agentsmd.md",
+        "pages/features/editors.md",
+        "pages/features/inspector.md",
+        "pages/features/notifications.md",
         "pages/guides/containers.md",
         "pages/guides/security.md",
         "pages/guides/tips_and_tricks.md",
@@ -89,6 +92,7 @@ defmodule Tidewave.MixProject do
         "pages/mcp/zed.md"
       ],
       groups_for_extras: [
+        Features: ~r/(pages\/features\/.?)/,
         Guides: ~r/(pages\/guides\/.?)/,
         MCP: ~r/pages\/mcp\/.?/
       ]
