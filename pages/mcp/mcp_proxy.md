@@ -1,9 +1,12 @@
 # Proxy
 
-Tidewave implements the HTTP versions of MCP protocol. Some tools may only support the IO
-protocol but we provide a proxy that also handles automatic reconnections when your restart
-your dev server. Therefore, we also recommend the proxy in cases where a native SSE implementation
-is available, but doesn't handle reconnecting properly.
+Tidewave implements the HTTP transports of the MCP protocol: Streamable HTTP
+for Phoenix and HTTP+SSE for Ruby on Rails. Some MCP clients may only support
+the stdio transport, and so we provide a proxy.
+
+The proxy handles automatic reconnection upon restart of the dev server, and
+so we also recommend the proxy in cases where a native HTTP implementation is
+available in your MCP client that does not properly handle reconnection.
 
 ## Rust-based proxy
 
