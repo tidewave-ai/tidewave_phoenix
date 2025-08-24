@@ -81,7 +81,7 @@ defmodule Tidewave.Router do
   end
 
   defp shell(port_init, args, conn) do
-    args = [:exit_status, :binary, :hide, :use_stdio, :stderr_to_stdout] ++ args
+    args = [:exit_status, :binary, :hide, :use_stdio, :stderr_to_stdout, cd: MCP.root()] ++ args
     port = Port.open(port_init, args)
 
     conn =
