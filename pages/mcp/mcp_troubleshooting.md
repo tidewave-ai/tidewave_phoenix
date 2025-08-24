@@ -49,7 +49,7 @@ You should see something like:
 
 Things to check for:
 
-* Does `localhost` fail to resolve to an IPv4 or IPv6 address? The example above resolved to IPv4; if `localhost` resolves to IPv6 for you, you need to check that your web server can accept IPv6 connections. Alternatively, use `http://127.0.0.1:$PORT/tidewave/mcp` as your URL instead of using localhost.
+* Does `localhost` resolve to an IPv6 address? The example above resolved to IPv4, but if `localhost` resolves to IPv6 for you, check that your web server can accept IPv6 connections. Alternatively, use `http://127.0.0.1:$PORT/tidewave/mcp` as your URL instead of using localhost.
 
 * Do the response headers (the lines starting with `<`) include a "transfer-encoding" that indicates compression? Some web servers may automatically compress responses, which may not be handled correctly by your editor or MCP client. In such cases, you may need to disable compression or use an [MCP proxy](../guides/mcp_proxy.md).
 
@@ -77,6 +77,6 @@ In case it still does not work, here are places you can get help to diagnose it:
 
 * [Our Discord server](https://discord.gg/5GhK7E54yA) - the best place to interact with the community and get help specific to your editor and framework
 
-* Our issues trackers - in case we messed something up, please let us know. Here are framework specific links:
+* Our issues trackers - in case we messed something up, please let us know. Here are framework-specific links:
   * [Tidewave for Phoenix](https://github.com/tidewave-ai/tidewave_phoenix/issues)
   * [Tidewave for Rails](https://github.com/tidewave-ai/tidewave_rails/issues)

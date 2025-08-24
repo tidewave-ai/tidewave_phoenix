@@ -2,8 +2,8 @@
 
 > To use Tidewave with Claude Code, [see here](claude_code.md).
 
-To use Tidewave with Claude Desktop, you must first install
-a [`mcp-proxy`](../guides/mcp_proxy.md).
+To use Tidewave with [Claude Desktop](https://support.anthropic.com/en/articles/10065433-installing-claude-desktop),
+you must first install an [`mcp-proxy`](../guides/mcp_proxy.md).
 
 Then open up Claude Desktop, go to "Settings" and, under the
 "Developer" tab, click on "Edit Config". It will point to a file
