@@ -11,7 +11,6 @@ You can access some of Tidewave's features from your editor/agent via the Model 
 We have specific instructions for:
 
   * [Claude Code](claude_code.md)
-  * [Claude Desktop](claude.md)
   * [Cursor](cursor.md)
   * [Neovim](neovim.md)
   * [opencode](opencode.md)

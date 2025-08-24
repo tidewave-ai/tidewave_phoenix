@@ -1,9 +1,8 @@
 # Claude Code
 
-> To use Tidewave with Claude Desktop, [see here](claude.md).
+You can use Tidewave with [Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview).
 
-Adding Tidewave to [Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview)
-is straight-forward, just run:
+Simply run:
 
 <!-- tabs-open -->
 
