@@ -31,7 +31,7 @@ Then, for Phoenix applications, go to your `lib/my_app_web/endpoint.ex` and righ
 Now access `/tidewave` route of your web application to enjoy Tidewave Web!
 
 > Tidewave Web works best with Phoenix LiveView v1.1 or later. Once you update it,
-> make sure to enable the following options in `your config/dev.exs`:
+> make sure to enable the following options in your `config/dev.exs`:
 >
 > ```elixir
 > config :phoenix_live_view,
@@ -40,6 +40,12 @@ Now access `/tidewave` route of your web application to enjoy Tidewave Web!
 > ```
 >
 > Those are enabled by default for Phoenix v1.8+ apps.
+
+> If you are running an umbrella project, also add this to your  `config/dev.exs`:
+>
+> ```elixir
+> config :tidewave, :root, File.cwd!()
+> ```
 
 ### Using Igniter
 
