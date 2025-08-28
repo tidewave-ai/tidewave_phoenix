@@ -41,7 +41,7 @@ Now access `/tidewave` route of your web application to enjoy Tidewave Web!
 >
 > Those are enabled by default for Phoenix v1.8+ apps.
 
-> If you are running an umbrella project, also add this to your  `config/dev.exs`:
+> If you are running an umbrella project, also add this to your  `config/runtime.exs`:
 >
 > ```elixir
 > config :tidewave, :root, File.cwd!()
