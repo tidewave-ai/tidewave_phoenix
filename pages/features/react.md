@@ -8,6 +8,8 @@ At the moment, we only support React running within Phoenix and Rails applicatio
 
 For Tidewave Web to be capable of changing both your frontend and backend at once, your React application must be located in the same Git repository root as your backend project. Furthermore, if your backend (Rails, Phoenix, etc.) is the one serving your frontend, no further changes are necessary. However, if your frontend and backend are effectively two different servers in development running on different ports, additional configuration in your build tool is necessary. Please see the steps below.
 
+Once set up, to verify it is all working as expected, you can [enable the Inspector on the top right](inspector.md) and then hover page elements defined in React components. By holding the `Ctrl` key (or `Cmd` key on macOS) at the same time, a purple grid will appear with the name of the containing React component. You may also click the element while `Ctrl` (or `Cmd`) are still held and verify Tidewave Web will open up the appropriate React source location.
+
 ## Vite support
 
 If your frontend and backend are served by two different hosts/ports, you must redirect the `/tidewave` path in your frontend to your backend. For example, if you have your backend running on port 3000 and Vite on port 3001, you will need the following proxy configuration:
