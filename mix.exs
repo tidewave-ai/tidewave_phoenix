@@ -57,7 +57,7 @@ defmodule Tidewave.MixProject do
       {:igniter, "~> 0.6", optional: true},
       {:bandit, "~> 1.6", only: [:dev, :test]},
       {:ex_doc, ">= 0.0.0", only: :docs},
-      {:makeup_json, ">= 0.0.0", only: :docs}
+      {:makeup_syntect, ">= 0.0.0", only: :docs}
     ]
   end
 
