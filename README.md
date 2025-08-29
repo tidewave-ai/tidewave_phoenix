@@ -36,7 +36,7 @@ Now access `/tidewave` route of your web application to enjoy Tidewave Web!
 > ```elixir
 > config :phoenix_live_view,
 >   debug_heex_annotations: true,
->   debug_tags_location: true
+>   debug_attributes: true
 > ```
 >
 > Those are enabled by default for Phoenix v1.8+ apps.
