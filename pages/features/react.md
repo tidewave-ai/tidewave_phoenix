@@ -8,7 +8,7 @@ At the moment, we only support React running within Phoenix and Rails applicatio
 
 For Tidewave Web to be capable of changing both your frontend and backend at once, your React application must be located in the same Git repository root as your backend project. Furthermore, if your backend (Rails, Phoenix, etc.) is the one serving your frontend, no further changes are necessary. However, if your frontend and backend are effectively two different servers in development running on different ports, additional configuration in your build tool is necessary. Please see the steps below.
 
-Once set up, to verify it is all working as expected, you can [enable the Inspector on the top right](inspector.md) and then hover page elements defined in React components. By holding the `Ctrl` key (or `Cmd` key on macOS) at the same time, a purple grid will appear with the name of the containing React component. You may also click the element while `Ctrl` (or `Cmd`) are still held and verify Tidewave Web will open up the appropriate React source location.
+Once set up, to verify it is all working as expected, you can [enable the Inspector on the top right](inspector.md) and then hover page elements defined by React components. By holding the `Ctrl` key (or `Cmd` key on macOS) while the inspector is enabled, a purple overlay will appear with the name of the containing React component. You may also click the element while `Ctrl` (or `Cmd`) are still held and verify Tidewave Web will open up the appropriate React source location. See [the Inspector documentation](inspector.md) to learn more.
 
 ## Vite support
 
@@ -25,7 +25,11 @@ export default defineConfig({
 });
 ```
 
-Tidewave Web will also automatically detect error pages coming from Vite and either fix them automatically during agent mode or present you a tooltip for a one-click fix.
+Tidewave Web will also automatically detect error pages coming from Vite and present you with a tooltip for a one-click fix:
+
+<iframe width="640" height="360" src="https://www.youtube.com/embed/al_VaUWxK9I?si=eCUmP9YdzLa7TtgP" title="Tidewave Web autofix for Vite + React errors" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+If the error appears while the agent is testing your web application, Tidewave Web automatically feeds in the error message and stacktrace.
 
 ## Webpack support
 
