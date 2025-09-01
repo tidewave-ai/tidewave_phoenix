@@ -41,7 +41,6 @@ defmodule Tidewave.MixProject do
       licenses: ["Apache-2.0"],
       links: %{
         "Tidewave" => @homepage_url,
-        "Changelog" => "https://hexdocs.pm/tidewave/changelog.html",
         "GitHub" => @source_url
       }
     ]
