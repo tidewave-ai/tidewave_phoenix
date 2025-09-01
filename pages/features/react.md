@@ -29,7 +29,7 @@ Tidewave Web will also automatically detect error pages coming from Vite and pre
 
 <iframe width="640" height="360" src="https://www.youtube.com/embed/al_VaUWxK9I?si=eCUmP9YdzLa7TtgP" title="Tidewave Web autofix for Vite + React errors" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-If the error appears while the agent is testing your web application, Tidewave Web automatically feeds in the error message and stacktrace.
+If the error appears while Tidewave Web is testing your web application, Tidewave Web automatically feeds the error message and stacktrace to the agent.
 
 ## Webpack support
 
