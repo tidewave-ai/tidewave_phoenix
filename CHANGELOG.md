@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.2 (2025-09-01)
+
+* Enhancements
+  * Raise if Tidewave is plugged after Phoenix.LiveReloader
+
 ## 0.4.1 (2025-08-22)
 
 * Enhancements
