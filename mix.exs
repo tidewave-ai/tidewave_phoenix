@@ -71,7 +71,7 @@ defmodule Tidewave.MixProject do
         raise "you forgot to add \"@moduledoc false\" to #{inspect(mod)}"
       end,
       extras: [
-        "CHANGELOG.md"
+        "CHANGELOG.md",
         "pages/installation.md",
         "pages/features/agentsmd.md",
         "pages/features/editors.md",
