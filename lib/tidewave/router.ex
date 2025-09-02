@@ -51,15 +51,6 @@ defmodule Tidewave.Router do
     |> halt()
   end
 
-  get "/mcp/*_ignored" do
-    # Return 404 for /.well-known resources lookup
-    Logger.metadata(tidewave_mcp: true)
-
-    conn
-    |> send_resp(404, "Not Found")
-    |> halt()
-  end
-
   post "/shell" do
     # Finding shell command logic from :os.cmd in OTP
     # https://github.com/erlang/otp/blob/8deb96fb1d017307e22d2ab88968b9ef9f1b71d0/lib/kernel/src/os.erl#L184
@@ -86,6 +77,15 @@ defmodule Tidewave.Router do
       _ ->
         raise "request body too large"
     end
+  end
+
+  match "/*_ignored" do
+    # Return 404 for /.well-known resources lookup and similar
+    Logger.metadata(tidewave_mcp: true)
+
+    conn
+    |> send_resp(404, "Not Found")
+    |> halt()
   end
 
   defp shell(port_init, args, conn) do
