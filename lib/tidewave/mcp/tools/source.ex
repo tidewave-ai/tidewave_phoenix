@@ -109,7 +109,9 @@ defmodule Tidewave.MCP.Tools.Source do
           {:ok, mod, fun, arity} ->
             case Code.ensure_loaded(mod) do
               {:module, _} ->
-                find_docs_for_mfa(mod, fun, arity, lookup)
+                with {:ok, _, docs} <- find_docs_for_mfa(mod, fun, arity, lookup) do
+                  {:ok, docs}
+                end
 
               {:error, reason} ->
                 {:error, "Could not load module #{inspect(mod)}, got: #{reason}"}
@@ -190,7 +192,13 @@ defmodule Tidewave.MCP.Tools.Source do
 
     case result do
       {_source_file, _module_pair, {fun_file, fun_line}} ->
-        {:ok, "#{Path.relative_to(fun_file, MCP.root())}:#{fun_line}"}
+        line =
+          case find_docs_for_mfa(mod, function, arity, [:function, :macro]) do
+            {:ok, line, _} when line < fun_line -> line
+            _ -> fun_line
+          end
+
+        {:ok, "#{Path.relative_to(fun_file, MCP.root())}:#{line}"}
 
       {_source_file, {module_file, module_line}, nil} ->
         {:ok, "#{Path.relative_to(module_file, MCP.root())}:#{module_line}"}
@@ -294,8 +302,8 @@ defmodule Tidewave.MCP.Tools.Source do
 
   defp find_docs_for_mfa(mod, nil, :*, _lookup) do
     case Code.fetch_docs(mod) do
-      {:docs_v1, _, _, "text/markdown", %{"en" => content}, _, _} ->
-        {:ok, "# #{inspect(mod)}\n\n#{content}"}
+      {:docs_v1, ann, _, "text/markdown", %{"en" => content}, _, _} ->
+        {:ok, :erl_anno.line(ann), "# #{inspect(mod)}\n\n#{content}"}
 
       {:docs_v1, _, _, _, _, _, _} ->
         {:error, "Documentation not found for #{inspect(mod)}"}
@@ -314,12 +322,16 @@ defmodule Tidewave.MCP.Tools.Source do
         {:error, "Documentation not found for #{inspect(mod)}.#{fun}/#{arity}"}
 
       docs ->
-        formatted_docs =
-          Enum.map(docs, fn {{type, fun, arity}, _, signature, doc, metadata} ->
-            format_function_docs(type, mod, fun, arity, signature, doc, metadata)
+        [{line, _} | _] =
+          formatted_docs =
+          docs
+          |> Enum.map(fn {{type, fun, arity}, ann, signature, doc, metadata} ->
+            {:erl_anno.line(ann),
+             format_function_docs(type, mod, fun, arity, signature, doc, metadata)}
           end)
+          |> Enum.sort()
 
-        {:ok, Enum.join(formatted_docs, "\n\n")}
+        {:ok, line, Enum.map_join(formatted_docs, "\n\n", &elem(&1, 1))}
     end
   end
 
