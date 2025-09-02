@@ -253,6 +253,14 @@ defmodule TidewaveTest do
 
       assert conn.status == 405
     end
+
+    test "404 for .well-known resources lookup" do
+      conn =
+        conn(:get, "/tidewave/mcp/.well-known/openid-configuration")
+        |> Tidewave.call(Tidewave.init([]))
+
+      assert conn.status == 404
+    end
   end
 
   describe "/shell" do

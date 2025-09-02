@@ -79,6 +79,15 @@ defmodule Tidewave.Router do
     end
   end
 
+  match "/*_ignored" do
+    # Return 404 for /.well-known resources lookup and similar
+    Logger.metadata(tidewave_mcp: true)
+
+    conn
+    |> send_resp(404, "Not Found")
+    |> halt()
+  end
+
   defp shell(port_init, args, conn) do
     args = [:exit_status, :binary, :hide, :use_stdio, :stderr_to_stdout, cd: MCP.root()] ++ args
     port = Port.open(port_init, args)
