@@ -52,6 +52,99 @@ defmodule Tidewave.Router do
     |> halt()
   end
 
+  get "/acp" do
+    Logger.metadata(tidewave_mcp: true)
+    conn = Plug.Conn.fetch_query_params(conn)
+
+    case conn.query_params do
+      %{"command" => command} ->
+        conn
+        |> WebSockAdapter.upgrade(Tidewave.ACP, %{command: command}, [])
+        |> halt()
+
+      _ ->
+        conn
+        |> send_resp(400, "Missing command")
+        |> halt()
+    end
+  end
+
+  get "/acp/mcp-remote" do
+    conn
+    |> WebSockAdapter.upgrade(Tidewave.ACP.MCPRemote, %{}, [])
+    |> halt()
+  end
+
+  # Streamable HTTP 405
+  get "/acp/mcp-remote-client" do
+    Logger.metadata(tidewave_mcp: true)
+
+    conn
+    |> send_resp(405, "Method Not Allowed")
+    |> halt()
+  end
+
+  post "/acp/mcp-remote-client" do
+    Logger.metadata(tidewave_mcp: true)
+    conn = Plug.Conn.fetch_query_params(conn)
+
+    case conn.query_params do
+      %{"sessionId" => session_id} ->
+        opts =
+          Plug.Parsers.init(
+            parsers: [:json],
+            pass: [],
+            json_decoder: Jason
+          )
+
+        conn
+        |> Plug.Parsers.call(opts)
+        |> forward_acp_mcp_message(session_id)
+        |> halt()
+
+      _ ->
+        conn
+        |> send_resp(400, "Missing sessionId")
+        |> halt()
+    end
+  end
+
+  defp forward_acp_mcp_message(conn, session_id) do
+    case Registry.lookup(Tidewave.ACP.MCPRegistry, session_id) do
+      [] ->
+        send_resp(conn, 404, "Session not found")
+
+      [{pid, _}] ->
+        ref = make_ref()
+        send(pid, {:mcp_message, {self(), ref}, session_id, conn.body_params})
+
+        resp =
+          receive do
+            {^ref, resp} -> resp
+          after
+            60_000 ->
+              case conn.body_params do
+                %{"id" => id} ->
+                  %{
+                    jsonrpc: "2.0",
+                    id: id,
+                    error: %{code: -32000, message: "timed out waiting for answer"}
+                  }
+
+                _ ->
+                  nil
+              end
+          end
+
+        conn = put_resp_content_type(conn, "application/json")
+
+        case resp do
+          nil -> send_resp(conn, 202, JSON.encode_to_iodata!(%{status: "ok"}))
+          resp -> send_resp(conn, 200, JSON.encode_to_iodata!(resp))
+        end
+    end
+  end
+
   post "/shell" do
     # Finding shell command logic from :os.cmd in OTP
     # https://github.com/erlang/otp/blob/8deb96fb1d017307e22d2ab88968b9ef9f1b71d0/lib/kernel/src/os.erl#L184

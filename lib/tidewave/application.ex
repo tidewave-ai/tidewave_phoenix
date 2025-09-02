@@ -7,7 +7,7 @@ defmodule Tidewave.Application do
   def start(_type, _args) do
     children =
       if Application.spec(:mix, :vsn) do
-        [Tidewave.MCP]
+        [Tidewave.MCP, {Registry, name: Tidewave.ACP.MCPRegistry, keys: :unique}]
       else
         Logger.warning("application :tidewave is not starting because Mix is not running")
         []

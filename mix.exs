@@ -50,6 +50,8 @@ defmodule Tidewave.MixProject do
   defp deps do
     [
       {:plug, "~> 1.17"},
+      {:websock, "~> 0.5.3"},
+      {:websock_adapter, "~> 0.5.8"},
       {:jason, "~> 1.4"},
       {:circular_buffer, "~> 0.4 or ~> 1.0"},
       {:req, "~> 0.5"},
