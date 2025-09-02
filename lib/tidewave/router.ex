@@ -87,6 +87,7 @@ defmodule Tidewave.Router do
       conn
       |> put_resp_content_type("application/octet-stream")
       |> send_chunked(200)
+      |> halt()
 
     shell(port, conn)
   end
