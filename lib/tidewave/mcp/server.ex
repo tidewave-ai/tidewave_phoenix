@@ -29,7 +29,7 @@ defmodule Tidewave.MCP.Server do
 
     # TODO: switch back to persistent_term when we don't support OTP 27 any more
     # :persistent_term.put({__MODULE__, :tools_and_dispatch}, {tools, dispatch_map})
-    :ets.new(:tidewave_tools, [:set, :named_table, read_concurrency: true])
+    :ets.new(:tidewave_tools, [:set, :public, :named_table, read_concurrency: true])
     :ets.insert(:tidewave_tools, {:tools, {tools, dispatch_map}})
   end
 

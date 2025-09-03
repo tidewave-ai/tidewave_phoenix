@@ -309,4 +309,105 @@ defmodule TidewaveTest do
                  ~S|{"status":0}|>>
     end
   end
+
+  describe "External tools" do
+    test "are correctly added to ets" do
+      external_tools = [Tidewave.MockTool]
+
+      conn =
+        conn(:post, "/tidewave/mcp")
+        |> put_req_header("origin", "http://localhost:4000")
+        |> Tidewave.call(
+          Tidewave.init(
+            external_tools: external_tools,
+            allowed_origins: ["http://localhost:4000"]
+          )
+        )
+
+      assert conn.status == 200
+
+      [{:tools, {tools, dispatch_map}}] = :ets.lookup(:tidewave_tools, :tools)
+
+      Enum.each(
+        Tidewave.MockTool.tools(),
+        fn tool ->
+          assert Enum.member?(tools, tool)
+          assert Enum.member?(dispatch_map, {tool.name, tool.callback})
+        end
+      )
+
+      # delete mock_tool
+      tools = Enum.reject(tools, &(&1.name === "mock_tool"))
+
+      dispatch_map = Map.delete(dispatch_map, "mock_tool")
+
+      :ets.insert(:tidewave_tools, {:tools, {tools, dispatch_map}})
+    end
+
+    test "duplicate new tools are not added" do
+      external_tools = [Tidewave.MockTool, Tidewave.MockTool]
+
+      conn =
+        conn(:post, "/tidewave/mcp")
+        |> put_req_header("origin", "http://localhost:4000")
+        |> Tidewave.call(
+          Tidewave.init(
+            external_tools: external_tools,
+            allowed_origins: ["http://localhost:4000"]
+          )
+        )
+
+      assert conn.status == 200
+
+      [{:tools, {tools, dispatch_map}}] = :ets.lookup(:tidewave_tools, :tools)
+
+      Enum.each(
+        Tidewave.MockTool.tools(),
+        fn tool ->
+          assert Enum.member?(tools, tool)
+          assert Enum.uniq(tools) == tools
+          assert Enum.member?(dispatch_map, {tool.name, tool.callback})
+        end
+      )
+
+      tools = Enum.reject(tools, &(&1.name === "mock_tool"))
+
+      dispatch_map = Map.delete(dispatch_map, "mock_tool")
+
+      :ets.insert(:tidewave_tools, {:tools, {tools, dispatch_map}})
+    end
+  end
+
+  test "duplicate tools are not added" do
+    external_tools = [Tidewave.MockTool, Tidewave.MCP.Tools.Logs]
+
+    conn =
+      conn(:post, "/tidewave/mcp")
+      |> put_req_header("origin", "http://localhost:4000")
+      |> Tidewave.call(
+        Tidewave.init(
+          external_tools: external_tools,
+          allowed_origins: ["http://localhost:4000"]
+        )
+      )
+
+    assert conn.status == 200
+
+    [{:tools, {tools, dispatch_map}}] = :ets.lookup(:tidewave_tools, :tools)
+
+    Enum.each(
+      Tidewave.MockTool.tools(),
+      fn tool ->
+        assert Enum.member?(tools, tool)
+        assert Enum.uniq(tools) == tools
+        assert Enum.member?(dispatch_map, {tool.name, tool.callback})
+      end
+    )
+
+    tools = Enum.reject(tools, &(&1.name === "mock_tool"))
+
+    dispatch_map = Map.delete(dispatch_map, "mock_tool")
+
+    :ets.insert(:tidewave_tools, {:tools, {tools, dispatch_map}})
+  end
 end
