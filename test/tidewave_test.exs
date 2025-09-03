@@ -21,6 +21,7 @@ defmodule TidewaveTest do
     # Should pass - same host, different port is allowed
     assert conn.status == 200
     assert conn.resp_body =~ "Could not parse message"
+    assert conn.halted
 
     conn =
       conn(:post, "/tidewave/mcp")
@@ -31,6 +32,7 @@ defmodule TidewaveTest do
     # Should pass - same host and port
     assert conn.status == 200
     assert conn.resp_body =~ "Could not parse message"
+    assert conn.halted
 
     # Should fail - different host
     conn =
@@ -40,6 +42,7 @@ defmodule TidewaveTest do
       |> Tidewave.call(Tidewave.init([]))
 
     assert conn.status == 400
+    assert conn.halted
   end
 
   test "validates allowed origins with explicit configuration" do
@@ -51,6 +54,7 @@ defmodule TidewaveTest do
 
     assert conn.status == 200
     assert conn.resp_body =~ "Could not parse message"
+    assert conn.halted
 
     # Test rejection when origin doesn't match
     conn =
@@ -59,6 +63,7 @@ defmodule TidewaveTest do
       |> Tidewave.call(Tidewave.init(allowed_origins: ["http://localhost:3000"]))
 
     assert conn.status == 400
+    assert conn.halted
   end
 
   test "validates allowed origins with scheme-less patterns" do
@@ -69,6 +74,7 @@ defmodule TidewaveTest do
       |> Tidewave.call(Tidewave.init(allowed_origins: ["//localhost:3000"]))
 
     assert conn.status == 200
+    assert conn.halted
 
     conn =
       conn(:post, "/tidewave/mcp")
@@ -76,6 +82,7 @@ defmodule TidewaveTest do
       |> Tidewave.call(Tidewave.init(allowed_origins: ["//localhost:3000"]))
 
     assert conn.status == 200
+    assert conn.halted
   end
 
   test "validates allowed origins with port-less patterns" do
@@ -86,6 +93,7 @@ defmodule TidewaveTest do
       |> Tidewave.call(Tidewave.init(allowed_origins: ["//localhost"]))
 
     assert conn.status == 200
+    assert conn.halted
 
     conn =
       conn(:post, "/tidewave/mcp")
@@ -93,6 +101,7 @@ defmodule TidewaveTest do
       |> Tidewave.call(Tidewave.init(allowed_origins: ["//localhost"]))
 
     assert conn.status == 200
+    assert conn.halted
   end
 
   test "validates allowed origins with wildcard patterns" do
@@ -103,6 +112,7 @@ defmodule TidewaveTest do
       |> Tidewave.call(Tidewave.init(allowed_origins: ["//*.example.com"]))
 
     assert conn.status == 200
+    assert conn.halted
 
     conn =
       conn(:post, "/tidewave/mcp")
@@ -110,6 +120,7 @@ defmodule TidewaveTest do
       |> Tidewave.call(Tidewave.init(allowed_origins: ["//*.example.com"]))
 
     assert conn.status == 200
+    assert conn.halted
 
     # Test exact domain match with wildcard
     conn =
@@ -118,6 +129,7 @@ defmodule TidewaveTest do
       |> Tidewave.call(Tidewave.init(allowed_origins: ["//*.example.com"]))
 
     assert conn.status == 200
+    assert conn.halted
 
     # Test rejection when wildcard doesn't match
     conn =
@@ -126,6 +138,7 @@ defmodule TidewaveTest do
       |> Tidewave.call(Tidewave.init(allowed_origins: ["//*.example.com"]))
 
     assert conn.status == 400
+    assert conn.halted
   end
 
   test "validates allowed origins with multiple patterns" do
@@ -138,6 +151,7 @@ defmodule TidewaveTest do
       |> Tidewave.call(Tidewave.init(allowed_origins: allowed_origins))
 
     assert conn.status == 200
+    assert conn.halted
 
     # Test second pattern
     conn =
@@ -146,6 +160,7 @@ defmodule TidewaveTest do
       |> Tidewave.call(Tidewave.init(allowed_origins: allowed_origins))
 
     assert conn.status == 200
+    assert conn.halted
 
     # Test third pattern
     conn =
@@ -154,6 +169,7 @@ defmodule TidewaveTest do
       |> Tidewave.call(Tidewave.init(allowed_origins: allowed_origins))
 
     assert conn.status == 200
+    assert conn.halted
 
     # Test rejection
     conn =
@@ -162,6 +178,7 @@ defmodule TidewaveTest do
       |> Tidewave.call(Tidewave.init(allowed_origins: allowed_origins))
 
     assert conn.status == 400
+    assert conn.halted
   end
 
   test "raises when no origin is configured and no endpoint set" do
@@ -181,6 +198,7 @@ defmodule TidewaveTest do
     # invalid JSON-RPC message (empty body)
     assert conn.status == 200
     assert conn.resp_body =~ "Could not parse message"
+    assert conn.halted
   end
 
   test "raises on invalid allowed origin configuration" do
@@ -209,6 +227,7 @@ defmodule TidewaveTest do
     # invalid JSON-RPC message (empty body)
     assert conn.status == 200
     assert conn.resp_body =~ "Could not parse message"
+    assert conn.halted
   end
 
   test "validates content type" do
@@ -226,6 +245,7 @@ defmodule TidewaveTest do
       |> Tidewave.call(Tidewave.init([]))
 
     assert conn.status == 400
+    assert conn.halted
 
     assert conn.resp_body =~
              "For security reasons, Tidewave does not accept remote connections by default."
@@ -236,6 +256,7 @@ defmodule TidewaveTest do
       |> Tidewave.call(Tidewave.init([]))
 
     assert conn.status == 200
+    assert conn.halted
 
     conn =
       conn(:get, "/tidewave")
@@ -243,6 +264,7 @@ defmodule TidewaveTest do
       |> Tidewave.call(Tidewave.init(allow_remote_access: true))
 
     assert conn.status == 200
+    assert conn.halted
   end
 
   describe "/mcp" do
@@ -252,6 +274,7 @@ defmodule TidewaveTest do
         |> Tidewave.call(Tidewave.init([]))
 
       assert conn.status == 405
+      assert conn.halted
     end
 
     test "404 for .well-known resources lookup" do
@@ -260,6 +283,7 @@ defmodule TidewaveTest do
         |> Tidewave.call(Tidewave.init([]))
 
       assert conn.status == 404
+      assert conn.halted
     end
   end
 
@@ -272,6 +296,7 @@ defmodule TidewaveTest do
         |> Tidewave.call(Tidewave.init([]))
 
       assert conn.status == 200
+      assert conn.halted
 
       assert conn.resp_body ==
                <<0, 0, 0, 0, 12, "hello world\n", 1, 0, 0, 0, 12, ~S|{"status":0}|>>
@@ -285,6 +310,7 @@ defmodule TidewaveTest do
         |> Tidewave.call(Tidewave.init([]))
 
       assert conn.status == 200
+      assert conn.halted
 
       assert conn.resp_body == <<1, 0, 0, 0, 13, ~S|{"status":42}|>>
     end
@@ -303,6 +329,7 @@ defmodule TidewaveTest do
         |> Tidewave.call(Tidewave.init([]))
 
       assert conn.status == 200
+      assert conn.halted
 
       assert conn.resp_body ==
                <<0, 0, 0, 0, 7, "line 1\n", 0, 0, 0, 0, 7, "line 2\n", 1, 0, 0, 0, 12,
