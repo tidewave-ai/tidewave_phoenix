@@ -1,6 +1,6 @@
 # Providers
 
-In order to use Tidewave Web, you will either a [GitHub Copilot subscription](https://github.com/features/copilot) or an [Anthropic API key](https://anthropic.com/api).
+In order to use Tidewave Web, you will need either a [GitHub Copilot subscription](https://github.com/features/copilot) or an [Anthropic API key](https://anthropic.com/api).
 
 ## GitHub Copilot
 
