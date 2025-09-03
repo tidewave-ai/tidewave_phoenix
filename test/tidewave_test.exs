@@ -39,7 +39,7 @@ defmodule TidewaveTest do
       |> put_private(:phoenix_endpoint, Endpoint)
       |> Tidewave.call(Tidewave.init([]))
 
-    assert conn.status == 403
+    assert conn.status == 400
   end
 
   test "validates allowed origins with explicit configuration" do
@@ -58,7 +58,7 @@ defmodule TidewaveTest do
       |> put_req_header("origin", "http://localhost:4000")
       |> Tidewave.call(Tidewave.init(allowed_origins: ["http://localhost:3000"]))
 
-    assert conn.status == 403
+    assert conn.status == 400
   end
 
   test "validates allowed origins with scheme-less patterns" do
@@ -125,7 +125,7 @@ defmodule TidewaveTest do
       |> put_req_header("origin", "http://evil.com")
       |> Tidewave.call(Tidewave.init(allowed_origins: ["//*.example.com"]))
 
-    assert conn.status == 403
+    assert conn.status == 400
   end
 
   test "validates allowed origins with multiple patterns" do
@@ -161,7 +161,7 @@ defmodule TidewaveTest do
       |> put_req_header("origin", "http://malicious.com")
       |> Tidewave.call(Tidewave.init(allowed_origins: allowed_origins))
 
-    assert conn.status == 403
+    assert conn.status == 400
   end
 
   test "raises when no origin is configured and no endpoint set" do
@@ -225,7 +225,7 @@ defmodule TidewaveTest do
       |> Map.put(:remote_ip, {192, 168, 1, 1})
       |> Tidewave.call(Tidewave.init([]))
 
-    assert conn.status == 403
+    assert conn.status == 400
 
     assert conn.resp_body =~
              "For security reasons, Tidewave does not accept remote connections by default."

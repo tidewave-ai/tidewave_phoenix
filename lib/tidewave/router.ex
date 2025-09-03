@@ -126,7 +126,7 @@ defmodule Tidewave.Router do
         conn
 
       true ->
-        log_and_send_403(conn, """
+        log_and_send_bad_request(conn, """
         For security reasons, Tidewave does not accept remote connections by default.
 
         If you really want to allow remote connections, configure the Tidewave with the `allow_remote_access: true` option.
@@ -146,7 +146,7 @@ defmodule Tidewave.Router do
         if validate_allowed_origin(conn, URI.parse(origin)) do
           conn
         else
-          log_and_send_403(conn, """
+          log_and_send_bad_request(conn, """
           For security reasons, Tidewave only accepts requests from the same origin your web app is running on.
 
           If you really want to allow remote connections, configure the Tidewave with the `allowed_origins: [#{inspect(origin)}]` option.
@@ -210,12 +210,12 @@ defmodule Tidewave.Router do
   defp compare_host?(request_host, allowed_host),
     do: request_host == allowed_host
 
-  defp log_and_send_403(conn, message) do
+  defp log_and_send_bad_request(conn, message) do
     require Logger
     Logger.warning(message)
 
     conn
-    |> send_resp(403, message)
+    |> send_resp(400, message)
     |> halt()
   end
 

@@ -21,7 +21,6 @@ defmodule Tidewave do
     |> validate!()
     |> Plug.Conn.put_private(:tidewave_config, config)
     |> Plug.forward(rest, Tidewave.Router, [])
-    |> Plug.Conn.halt()
   end
 
   def call(conn, _opts), do: validate!(conn)
