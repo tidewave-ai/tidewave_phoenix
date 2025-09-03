@@ -41,6 +41,16 @@ defmodule Tidewave.MCP.Tools.SourceTest do
       assert {:ok, text} = result
       assert text =~ "source.ex"
     end
+
+    test "returns the doc location whenever possible" do
+      {:ok, text} = Source.get_source_location(%{"reference" => "Plug.forward"})
+      [file, line] = String.split(text, ":")
+
+      assert File.read!(file)
+             |> String.split("\n")
+             |> Enum.fetch!(String.to_integer(line) - 1) =~
+               "@doc \"\"\""
+    end
   end
 
   describe "get_package_location/1" do
