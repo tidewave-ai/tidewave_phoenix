@@ -14,7 +14,7 @@ defmodule Tidewave.Router do
   get "/" do
     conn
     |> put_resp_content_type("text/html")
-    |> send_resp(200, tidewave_html())
+    |> send_resp(200, tidewave_html(conn.private[:tidewave_config]))
     |> halt()
   end
 
@@ -219,13 +219,14 @@ defmodule Tidewave.Router do
     |> halt()
   end
 
-  defp tidewave_html() do
+  defp tidewave_html(plug_config) do
     client_url = Application.get_env(:tidewave, :client_url, "https://tidewave.ai")
 
     config = %{
       project_name: MCP.project_name(),
       framework_type: "phoenix",
-      tidewave_version: package_version(:tidewave)
+      tidewave_version: package_version(:tidewave),
+      team: plug_config[:team] && Map.new(plug_config[:team])
     }
 
     # We return a basic page that loads script from Tidewave server to
