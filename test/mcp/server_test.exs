@@ -12,12 +12,15 @@ defmodule Tidewave.MCP.ServerTest do
       conn =
         conn(:post, "/tidewave/mcp?include_fs_tools=true", %{})
         |> put_req_header("content-type", "application/json")
-        |> put_private(:tidewave_config, %{
-          allowed_origins: nil,
-          allow_remote_access: false,
-          phoenix_endpoint: nil,
-          inspect_opts: [charlists: :as_lists, limit: 50, pretty: true]
-        })
+        |> put_private(
+          :tidewave_config,
+          Tidewave.init(
+            allowed_origins: nil,
+            allow_remote_access: false,
+            phoenix_endpoint: nil,
+            inspect_opts: [charlists: :as_lists, limit: 50, pretty: true]
+          )
+        )
 
       %{conn: conn}
     end

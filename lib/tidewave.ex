@@ -9,13 +9,26 @@ defmodule Tidewave do
       allow_remote_access: Keyword.get(opts, :allow_remote_access, false),
       phoenix_endpoint: nil,
       inspect_opts:
-        Keyword.get(opts, :inspect_opts, charlists: :as_lists, limit: 50, pretty: true)
+        Keyword.get(opts, :inspect_opts, charlists: :as_lists, limit: 50, pretty: true),
+      exclude_tools: Enum.map(opts[:tools][:exclude] || [], &to_string/1),
+      include_tools: opts[:tools][:include] && Enum.map(opts[:tools][:include], &to_string/1)
     }
   end
 
   @impl true
   def call(%Plug.Conn{path_info: ["tidewave" | rest]} = conn, config) do
     config = %{config | phoenix_endpoint: conn.private[:phoenix_endpoint]}
+    conn = Plug.Conn.fetch_query_params(conn)
+
+    # allow Tidewave Web to override any tool exclusions
+    config =
+      case conn.query_params do
+        %{"all_tools" => _} ->
+          %{config | exclude_tools: [], include_tools: nil}
+
+        _ ->
+          config
+      end
 
     conn
     |> validate!()

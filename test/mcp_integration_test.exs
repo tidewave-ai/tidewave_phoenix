@@ -107,6 +107,36 @@ defmodule Tidewave.MCPIntegrationTest do
     assert response["result"]
   end
 
+  @tag plug_opts: [tools: [exclude: [:get_logs]]]
+  test "can exclude tools via plug opts", %{tools: tools} do
+    assert is_list(tools)
+    assert tool_names = Enum.map(tools, & &1["name"])
+    assert "project_eval" in tool_names
+    refute "get_logs" in tool_names
+  end
+
+  @tag plug_opts: [tools: [exclude: [:get_logs]]]
+  test "tool exclusion / inclusion is overriden by all_tools parameter" do
+    result =
+      Req.post!(@base_url,
+        json: %{
+          "jsonrpc" => "2.0",
+          "id" => "init",
+          "method" => "initialize",
+          "params" => %{
+            "protocolVersion" => "2025-03-26",
+            "capabilities" => %{}
+          }
+        },
+        params: [all_tools: "true"]
+      )
+
+    tools = result.body["result"]["tools"]
+    assert tool_names = Enum.map(tools, & &1["name"])
+    assert "project_eval" in tool_names
+    assert "get_logs" in tool_names
+  end
+
   ### helpers
 
   defp initialize_and_get_tools() do
