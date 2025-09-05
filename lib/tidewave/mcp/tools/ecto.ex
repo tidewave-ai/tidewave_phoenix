@@ -51,13 +51,13 @@ defmodule Tidewave.MCP.Tools.Ecto do
                 type: "string",
                 description: """
                 The SQL query to execute. Parameters can be passed using the appropriate database syntax,
-                such as $1, $2, for PostgreSQL, ? for MySQL, and so on.
+                such as $1, $2, for PostgreSQL, ? for MySQL, and so on
                 """
               },
               arguments: %{
                 type: "array",
                 description:
-                  "The arguments to pass to the query. The query must contain corresponding parameters.",
+                  "The arguments to pass to the query. The query must contain corresponding parameters",
                 items: %{}
               }
             }

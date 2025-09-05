@@ -22,7 +22,7 @@ defmodule Tidewave.MCP.Tools.Logs do
             level: %{
               type: "string",
               description:
-                "Filter logs with the given level and above. Use \"error\" when you to capture errors in particular.",
+                "Filter logs with the given level and above. Use \"error\" when you to capture errors in particular",
               enum: @known_levels
             }
           }

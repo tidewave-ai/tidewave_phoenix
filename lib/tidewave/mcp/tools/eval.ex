@@ -29,20 +29,18 @@ defmodule Tidewave.MCP.Tools.Eval do
           properties: %{
             code: %{
               type: "string",
-              description: "The Elixir code to evaluate."
+              description: "The Elixir code to evaluate"
             },
             arguments: %{
               type: "array",
               description:
-                "The arguments to pass to evaluation. They are available inside the evaluated code as `arguments`.",
+                "The arguments to pass to evaluation. They are available inside the evaluated code as `arguments`",
               items: %{}
             },
             timeout: %{
               type: "integer",
-              description: """
-              Optional. A timeout in milliseconds after which the execution stops if it did not finish yet.
-              Defaults to 30000 (30 seconds).
-              """
+              description:
+                "Optional. The maximum time to wait for execution, in milliseconds. Defaults to `30_000`"
             }
           }
         },
