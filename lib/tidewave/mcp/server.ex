@@ -41,10 +41,13 @@ defmodule Tidewave.MCP.Server do
     tools
   end
 
-  defp tools() do
+  @doc false
+  def tools(assigns) do
     {tools, _} = tools_and_dispatch()
 
-    for tool <- tools do
+    for tool <- tools,
+        is_nil(assigns.include_tools) or tool.name in assigns.include_tools,
+        tool.name not in assigns.exclude_tools do
       tool
       |> Map.put(:description, String.trim(tool.description))
       |> Map.drop([:callback])
@@ -107,7 +110,7 @@ defmodule Tidewave.MCP.Server do
      }}
   end
 
-  defp handle_initialize(request_id, params) do
+  defp handle_initialize(request_id, params, assigns) do
     case validate_protocol_version(params["protocolVersion"]) do
       :ok ->
         {:ok,
@@ -125,7 +128,7 @@ defmodule Tidewave.MCP.Server do
                name: "Tidewave MCP Server",
                version: @vsn
              },
-             tools: tools()
+             tools: tools(assigns)
            }
          }}
 
@@ -134,8 +137,8 @@ defmodule Tidewave.MCP.Server do
     end
   end
 
-  defp handle_list_tools(request_id, _params) do
-    result_or_error(request_id, {:ok, %{tools: tools()}})
+  defp handle_list_tools(request_id, _params, assigns) do
+    result_or_error(request_id, {:ok, %{tools: tools(assigns)}})
   end
 
   defp result_or_error(request_id, {:ok, text, metadata})
@@ -236,11 +239,11 @@ defmodule Tidewave.MCP.Server do
           "Handling initialize request with params: #{inspect(message["params"], pretty: true)}"
         )
 
-        handle_initialize(id, message["params"])
+        handle_initialize(id, message["params"], assigns)
 
       "tools/list" ->
         Logger.debug("Handling tools list request")
-        handle_list_tools(id, message["params"])
+        handle_list_tools(id, message["params"], assigns)
 
       "tools/call" ->
         Logger.debug(
