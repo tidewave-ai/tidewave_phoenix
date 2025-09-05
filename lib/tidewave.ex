@@ -8,6 +8,7 @@ defmodule Tidewave do
       allowed_origins: Keyword.get(opts, :allowed_origins, nil),
       allow_remote_access: Keyword.get(opts, :allow_remote_access, false),
       phoenix_endpoint: nil,
+      team: Keyword.get(opts, :team, []),
       inspect_opts:
         Keyword.get(opts, :inspect_opts, charlists: :as_lists, limit: 50, pretty: true)
     }
