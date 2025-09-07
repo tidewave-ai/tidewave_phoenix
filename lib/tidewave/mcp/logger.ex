@@ -8,7 +8,7 @@ defmodule Tidewave.MCP.Logger do
   end
 
   def get_logs(n, grep \\ nil) do
-    regex = grep && Regex.compile!(grep)
+    regex = grep && Regex.compile!(grep, "iu")
     GenServer.call(__MODULE__, {:get_logs, n, regex})
   end
 

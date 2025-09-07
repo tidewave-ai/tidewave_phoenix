@@ -34,6 +34,10 @@ defmodule Tidewave.MCP.Tools.LogsTest do
       {:ok, logs} = Logs.get_logs(%{"tail" => 10, "grep" => "darkness|seen"})
       assert logs =~ "hello darkness my old friend"
       assert logs =~ "this will not be seen"
+
+      {:ok, logs} = Logs.get_logs(%{"tail" => 10, "grep" => "DARKNESS|seen"})
+      assert logs =~ "hello darkness my old friend"
+      assert logs =~ "this will not be seen"
     end
   end
 end
