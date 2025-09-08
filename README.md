@@ -13,7 +13,7 @@ You can install Tidewave by adding the `tidewave` package to your list of depend
 ```elixir
 def deps do
   [
-    {:tidewave, "~> 0.4", only: :dev}
+    {:tidewave, "~> 0.5", only: :dev}
   ]
 end
 ```

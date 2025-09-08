@@ -1,9 +1,16 @@
 # Changelog
 
+## v0.5.0 (2025-09-08)
+
+* Enhancements
+  * Add `grep` option to `get_logs` in favor of `level`
+  * Bundle `get_package_location` into `get_source_location`
+  * Support team configuration
+
 ## 0.4.2 (2025-09-01)
 
 * Enhancements
-  * Raise if Tidewave is plugged after Phoenix.LiveReloader
+  * Raise if Tidewave is plugged after `Phoenix.LiveReloader`
 
 ## 0.4.1 (2025-08-22)
 
