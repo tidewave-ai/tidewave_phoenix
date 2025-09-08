@@ -1,6 +1,5 @@
 defmodule Tidewave.MCP.Tools.Logs do
   @moduledoc false
-  @known_levels ~w(emergency alert critical error warning notice info debug)
 
   def tools do
     [
@@ -19,11 +18,10 @@ defmodule Tidewave.MCP.Tools.Logs do
               type: "number",
               description: "The number of log entries to return from the end of the log"
             },
-            level: %{
+            grep: %{
               type: "string",
               description:
-                "Filter logs with the given level and above. Use \"error\" when you to capture errors in particular",
-              enum: @known_levels
+                "Filter logs with the given regular expression (case insensitive). E.g. \"error\" when you want to capture errors in particular"
             }
           }
         },
@@ -35,13 +33,8 @@ defmodule Tidewave.MCP.Tools.Logs do
   def get_logs(args) do
     case args do
       %{"tail" => n} ->
-        level =
-          case args do
-            %{"level" => level} when level in @known_levels -> String.to_atom(level)
-            _ -> :debug
-          end
-
-        {:ok, Enum.join(Tidewave.MCP.Logger.get_logs(n, level), "\n")}
+        grep = Map.get(args, "grep")
+        {:ok, Enum.join(Tidewave.MCP.Logger.get_logs(n, grep), "\n")}
 
       _ ->
         {:error, :invalid_arguments}

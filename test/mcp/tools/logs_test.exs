@@ -26,9 +26,18 @@ defmodule Tidewave.MCP.Tools.LogsTest do
     test "filters by level" do
       Logger.debug("this will not be seen")
       Logger.error("hello darkness my old friend")
-      {:ok, logs} = Logs.get_logs(%{"tail" => 10, "level" => "info"})
+
+      {:ok, logs} = Logs.get_logs(%{"tail" => 10, "grep" => "darkness"})
       assert logs =~ "hello darkness my old friend"
       refute logs =~ "this will not be seen"
+
+      {:ok, logs} = Logs.get_logs(%{"tail" => 10, "grep" => "darkness|seen"})
+      assert logs =~ "hello darkness my old friend"
+      assert logs =~ "this will not be seen"
+
+      {:ok, logs} = Logs.get_logs(%{"tail" => 10, "grep" => "DARKNESS|seen"})
+      assert logs =~ "hello darkness my old friend"
+      assert logs =~ "this will not be seen"
     end
   end
 end
