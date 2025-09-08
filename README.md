@@ -111,6 +111,8 @@ The following options are available:
 
   * `:inspect_opts` - Custom options passed to `Kernel.inspect/2` when formatting some tool results. Defaults to: `[charlists: :as_lists, limit: 50, pretty: true]`
 
+  * `:team` - set your Tidewave Team configuration, such as `team: [id: "my-company"]`
+
 Furthermore, the following options are available in the `:tidewave` application and can configured in your `config/runtime.exs`:
 
   * `:root` - The root of your application. It defaults to the current working directory but you may set it to a root directory, in case of monorepos and umbrella projects. For example, you may set it to `config :tidewave, :root, File.cwd!()` in the `config/runtime.exs` file of your umbrella root so Tidewave sees your whole project, even when started within a child application. Keep in mind the `:root` directory must always be version managed by `Git`
