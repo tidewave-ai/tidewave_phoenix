@@ -53,26 +53,17 @@ defmodule Tidewave.MCP.Tools.SourceTest do
     end
   end
 
-  describe "get_package_location/1" do
-    test "returns all top-level dependencies" do
-      result = Source.get_package_location(%{})
-      assert {:ok, text} = result
-      assert text =~ "plug"
-      assert text =~ "req"
-      refute text =~ "plug_crypto"
-    end
-
+  describe "get_source_location/1 with dep: prefix" do
     test "returns the location of a specific dependency" do
-      result = Source.get_package_location(%{"package" => "plug_crypto"})
+      result = Source.get_source_location(%{"reference" => "dep:plug_crypto"})
       assert {:ok, text} = result
       assert text =~ "deps/plug_crypto"
     end
 
     test "returns an error if the dependency is not found" do
-      result = Source.get_package_location(%{"package" => "non_existent_dependency"})
+      result = Source.get_source_location(%{"reference" => "dep:non_existent_dependency"})
       assert {:error, text} = result
       assert text =~ "Package non_existent_dependency not found"
-      assert text =~ "The overall dependency path is #{Mix.Project.deps_path()}"
     end
   end
 

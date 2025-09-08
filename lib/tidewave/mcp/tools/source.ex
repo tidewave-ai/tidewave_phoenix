@@ -15,6 +15,8 @@ defmodule Tidewave.MCP.Tools.Source do
 
         This tool only works if you know the `Module`, `Module.function`, or `Module.function/arity` that is being targeted.
         If that is the case, prefer this tool over grepping the file system.
+
+        You can also use "dep:PACKAGE_NAME" to get the location of a specific dependency package.
         """,
         inputSchema: %{
           type: "object",
@@ -50,38 +52,26 @@ defmodule Tidewave.MCP.Tools.Source do
           }
         },
         callback: &get_docs/1
-      },
-      %{
-        name: "get_package_location",
-        description: """
-        Returns the location of dependency packages.
-
-        You can use this tool to get the location of any project dependency. Optionally,
-        a specific dependency name can be provided to only return the location of that dependency.
-
-        Packages that are placed with the current project will return
-        a relative path and can be read as part of the project files.
-        Dependencies with an absolute path must be read with care
-        through shell commands.
-        """,
-        inputSchema: %{
-          type: "object",
-          required: [],
-          properties: %{
-            package: %{
-              type: "string",
-              description:
-                "The name of the package to get the location of. If not provided, the location of all packages will be returned."
-            }
-          }
-        },
-        callback: &get_package_location/1
       }
     ]
   end
 
   def get_source_location(args) do
     case args do
+      %{"reference" => "dep:" <> package} ->
+        path =
+          try do
+            Mix.Project.deps_paths()[String.to_existing_atom(package)]
+          rescue
+            _ -> nil
+          end
+
+        if path do
+          {:ok, Path.relative_to(path, MCP.root())}
+        else
+          {:error, "Package #{package} not found."}
+        end
+
       %{"reference" => ref} ->
         case parse_reference(ref) do
           {:ok, mod, fun, arity} ->
@@ -123,33 +113,6 @@ defmodule Tidewave.MCP.Tools.Source do
 
       _ ->
         {:error, :invalid_arguments}
-    end
-  end
-
-  def get_package_location(args) do
-    # when no package is provided, we only return top-level dependencies,
-    # but if a specific package is requested, we check all dependencies
-    deps =
-      Mix.Project.deps_paths(depth: 1)
-      |> Map.new(fn {package, path} -> {to_string(package), path} end)
-
-    all_deps =
-      Mix.Project.deps_paths()
-      |> Map.new(fn {package, path} -> {to_string(package), path} end)
-
-    case args do
-      %{"package" => package} when is_map_key(all_deps, package) ->
-        {:ok, Path.relative_to(all_deps[package], MCP.root())}
-
-      %{"package" => package} ->
-        {:error,
-         "Package #{package} not found. The overall dependency path is #{Mix.Project.deps_path()}."}
-
-      _ ->
-        {:ok,
-         Enum.map_join(deps, "\n", fn {package, path} ->
-           "#{package}: #{Path.relative_to(path, MCP.root())}"
-         end)}
     end
   end
 

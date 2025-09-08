@@ -35,7 +35,6 @@ Here is a baseline comparison of the tools supported by different frameworks/lan
 | `project_eval`               | ✅                    | ✅                 |
 | `get_docs`                   | ✅                    | ✅                 |
 | `get_source_location`        | ✅                    | ✅                 |
-| `get_package_location`       | ✅                    | ✅                 |
 | `get_logs`                   | ✅                    | ✅                 |
 | `get_models` / `get_schemas` | ✅                    | ✅                 |
 | `execute_sql_query`          | ✅                    | ✅                 |
