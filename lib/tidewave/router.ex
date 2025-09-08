@@ -14,7 +14,7 @@ defmodule Tidewave.Router do
   get "/" do
     conn
     |> put_resp_content_type("text/html")
-    |> send_resp(200, tidewave_html(conn.private[:tidewave_config]))
+    |> send_resp(200, tidewave_html(conn.private.tidewave_config))
     |> halt()
   end
 
