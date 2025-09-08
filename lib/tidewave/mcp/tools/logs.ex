@@ -21,7 +21,7 @@ defmodule Tidewave.MCP.Tools.Logs do
             grep: %{
               type: "string",
               description:
-                "Filter logs with the given regular expression (case insensitive). E.g. \"error\" when you to capture errors in particular"
+                "Filter logs with the given regular expression (case insensitive). E.g. \"error\" when you want to capture errors in particular"
             }
           }
         },
