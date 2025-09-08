@@ -226,7 +226,7 @@ defmodule Tidewave.Router do
       project_name: MCP.project_name(),
       framework_type: "phoenix",
       tidewave_version: package_version(:tidewave),
-      team: Map.new(plug_config[:team] || %{)
+      team: Map.new(plug_config[:team] || %{})
     }
 
     # We return a basic page that loads script from Tidewave server to
