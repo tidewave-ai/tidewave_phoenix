@@ -77,6 +77,7 @@ defmodule Tidewave.MixProject do
         "pages/features/notifications.md",
         "pages/features/providers.md",
         "pages/features/react.md",
+        "pages/features/teams.md",
         "pages/guides/containers.md",
         "pages/guides/security.md",
         "pages/guides/tips_and_tricks.md",
