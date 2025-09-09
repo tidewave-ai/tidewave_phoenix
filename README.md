@@ -2,7 +2,7 @@
 
 Tidewave is the coding agent for full-stack web app development, deeply integrated with Phoenix, from the database to the UI. [See our website](https://tidewave.ai) for more information.
 
-This project can also be used as a standalone Model Context Protocol server for your editors.
+This project can also be used as a standalone Model Context Protocol (MCP) server for your editors.
 
 ## Installation
 
@@ -63,7 +63,7 @@ Now access `/tidewave` route of your web application to enjoy Tidewave Web!
 
 ### Usage in non-Phoenix applications
 
-Tidewave is a regular Plug, so you can use it in any Elixir project, as long as you run a web server. For example, you can use `bandit` (and `tidewave`) in dev mode in your `mix.exs`:
+Tidewave can be used as a MCP in any Elixir project. For example, you can use `bandit` (and `tidewave`) in dev mode in your `mix.exs`:
 
 ```elixir
 {:tidewave, "~> 0.4", only: :dev},
@@ -79,7 +79,7 @@ aliases: [
 ]
 ```
 
-Now run `mix tidewave` and Tidewave will be available at `https://localhost:4000/tidewave`.
+Now run `mix tidewave` and [configure Tidewave as a MCP](https://hexdocs.pm/tidewave/mcp.html).
 
 ## Troubleshooting
 
