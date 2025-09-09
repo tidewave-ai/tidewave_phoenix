@@ -16,7 +16,7 @@ On macOS/Linux:
 {
   "tidewave-mcp": {
     "command": "/path/to/mcp-proxy",
-    "args": ["http://localhost:$PORT/tidewave/mcp"],
+    "args": ["--transport", "streamablehttp", "http://localhost:$PORT/tidewave/mcp"],
     "env": {}
   }
 }
