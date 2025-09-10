@@ -18,13 +18,6 @@ defmodule Tidewave.Router do
     |> halt()
   end
 
-  get "/empty" do
-    conn
-    |> put_resp_content_type("text/html")
-    |> send_resp(200, "")
-    |> halt()
-  end
-
   get "/mcp" do
     Logger.metadata(tidewave_mcp: true)
 
