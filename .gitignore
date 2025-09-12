@@ -21,3 +21,6 @@ tidewave-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+# Nix files
+result
