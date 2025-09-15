@@ -65,6 +65,17 @@ If the MCP proxy does not work, here is what you can try to debug it:
     ```
     echo '{"jsonrpc":"2.0","id":1,"method":"ping"}' | /path/to/mcp-proxy http://localhost:$PORT/tidewave/mcp
     ```
+  * If you are getting HTTP error 405 (Method Not Allowed), try adding `--transport=streamablehttp` option, i.e.:
+    ```
+    echo '{"jsonrpc":"2.0","id":1,"method":"ping"}' | /path/to/mcp-proxy http://localhost:$PORT/tidewave/mcp --transport=streamablehttp
+    ```
+    If it helps, adjust your MCP configuration in the editor, for example:
+    ```json
+    "tidawave": {
+      "command": "mcp-proxy",
+      "args": ["http://localhost:4000/tidewave/mcp", "--transport=streamablehttp"]
+    }
+    ```
   * Our Rust proxy accepts a `--debug` parameter, which logs helpful debugging information on stderr.
 
 ## Your editor
