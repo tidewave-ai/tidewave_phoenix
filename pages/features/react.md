@@ -12,16 +12,18 @@ Once set up, to verify it is all working as expected, you can [enable the Inspec
 
 ## Vite support
 
-If your frontend and backend are served by two different hosts/ports, you must redirect the `/tidewave` path in your frontend to your backend. For example, if you have your backend running on port 3000 and Vite on port 3001, you will need the following proxy configuration:
+If your frontend and backend are served by two different hosts/ports, you must redirect the `/tidewave` path in your frontend to your backend. For example, if you have your backend running on port 4000 and Vite on port 3001, you will need the following proxy configuration:
 
 ```javascript
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [tailwindcss(), react()],
   server: {
-    3001, // your frontend port
-    proxy: {"/tidewave": `http://localhost:3000`}
-  }
+    port: 3001, // your frontend port
+    proxy: {
+      "/tidewave": `http://localhost:4000`
+    },
+  },
 });
 ```
 
@@ -44,7 +46,7 @@ module.exports = {
     proxy: [
       {
         context: ['/tidewave'],
-        target: 'http://localhost:3000' // your backend port
+        target: 'http://localhost:4000' // your backend port
       }
     ]
   }
