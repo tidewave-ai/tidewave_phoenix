@@ -19,9 +19,11 @@ If your frontend and backend are served by two different hosts/ports, you must r
 export default defineConfig({
   plugins: [tailwindcss(), react()],
   server: {
-    3001, // your frontend port
-    proxy: {"/tidewave": `http://localhost:3000`}
-  }
+    port: 3001, // your frontend port
+    proxy: {
+      "/tidewave": `http://localhost:3000` // your backend port
+    },
+  },
 });
 ```
 
