@@ -21,7 +21,7 @@ export default defineConfig({
   server: {
     port: 3001, // your frontend port
     proxy: {
-      "/tidewave": `http://localhost:4000`
+      "/tidewave": `http://localhost:3000`
     },
   },
 });
@@ -46,7 +46,7 @@ module.exports = {
     proxy: [
       {
         context: ['/tidewave'],
-        target: 'http://localhost:4000' // your backend port
+        target: 'http://localhost:3000' // your backend port
       }
     ]
   }
