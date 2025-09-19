@@ -11,15 +11,6 @@ defmodule Tidewave.Router do
   plug(:check_origin)
   plug(:dispatch)
 
-  defp config(plug_config) do
-    %{
-      project_name: MCP.project_name(),
-      framework_type: "phoenix",
-      tidewave_version: package_version(:tidewave),
-      team: Map.new(plug_config.team)
-    }
-  end
-
   get "/" do
     conn
     |> put_resp_content_type("text/html")
@@ -253,5 +244,14 @@ defmodule Tidewave.Router do
     if vsn = Application.spec(app)[:vsn] do
       List.to_string(vsn)
     end
+  end
+
+  defp config(plug_config) do
+    %{
+      project_name: MCP.project_name(),
+      framework_type: "phoenix",
+      tidewave_version: package_version(:tidewave),
+      team: Map.new(plug_config.team)
+    }
   end
 end
