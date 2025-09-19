@@ -25,7 +25,29 @@ defmodule Tidewave do
     |> Plug.Conn.halt()
   end
 
-  def call(conn, _opts), do: validate!(conn)
+  def call(conn, _opts) do
+    conn
+    |> validate!()
+    |> Plug.Conn.register_before_send(fn conn ->
+      conn
+      |> maybe_remove_csp()
+      |> maybe_remove_x_frame_options()
+    end)
+  end
+
+  defp maybe_remove_csp(conn) do
+    case Plug.Conn.get_resp_header(conn, "content-security-policy") do
+      [_ | _] -> Plug.Conn.delete_resp_header(conn, "content-security-policy")
+      _ -> conn
+    end
+  end
+
+  defp maybe_remove_x_frame_options(conn) do
+    case Plug.Conn.get_resp_header(conn, "x-frame-options") do
+      [_ | _] -> Plug.Conn.delete_resp_header(conn, "x-frame-options")
+      _ -> conn
+    end
+  end
 
   defp validate!(conn) do
     if live_reload_enabled?(conn) or request_body_parsed?(conn) do

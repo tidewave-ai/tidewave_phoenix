@@ -18,6 +18,20 @@ defmodule Tidewave.Router do
     |> halt()
   end
 
+  get "/config" do
+    config = %{
+      project_name: MCP.project_name(),
+      framework_type: "phoenix",
+      tidewave_version: package_version(:tidewave),
+      team: Map.new(conn.private.tidewave_config.team)
+    }
+
+    conn
+    |> put_resp_content_type("application/json")
+    |> send_resp(200, Jason.encode_to_iodata!(config))
+    |> halt()
+  end
+
   get "/mcp" do
     Logger.metadata(tidewave_mcp: true)
 
