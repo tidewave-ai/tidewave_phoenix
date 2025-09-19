@@ -248,12 +248,18 @@ defmodule TidewaveTest do
   test "removes CSP and X-Frame-Options headers if set" do
     conn =
       conn(:get, "/foo")
-      |> Plug.Conn.put_resp_header("content-security-policy", "foo")
+      |> Plug.Conn.put_resp_header(
+        "content-security-policy",
+        "default-src 'self' http://example.com; connect-src 'none'; script-src 'self'; frame-ancestors 'none'"
+      )
       |> Plug.Conn.put_resp_header("x-frame-options", "DENY")
       |> Tidewave.call(Tidewave.init([]))
       |> Plug.Conn.send_resp(200, "foo")
 
-    assert Plug.Conn.get_resp_header(conn, "content-security-policy") == []
+    assert Plug.Conn.get_resp_header(conn, "content-security-policy") == [
+             "default-src 'self' http://example.com; connect-src 'none'; script-src 'unsafe-eval' 'self'"
+           ]
+
     assert Plug.Conn.get_resp_header(conn, "x-frame-options") == []
   end
 
