@@ -56,10 +56,7 @@ defmodule Tidewave do
     case Plug.Conn.get_resp_header(conn, "content-security-policy") do
       [csp | _] ->
         csp = rewrite_csp(csp)
-
-        conn
-        |> Plug.Conn.delete_resp_header("content-security-policy")
-        |> Plug.Conn.put_resp_header("content-security-policy", csp)
+        Plug.Conn.put_resp_header(conn, "content-security-policy", csp)
 
       _ ->
         conn
