@@ -40,6 +40,10 @@ and the underlying frameworks:
 If you prefer to not run your web app on `localhost`, check the installation
 steps for each framework on GitHub to learn how to customize them.
 
+Note: to work, Tidewave removes the `Content-Security-Policy` and `X-Frame-Options`
+headers from your web application's responses. When configured according to the
+installation instructions, this **does not** affect your production environment.
+
 ## Tool execution
 
 Tidewave enhances AI agents by allowing them to perform the same project tasks
