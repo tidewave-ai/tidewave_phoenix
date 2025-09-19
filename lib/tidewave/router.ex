@@ -11,6 +11,15 @@ defmodule Tidewave.Router do
   plug(:check_origin)
   plug(:dispatch)
 
+  defp config(plug_config) do
+    %{
+      project_name: MCP.project_name(),
+      framework_type: "phoenix",
+      tidewave_version: package_version(:tidewave),
+      team: Map.new(plug_config.team)
+    }
+  end
+
   get "/" do
     conn
     |> put_resp_content_type("text/html")
@@ -19,16 +28,9 @@ defmodule Tidewave.Router do
   end
 
   get "/config" do
-    config = %{
-      project_name: MCP.project_name(),
-      framework_type: "phoenix",
-      tidewave_version: package_version(:tidewave),
-      team: Map.new(conn.private.tidewave_config.team)
-    }
-
     conn
     |> put_resp_content_type("application/json")
-    |> send_resp(200, Jason.encode_to_iodata!(config))
+    |> send_resp(200, Jason.encode_to_iodata!(config(conn.private.tidewave_config)))
     |> halt()
   end
 
@@ -229,13 +231,6 @@ defmodule Tidewave.Router do
   defp tidewave_html(plug_config) do
     client_url = Application.get_env(:tidewave, :client_url, "https://tidewave.ai")
 
-    config = %{
-      project_name: MCP.project_name(),
-      framework_type: "phoenix",
-      tidewave_version: package_version(:tidewave),
-      team: Map.new(plug_config.team)
-    }
-
     # We return a basic page that loads script from Tidewave server to
     # bootstrap the client app. Note that the script name does not
     # include a hash, since is is very small and its main purpose is
@@ -246,7 +241,7 @@ defmodule Tidewave.Router do
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="tidewave:config" content="#{config |> Jason.encode!() |> Plug.HTML.html_escape()}" />
+        <meta name="tidewave:config" content="#{config(plug_config) |> Jason.encode!() |> Plug.HTML.html_escape()}" />
         <script type="module" src="#{client_url}/tc/tc.js"></script>
       </head>
       <body></body>
