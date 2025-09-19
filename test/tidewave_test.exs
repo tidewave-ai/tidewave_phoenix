@@ -331,7 +331,7 @@ defmodule TidewaveTest do
                "project_name" => "tidewave",
                "team" => %{},
                "tidewave_version" => _
-             } = JSON.decode!(conn.resp_body)
+             } = Jason.decode!(conn.resp_body)
     end
   end
 end
