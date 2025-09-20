@@ -245,6 +245,24 @@ defmodule TidewaveTest do
     assert conn.status == 200
   end
 
+  test "removes CSP and X-Frame-Options headers if set" do
+    conn =
+      conn(:get, "/foo")
+      |> Plug.Conn.put_resp_header(
+        "content-security-policy",
+        "default-src 'self' http://example.com; connect-src 'none'; script-src 'self'; frame-ancestors 'none'"
+      )
+      |> Plug.Conn.put_resp_header("x-frame-options", "DENY")
+      |> Tidewave.call(Tidewave.init([]))
+      |> Plug.Conn.send_resp(200, "foo")
+
+    assert Plug.Conn.get_resp_header(conn, "content-security-policy") == [
+             "default-src 'self' http://example.com; connect-src 'none'; script-src 'unsafe-eval' 'self'"
+           ]
+
+    assert Plug.Conn.get_resp_header(conn, "x-frame-options") == []
+  end
+
   describe "/mcp" do
     test "405 when GETing" do
       conn =
@@ -307,6 +325,19 @@ defmodule TidewaveTest do
       assert conn.resp_body ==
                <<0, 0, 0, 0, 7, "line 1\n", 0, 0, 0, 0, 7, "line 2\n", 1, 0, 0, 0, 12,
                  ~S|{"status":0}|>>
+    end
+  end
+
+  describe "/config" do
+    test "returns config" do
+      conn = conn(:get, "/tidewave/config") |> Tidewave.call(Tidewave.init([]))
+
+      assert %{
+               "framework_type" => "phoenix",
+               "project_name" => "tidewave",
+               "team" => %{},
+               "tidewave_version" => _
+             } = Jason.decode!(conn.resp_body)
     end
   end
 end

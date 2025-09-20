@@ -25,7 +25,15 @@ defmodule Tidewave do
     |> Plug.Conn.halt()
   end
 
-  def call(conn, _opts), do: validate!(conn)
+  def call(conn, _opts) do
+    conn
+    |> validate!()
+    |> Plug.Conn.register_before_send(fn conn ->
+      conn
+      |> maybe_rewrite_csp()
+      |> Plug.Conn.delete_resp_header("x-frame-options")
+    end)
+  end
 
   defp validate!(conn) do
     if live_reload_enabled?(conn) or request_body_parsed?(conn) do
@@ -42,5 +50,38 @@ defmodule Tidewave do
 
   defp request_body_parsed?(conn) do
     not match?(%Plug.Conn.Unfetched{}, conn.body_params)
+  end
+
+  defp maybe_rewrite_csp(conn) do
+    case Plug.Conn.get_resp_header(conn, "content-security-policy") do
+      [csp | _] ->
+        csp = rewrite_csp(csp)
+        Plug.Conn.put_resp_header(conn, "content-security-policy", csp)
+
+      _ ->
+        conn
+    end
+  end
+
+  defp rewrite_csp(csp) do
+    policy_directives = String.split(csp, ";", trim: true)
+
+    for policy_directive <- policy_directives,
+        policy_directive = String.trim(policy_directive),
+        [policy, directives] = String.split(policy_directive, " ", parts: 2),
+        policy != "frame-ancestors" do
+      if policy == "script-src" do
+        case :binary.match(directives, "'unsafe-eval'") do
+          :nomatch ->
+            "#{policy} 'unsafe-eval' #{directives}"
+
+          _ ->
+            "#{policy} #{directives}"
+        end
+      else
+        "#{policy} #{directives}"
+      end
+    end
+    |> Enum.join("; ")
   end
 end
