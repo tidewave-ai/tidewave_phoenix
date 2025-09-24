@@ -9,6 +9,7 @@ First, you must install a [`mcp-proxy`](guides/mcp_proxy.md).
 ```shell
 $ codex mcp add tidewave /path/to/mcp-proxy http://localhost:$PORT/tidewave/mcp
 ```
+
 Where `$PORT` is the port your web application is running on. And you are good to go!
 
 ## Verify

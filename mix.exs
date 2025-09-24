@@ -85,6 +85,7 @@ defmodule Tidewave.MixProject do
         "pages/mcp/mcp_proxy.md",
         "pages/mcp/mcp_troubleshooting.md",
         "pages/mcp/claude_code.md",
+        "pages/mcp/codex.md",
         "pages/mcp/cursor.md",
         "pages/mcp/neovim.md",
         "pages/mcp/opencode.md",
