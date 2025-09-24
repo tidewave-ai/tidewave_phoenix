@@ -14,4 +14,4 @@ Where `$PORT` is the port your web application is running on. And you are good t
 
 ## Verify
 
-Running `codex mcp list` will show you the config is there, but won't verify the connection. You can verify the MCP connection is working by starting Codex and running the `/mcp` command. If it's connected, you should see the list of Tidwave tools. If not, check out our [MCP Troubleshooting guide](mcp_troubleshooting.md).
+Running `codex mcp list` will show you the config is there, but won't verify the connection. You can verify the MCP connection is working by starting Codex and running the `/mcp` command. If it's connected, you should see the list of Tidewave tools. If not, check out our [MCP Troubleshooting guide](mcp_troubleshooting.md).
