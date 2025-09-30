@@ -26,6 +26,20 @@ defmodule Tidewave.MCP.Tools.Logs do
           }
         },
         callback: &get_logs/1
+      },
+      %{
+        name: "clear_logs",
+        description: """
+        Clears all captured logs.
+
+        Use this before executing code to ensure that subsequent get_logs calls only return fresh logs.
+        Useful pattern: clear_logs() → project_eval(code) → get_logs() to see exactly what was logged.
+        """,
+        inputSchema: %{
+          type: "object",
+          properties: %{}
+        },
+        callback: &clear_logs/1
       }
     ]
   end
@@ -39,5 +53,10 @@ defmodule Tidewave.MCP.Tools.Logs do
       _ ->
         {:error, :invalid_arguments}
     end
+  end
+
+  def clear_logs(_args) do
+    :ok = Tidewave.MCP.Logger.clear_logs()
+    {:ok, "Logs cleared"}
   end
 end

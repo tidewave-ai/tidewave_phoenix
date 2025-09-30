@@ -12,6 +12,10 @@ defmodule Tidewave.MCP.Logger do
     GenServer.call(__MODULE__, {:get_logs, n, regex})
   end
 
+  def clear_logs do
+    GenServer.call(__MODULE__, :clear_logs)
+  end
+
   # Erlang/OTP log handler
   def log(%{meta: meta} = event, config) do
     if meta[:tidewave_mcp] do
@@ -47,5 +51,10 @@ defmodule Tidewave.MCP.Logger do
       end
 
     {:reply, Enum.take(logs, -n), state}
+  end
+
+  def handle_call(:clear_logs, _from, state) do
+    cb = CircularBuffer.new(1024)
+    {:reply, :ok, %{state | cb: cb}}
   end
 end
