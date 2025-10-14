@@ -2,6 +2,25 @@ defmodule Tidewave do
   @moduledoc false
   @behaviour Plug
 
+  @doc """
+  Clears all captured logs from the logger buffer.
+
+  This is useful when you want to ensure that subsequent log retrievals only contain
+  fresh logs. A typical pattern is to clear logs before executing code, then retrieve
+  logs afterward to see exactly what was logged during that execution.
+
+  ## Example
+
+      # In project_eval tool:
+      Tidewave.clear_logs()
+      MyApp.some_function()
+      # Now get_logs will only show logs from some_function()
+
+  """
+  def clear_logs do
+    Tidewave.MCP.Logger.clear_logs()
+  end
+
   @impl true
   def init(opts) do
     %{

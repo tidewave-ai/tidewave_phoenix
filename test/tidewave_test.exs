@@ -340,4 +340,32 @@ defmodule TidewaveTest do
              } = Jason.decode!(conn.resp_body)
     end
   end
+
+  describe "clear_logs/0" do
+    test "clears all captured logs" do
+      require Logger
+
+      Logger.info("log before clear")
+      logs = Tidewave.MCP.Logger.get_logs(10)
+      assert Enum.any?(logs, &String.contains?(&1, "log before clear"))
+
+      assert :ok = Tidewave.clear_logs()
+
+      logs = Tidewave.MCP.Logger.get_logs(10)
+      refute Enum.any?(logs, &String.contains?(&1, "log before clear"))
+      assert logs == []
+    end
+
+    test "allows fresh logs after clearing" do
+      require Logger
+
+      Logger.info("old log")
+      Tidewave.clear_logs()
+      Logger.info("new log")
+
+      logs = Tidewave.MCP.Logger.get_logs(10)
+      refute Enum.any?(logs, &String.contains?(&1, "old log"))
+      assert Enum.any?(logs, &String.contains?(&1, "new log"))
+    end
+  end
 end
