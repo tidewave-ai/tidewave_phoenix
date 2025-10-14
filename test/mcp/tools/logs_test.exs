@@ -9,9 +9,8 @@ defmodule Tidewave.MCP.Tools.LogsTest do
       tools = Logs.tools()
 
       assert is_list(tools)
-      assert length(tools) == 2
+      assert length(tools) == 1
       assert Enum.any?(tools, &(&1.name == "get_logs"))
-      assert Enum.any?(tools, &(&1.name == "clear_logs"))
     end
   end
 
@@ -39,33 +38,6 @@ defmodule Tidewave.MCP.Tools.LogsTest do
       {:ok, logs} = Logs.get_logs(%{"tail" => 10, "grep" => "DARKNESS|seen"})
       assert logs =~ "hello darkness my old friend"
       assert logs =~ "this will not be seen"
-    end
-  end
-
-  describe "clear_logs/1" do
-    @tag :capture_log
-    test "clears all logs" do
-      Logger.info("log before clear")
-      {:ok, logs} = Logs.get_logs(%{"tail" => 10})
-      assert logs =~ "log before clear"
-
-      {:ok, message} = Logs.clear_logs(%{})
-      assert message == "Logs cleared"
-
-      {:ok, logs} = Logs.get_logs(%{"tail" => 10})
-      refute logs =~ "log before clear"
-      assert logs == ""
-    end
-
-    @tag :capture_log
-    test "allows fresh logs after clearing" do
-      Logger.info("old log")
-      {:ok, _} = Logs.clear_logs(%{})
-      Logger.info("new log")
-
-      {:ok, logs} = Logs.get_logs(%{"tail" => 10})
-      refute logs =~ "old log"
-      assert logs =~ "new log"
     end
   end
 end
