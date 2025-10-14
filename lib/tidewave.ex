@@ -9,6 +9,11 @@ defmodule Tidewave do
   fresh logs. A typical pattern is to clear logs before executing code, then retrieve
   logs afterward to see exactly what was logged during that execution.
 
+  You may also instruct your coding agents to invoke this function whenever necessary.
+  For example, you might say: "when debugging, use the `project_eval` tool to run
+  `Tidewave.clear_logs` before executing code, then use `get_logs` to see only fresh
+  output".
+
   ## Example
 
       # In project_eval tool:

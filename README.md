@@ -119,29 +119,6 @@ Furthermore, the following options are available in the `:tidewave` application 
 
   * `:root` - The root of your application. It defaults to the current working directory but you may set it to a root directory, in case of monorepos and umbrella projects. For example, you may set it to `config :tidewave, :root, File.cwd!()` in the `config/runtime.exs` file of your umbrella root so Tidewave sees your whole project, even when started within a child application. Keep in mind the `:root` directory must always be version managed by `Git`
 
-## 🛟 Tips
-
-### Add a Rule
-
-If you want your coding agent to automatically use Tidewave's capabilities in Phoenix projects without having to ask explicitly each time, you can define a simple rule in your MCP client's rule section:
-
-- For Windsurf, in `.windsurfrules` file
-- For Cursor, from `Cursor Settings > Rules` section
-- For Claude Code, in `CLAUDE.md` file
-
-Or the equivalent in your MCP client to auto-leverage Tidewave's Phoenix integration.
-
-#### Example Rule
-
-```txt
-Always use Tidewave's tools when working with Phoenix LiveView, Ecto queries, or Elixir code.
-Use the project_eval tool to execute Elixir code in the application context.
-When debugging, use project_eval to run Tidewave.clear_logs() before executing code, then use get_logs to see only fresh output.
-Use the source tool to find function definitions and search Hex package documentation.
-```
-
-From then on, your agent will automatically leverage Tidewave's deep Phoenix integration without you having to explicitly ask. You can customize the rule to match your workflow.
-
 ## License
 
 Copyright (c) 2025 Dashbit
