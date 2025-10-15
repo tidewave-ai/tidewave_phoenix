@@ -238,6 +238,14 @@ defmodule Tidewave.MCP.Server do
 
         handle_initialize(id, message["params"])
 
+      "prompts/list" ->
+        Logger.debug("Handling prompts list request")
+        result_or_error(id, {:ok, %{prompts: []}})
+
+      "resources/list" ->
+        Logger.debug("Handling resources list request")
+        result_or_error(id, {:ok, %{resources: []}})
+
       "tools/list" ->
         Logger.debug("Handling tools list request")
         handle_list_tools(id, message["params"])
