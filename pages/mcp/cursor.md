@@ -10,6 +10,27 @@ Create a file at `.cursor/mcp.json` and add the following contents.
 
 <!-- tabs-open -->
 
+### HTTP connection
+
+> #### Installing an MCP proxy {: .warning}
+>
+> The HTTP integration of Cursor was shown to be unreliable in the past. For example,
+> whenever you restarted your dev server, Cursor would not properly reconnect, leading
+> to a frustrating user experience. If you run into such issues, consider using the
+> MCP proxy.
+
+```json
+{
+  "mcpServers": {
+    "tidewave": {
+      "url": "http://localhost:$PORT/tidewave/mcp"
+    }
+  }
+}
+```
+
+Where `$PORT` is the port your web application is running on. If the `mcp-proxy` command
+
 ### MCP Proxy (recommended)
 
 See the [MCP proxy documentation](guides/mcp_proxy.md).
@@ -45,27 +66,6 @@ On Windows:
 ```
 
 Where `$PORT` is the port your web application is running on.
-
-### HTTP/SSE connection
-
-> #### Installing an MCP proxy {: .warning}
->
-> The SSE integration of Cursor has shown to be unreliable. Whenever the connection
-> drops to the SSE server, for example when you restart your dev server, Cursor does
-> not properly reconnect, leading to a frustrating user experience. For this reason,
-> we highly recommend to using the MCP proxy despite the built in SSE support.
-
-```json
-{
-  "mcpServers": {
-    "tidewave": {
-      "url": "http://localhost:$PORT/tidewave/mcp"
-    }
-  }
-}
-```
-
-Where `$PORT` is the port your web application is running on. If the `mcp-proxy` command
 
 <!-- tabs-close -->
 

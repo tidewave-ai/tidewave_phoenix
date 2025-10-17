@@ -21,7 +21,7 @@ We have specific instructions for:
 
 ## General instructions
 
-Add the Tidewave MCP server to your editor or MCP client configuration as the type "http" (streamable) for Phoenix or "sse" for Rails, pointing to the `/tidewave/mcp` path and port your web application is running at. For example, `http://localhost:4000/tidewave/mcp`.
+Add the Tidewave MCP server to your editor or MCP client configuration as the type "http" (streamable), pointing to the `/tidewave/mcp` path and port your web application is running at. For example, `http://localhost:4000/tidewave/mcp`.
 
 In case your tool of choice only supports "stdio" servers, you can use our [MCP proxy](../guides/mcp_proxy.md).
 

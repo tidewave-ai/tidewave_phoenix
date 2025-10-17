@@ -1,9 +1,8 @@
 # Proxy
 
-Tidewave implements the HTTP transports of the MCP protocol: Streamable HTTP
-for Phoenix and SSE for Ruby on Rails. Some MCP clients may only support
-the stdio transport, and so we provide a proxy. See [the
-installation instructions on GitHub](https://github.com/tidewave-ai/mcp_proxy_rust#installation).
+Tidewave implements the Streamable HTTP transport of the MCP protocol.
+Some MCP clients may only support the stdio transport, and so we provide
+a proxy. See [the installation instructions on GitHub](https://github.com/tidewave-ai/mcp_proxy_rust#installation).
 
 Once installation concludes, take note of the full path
 the `mcp-proxy` was installed at. It will be necessary

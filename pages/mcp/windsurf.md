@@ -9,7 +9,23 @@ manually add Tidewave:
 
 <!-- tabs-open -->
 
-### MCP Proxy (recommended)
+### HTTP connection
+
+Windsurf also supports MCP servers through HTTP:
+
+```json
+{
+  "mcpServers": {
+    "tidewave": {
+      "serverUrl": "http://localhost:4000/tidewave/mcp"
+    }
+  }
+}
+```
+
+Note, if you restart your dev server, you will need to refresh the MCP connection.
+
+### MCP Proxy
 
 See the [MCP proxy documentation](guides/mcp_proxy.md).
 
@@ -40,22 +56,6 @@ On Windows:
 ```
 
 Where `$PORT` is the port your web application is running on.
-
-### HTTP/SSE connection
-
-Windsurf also supports MCP servers through HTTP/SSE:
-
-```json
-{
-  "mcpServers": {
-    "tidewave": {
-      "serverUrl": "http://localhost:4000/tidewave/mcp"
-    }
-  }
-}
-```
-
-Note, if you restart your dev server, you will need to refresh the MCP connection.
 
 <!-- tabs-close -->
 

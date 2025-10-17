@@ -10,7 +10,21 @@ the following contents.
 
 <!-- tabs-open -->
 
-### MCP Proxy (recommended)
+### HTTP connection
+
+```json
+{
+  "mcpServers": {
+    "tidewave": {
+      "url": "http://localhost:$PORT/tidewave/mcp"
+    }
+  }
+}
+```
+
+Where `$PORT` is the port your web application is running on. If the `mcp-proxy` command
+
+### MCP Proxy
 
 See the [MCP proxy documentation](guides/mcp_proxy.md).
 
@@ -45,20 +59,6 @@ On Windows:
 ```
 
 Where `$PORT` is the port your web application is running on.
-
-### HTTP/SSE connection
-
-```json
-{
-  "mcpServers": {
-    "tidewave": {
-      "url": "http://localhost:$PORT/tidewave/mcp"
-    }
-  }
-}
-```
-
-Where `$PORT` is the port your web application is running on. If the `mcp-proxy` command
 
 <!-- tabs-close -->
 

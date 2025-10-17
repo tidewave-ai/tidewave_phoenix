@@ -7,7 +7,23 @@ You can use Tidewave with [opencode](https://opencode.ai/) by adding the followi
 
 <!-- tabs-open -->
 
-### MCP Proxy (recommended)
+### HTTP connection
+
+```json
+{
+  "mcp": {
+    "tidewave": {
+      "type": "remote",
+      "url": "http://localhost:$PORT/tidewave/mcp",
+      "enabled": true
+    }
+  }
+}
+```
+
+Where `$PORT` is the port your web application is running on.
+
+### MCP Proxy
 
 See the [MCP proxy documentation](guides/mcp_proxy.md).
 
@@ -33,22 +49,6 @@ On Windows:
     "tidewave": {
       "type": "local",
       "command": ["/path/to/mcp-proxy.exe", "http://localhost:$PORT/tidewave/mcp"],
-      "enabled": true
-    }
-  }
-}
-```
-
-Where `$PORT` is the port your web application is running on.
-
-### HTTP/SSE connection
-
-```json
-{
-  "mcp": {
-    "tidewave": {
-      "type": "remote",
-      "url": "http://localhost:$PORT/tidewave/mcp",
       "enabled": true
     }
   }
