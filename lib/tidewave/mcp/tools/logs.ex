@@ -15,7 +15,7 @@ defmodule Tidewave.MCP.Tools.Logs do
           required: ["tail"],
           properties: %{
             tail: %{
-              type: "number",
+              type: "integer",
               description: "The number of log entries to return from the end of the log"
             },
             grep: %{
