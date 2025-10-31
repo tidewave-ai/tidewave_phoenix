@@ -1,6 +1,6 @@
 # Codex
 
-You can use Tidewave with OpenAI's [Codex CLI](https://developers.openai.com/codex/cli/)
+You can use Tidewave MCP with OpenAI's [Codex CLI](https://developers.openai.com/codex/cli/)
 
 ## Installation
 

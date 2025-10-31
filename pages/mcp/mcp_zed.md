@@ -1,6 +1,6 @@
 # Zed
 
-You can use Tidewave with [Zed](https://zed.dev/). First, you must
+You can use Tidewave MCP with [Zed](https://zed.dev/). First, you must
 install a [`mcp-proxy`](../guides/mcp_proxy.md).
 
 Once that's done, open up the Assistant tab and click on the `⋯` icon at the

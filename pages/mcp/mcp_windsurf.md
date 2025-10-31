@@ -1,6 +1,6 @@
 # Windsurf
 
-You can use Tidewave with [Windsurf](https://windsurf.com/). First, you must
+You can use Tidewave MCP with [Windsurf](https://windsurf.com/). First, you must
 install a [`mcp-proxy`](../guides/mcp_proxy.md).
 
 Once you are done, open up your "Windsurf Settings", find the "Cascade" section,

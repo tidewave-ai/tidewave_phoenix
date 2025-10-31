@@ -1,6 +1,6 @@
 # Cursor
 
-You can use Tidewave with [Cursor](https://cursor.com/).
+You can use Tidewave MCP with [Cursor](https://cursor.com/).
 
 Cursor allows you to place a file at `.cursor/mcp.json`, for configuration
 which is specific to your project. Given Tidewave is explicitly tied to your

@@ -4,26 +4,26 @@ You can access some of Tidewave's features from your editor/agent via the Model 
 
 > #### Tidewave Web features {: .info}
 >
-> Tidewave MCP includes only a subset of Tidewave's features. In-browser agents, point-and-click prompting, and contextual browser testing are all parts of [Tidewave Web](https://tidewave.ai), and are available under the `/tidewave` route of your application.
+> Tidewave MCP includes only a subset of Tidewave's features. In-browser agents, point-and-click prompting, Figma integration, and contextual browser testing are all parts of [Tidewave Web](https://tidewave.ai), and are available under the `/tidewave` route of your application.
 
 ## Editor/agent instructions
 
 We have specific instructions for:
 
-  * [Claude Code](claude_code.md)
-  * [Codex](codex.md)
-  * [Cursor](cursor.md)
-  * [Neovim](neovim.md)
-  * [opencode](opencode.md)
-  * [VS Code](vscode.md)
-  * [Windsurf](windsurf.md)
-  * [Zed](zed.md)
+  * [Claude Code](mcp_claude_code.md)
+  * [Codex](mcp_codex.md)
+  * [Cursor](mcp_cursor.md)
+  * [Neovim](mcp_neovim.md)
+  * [opencode](mcp_opencode.md)
+  * [VS Code](mcp_vscode.md)
+  * [Windsurf](mcp_windsurf.md)
+  * [Zed](mcp_zed.md)
 
 ## General instructions
 
 Add the Tidewave MCP server to your editor or MCP client configuration as the type "http" (streamable), pointing to the `/tidewave/mcp` path and port your web application is running at. For example, `http://localhost:4000/tidewave/mcp`.
 
-In case your tool of choice only supports "stdio" servers, you can use our [MCP proxy](../guides/mcp_proxy.md).
+In case your tool of choice only supports "stdio" servers, you can use our MCP proxy (see below).
 
 ## Tips
 

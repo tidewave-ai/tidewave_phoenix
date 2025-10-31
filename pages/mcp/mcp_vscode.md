@@ -1,6 +1,6 @@
 # VS Code
 
-You can use Tidewave with Visual Studio Code through the [GitHub Copilot extension](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot).
+You can use Tidewave MCP with Visual Studio Code through the [GitHub Copilot extension](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot).
 
 > #### Public preview required {: .warning}
 >

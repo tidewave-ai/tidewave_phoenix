@@ -1,6 +1,6 @@
 # Neovim
 
-You can use Tidewave with [Neovim](https://neovim.io/) through the
+You can use Tidewave MCP with [Neovim](https://neovim.io/) through the
 [MCP Hub extension](https://github.com/ravitemer/mcphub.nvim), and integration
 with [Avante](https://github.com/yetone/avante.nvim) or
 [CodeCompanion](https://github.com/olimorris/codecompanion.nvim).
