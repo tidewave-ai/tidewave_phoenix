@@ -33,3 +33,7 @@ You can also use Tidewave with an OpenAI API key. You can [create an OpenAI API 
 ### OpenRouter
 
 You can also use Tidewave with OpenRouter. You can [create an OpenRouter API key](https://openrouter.ai/settings/keys) and paste it into your provider configuration in Settings. Alternatively, you may set the `OPENROUTER_API_KEY` as an [environment variable](https://en.wikipedia.org/wiki/Environment_variable), which will be automatically picked up by Tidewave.
+
+## Custom agents
+
+Tidewave also supports any coding agent that implements the [Agent Client Protocol](http://agentclientprotocol.com) (ACP). You can enable them in "External Agents" tab under the advanced settings. However, given ACP is still evolving, Tidewave may not work as expected when using such agents.
