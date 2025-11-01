@@ -77,6 +77,8 @@ In case it still does not work, here are places you can get help to diagnose it:
 
 * [Our Discord server](https://discord.gg/5GhK7E54yA) - the best place to interact with the community and get help specific to your editor and framework
 
-* Our issues trackers - in case we messed something up, please let us know. Here are framework-specific links:
+* Our issues trackers - in case we messed something up, please let us know. Here are the specific repositories:
+  * [Tidewave for JavaScript](https://github.com/tidewave-ai/tidewave_js/issues)
   * [Tidewave for Phoenix](https://github.com/tidewave-ai/tidewave_phoenix/issues)
+  * [Tidewave for Python](https://github.com/tidewave-ai/tidewave_python/issues)
   * [Tidewave for Rails](https://github.com/tidewave-ai/tidewave_rails/issues)

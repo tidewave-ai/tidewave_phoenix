@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.5.1 (2025-11-01)
+
+* Enhancements
+  * Add `Tidewave.clear_logs/0`
+  * Add `/tidewave/config` endpoint for Tidewave App/CLI
+
+* Bug fixes
+  * Fix type of `get_logs`
+
 ## v0.5.0 (2025-09-08)
 
 * Enhancements

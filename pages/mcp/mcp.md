@@ -44,12 +44,12 @@ From then on, your coding agent will automatically leverage Tidewave's deep fram
 
 Here is a baseline comparison of the tools supported by different frameworks/languages. Frameworks may support additional features.
 
-| Features                     | Tidewave for Phoenix | Tidewave for Rails |
-| :--------------------------- | :------------------: | :----------------: |
-| `project_eval`               | ✅                    | ✅                 |
-| `get_docs`                   | ✅                    | ✅                 |
-| `get_source_location`        | ✅                    | ✅                 |
-| `get_logs`                   | ✅                    | ✅                 |
-| `get_models` / `get_schemas` | ✅                    | ✅                 |
-| `execute_sql_query`          | ✅                    | ✅                 |
-| `search_package_docs`        | ✅                    |                   |
+| Features                     | Django | FastAPI | Flask | Next.js | Phoenix | Rails |
+| :--------------------------- | :----: | :-----: | :---: | :-----: | :-----: | :---: |
+| `project_eval`               | ✅     | ✅       | ✅    | ✅      | ✅      | ✅    |
+| `get_docs`                   | ✅     | ✅       | ✅    | ✅      | ✅      | ✅    |
+| `get_source_location`        | ✅     | ✅       | ✅    | ✅      | ✅      | ✅    |
+| `get_logs`                   | ✅     | ✅       | ✅    | ✅      | ✅      | ✅    |
+| `get_models` / `get_schemas` | ✅     | ✅       | ✅    |         | ✅      | ✅    |
+| `execute_sql_query`          | ✅     | ✅       | ✅    |         | ✅      | ✅    |
+| `search_package_docs`        |        |          |       |         | ✅      |       |

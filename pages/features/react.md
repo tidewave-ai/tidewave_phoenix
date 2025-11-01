@@ -1,4 +1,4 @@
-# React Integration
+# React integration
 
 Tidewave Web directly integrates with [React](https://react.dev). We can automatically detect React components on the page, [inspect them](inspector.md), and send their source location to the agent.
 

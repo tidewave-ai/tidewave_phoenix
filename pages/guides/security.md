@@ -11,34 +11,28 @@ assistant.
 
 ## Server exposure
 
-The Tidewave runs over the same host and port as your web application,
-such as `http://localhost:4000/tidewave`. Theoretically, someone in
-the same network as you would be able to access Tidewave and its abilities
-to evaluate code. Luckily, there are best practices put in place to prevent
-that:
+Tidewave is made of two components:
+
+* The Tidewave server, running from the desktop app/cli
+* The Tidewave MCP, running over the same host and port as your web application
+
+Theoretically, someone in the same network as you would be able to access Tidewave and its services to evaluate code. Luckily, there are best practices put in place to prevent that:
 
   * **Localhost binding** - most web frameworks restrict your web application
     in development to only be accessible from your own machine, to restrict
     unwanted access to your application and development tools like Tidewave.
 
-  * **Remote IP checks** - Tidewave verifies all incoming requests belong to
-    the current machine by verifying the connection's remote IP.
+  * **Remote IP checks** - If the above is disabled, Tidewave MCP still
+    verifies all incoming requests belong to the current machine by verifying
+    the connection's remote IP.
 
   * **Origin checks** - For browser requests, Tidewave also verifies that
     the request's "origin" header matches your development URL.
 
-Here is a summary of how these measures are enabled across different Tidewave
-implementations. The values below represent the default settings used by Tidewave
-and the underlying frameworks:
-
-| Security measure             | Tidewave for Phoenix | Tidewave for Rails |
-| :--------------------------- | :------------------: | :----------------: |
-| Localhost binding            | ✅                    | ✅                  |
-| Remote IP checks             | ✅                    | ✅                  |
-| Origin checks                | ✅                    | ✅                  |
-
-If you prefer to not run your web app on `localhost`, check the installation
-steps for each framework on GitHub to learn how to customize them.
+By default, both Tidewave server and Tidewave MCP only allow local access.
+In case you need to expose Tidewave remotely, you can pass the `--allow-remote-access`
+to the Tidewave CLI. In rare cases, you can also enable such configuration
+within your web frameworks. **Do so with care**.
 
 ## Tool execution
 
@@ -71,23 +65,15 @@ In particular:
     project packages. The tool supports additional packages to be given,
     which you must then confirm before allowing the tool to run
 
+Third-party coding agents, such as Claude Code, have their own tools,
+which may perform web searches, fetch URLs, and so forth. Those are not
+controlled by Tidewave. Read their documentation to see which tools and
+security mechanisms they have in place.
+
 ## Data collection
 
-Tidewave does not store your prompts or responses, unless you have explicitly
-opted in to prompt logging in your account settings. It’s as simple as that.
-
-Tidewave does store metadata (e.g. number of tokens, latency, etc) for each
-request, which is used to improve our services and provide features that can
-enhance your user experience in the future (such as activity reports).
-
-When invoking Tidewave tools, they may access external services, some known
-upfront:
-
-  * `search_package_docs` tasks will query the package manager
-    of your programming language, such as Hex.pm
-
-  * Commands that evaluate code may invoke HTTP clients or `curl`,
-    which may cause data to leave your machine
-
-You should evaluate those commands accordingly and stop their execution if they
-are a concern.
+We log basic request metadata (timestamps, model used, token counts).
+Prompts and messages are not logged unless you explicitly opt-in.
+We don't store tool results. Note the underlying coding agent or model
+provider you use may store data separately depending on your user agreement
+with them.
