@@ -5,9 +5,25 @@ Because Tidewave runs within your web application, running your app in a contain
 automatically isolates Tidewave as well, this makes Tidewave simpler to containerize
 than other agents.
 
+> #### Tidewave CLI
+>
+> In order to use Tidewave Web with [ACP support](https://agentclientprotocol.com/overview/introduction), you'll
+> also need to add the [Tidewave CLI](https://github.com/tidewave-ai/tidewave_app) to your container image and
+> start it alongside your web application. You cannot use the Tidewave Desktop app from outside the container
+> to connect to Tidewave inside the container.
+
 One popular solution for this is [Visual Studio Code's dev containers](https://code.visualstudio.com/docs/devcontainers/containers).
-Tidewave works out of the box when using devcontainers. In the section below, we'll
-be looking at a minimal, devcontainer-like, setup.
+Tidewave works out of the box when using devcontainers. Just download the latest `tidewave` CLI binary with curl or wget in a
+Terminal inside your container:
+
+```bash
+$ curl -sL -o tidewave https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-cli-aarch64-unknown-linux-musl
+$ chmod +x tidewave
+$ ./tidewave
+2025-11-03T16:27:00.232551Z  INFO tidewave_core::server: HTTP server bound to 127.0.0.1:9832
+```
+
+In the section below, we'll be looking at a minimal, devcontainer-like, setup.
 
 ## Build your own dev container
 
@@ -57,12 +73,17 @@ based on your web framework below:
 ```dockerfile
 FROM ruby:3.2
 
-RUN apt update && apt -y install git bash inotify-tools socat
+RUN apt update && apt -y install curl git bash inotify-tools socat
+RUN curl -sL -o tidewave https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-cli-$(uname -m)-unknown-linux-musl && \
+    chmod +x tidewave && \
+    mv tidewave /usr/local/bin/tidewave
 RUN <<EOF cat >> /run.sh
 #!/bin/sh
 
 socat TCP-LISTEN:3001,fork TCP:localhost:3000 > /dev/null 2>&1 &
-socat TCP-LISTEN:localhost:5432,fork TCP:db:5432 > /dev/null 2>&1 &
+socat TCP-LISTEN:5432,fork,bind=127.0.0.1 TCP:db:5432 > /dev/null 2>&1 &
+socat TCP-LISTEN:9833,fork TCP:localhost:9832 > /dev/null 2>&1 &
+tidewave -p 9832 > /dev/null 2>&1 &
 
 bash
 EOF
@@ -77,12 +98,17 @@ FROM hexpm/elixir:1.18.4-erlang-27.3.4-ubuntu-noble-20250529
 RUN mix local.hex --force
 RUN mix local.rebar --force
 
-RUN apt update && apt -y install git bash inotify-tools socat
+RUN apt update && apt -y install curl git bash inotify-tools socat
+RUN curl -sL -o tidewave https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-cli-$(uname -m)-unknown-linux-musl && \
+    chmod +x tidewave && \
+    mv tidewave /usr/local/bin/tidewave
 RUN <<EOF cat >> /run.sh
 #!/bin/sh
 
 socat TCP-LISTEN:4001,fork TCP:localhost:4000 > /dev/null 2>&1 &
-socat TCP-LISTEN:localhost:5432,fork TCP:db:5432 > /dev/null 2>&1 &
+socat TCP-LISTEN:5432,fork,bind=127.0.0.1 TCP:db:5432 > /dev/null 2>&1 &
+socat TCP-LISTEN:9833,fork TCP:localhost:9832 > /dev/null 2>&1 &
+tidewave -p 9832 > /dev/null 2>&1 &
 
 bash
 EOF
@@ -111,7 +137,9 @@ docker compose -f docker-compose.dev.yml up -d
 docker build -f Dockerfile.dev -t tidewave-devcontainer .
 docker run --rm -w $(pwd) \
   -v $(pwd):$(pwd) \
+  --network my_app \
   -p 127.0.0.1:3000:3001 \
+  -p 127.0.0.1:9832:9833 \
   -it tidewave-devcontainer /run.sh
 ```
 
@@ -125,6 +153,9 @@ Also pay close attention to the `-p` parameter above:
 
 * We used ports 3000:3001 but you need to adapt them to your web framework
   (such as 4000:4001 for Phoenix).
+
+* We forward the ports for the Tidewave CLI as well, such that you can access it
+  at `http://localhost:9832`.
 
 * We only bind to `127.0.0.1` for security purposes. Don't use `-p 3000:3001`,
   otherwise anyone on your local network can access your web app and Tidewave.
