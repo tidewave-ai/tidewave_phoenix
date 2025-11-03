@@ -82,8 +82,8 @@ RUN <<EOF cat >> /run.sh
 
 socat TCP-LISTEN:3001,fork TCP:localhost:3000 > /dev/null 2>&1 &
 socat TCP-LISTEN:5432,fork,bind=127.0.0.1 TCP:db:5432 > /dev/null 2>&1 &
-socat TCP-LISTEN:9833,fork TCP:localhost:9832 > /dev/null 2>&1 &
-tidewave -p 9832 > /dev/null 2>&1 &
+socat TCP-LISTEN:9001,fork TCP:localhost:9000 > /dev/null 2>&1 &
+tidewave -p 9000 > /dev/null 2>&1 &
 
 bash
 EOF
@@ -107,8 +107,8 @@ RUN <<EOF cat >> /run.sh
 
 socat TCP-LISTEN:4001,fork TCP:localhost:4000 > /dev/null 2>&1 &
 socat TCP-LISTEN:5432,fork,bind=127.0.0.1 TCP:db:5432 > /dev/null 2>&1 &
-socat TCP-LISTEN:9833,fork TCP:localhost:9832 > /dev/null 2>&1 &
-tidewave -p 9832 > /dev/null 2>&1 &
+socat TCP-LISTEN:9001,fork TCP:localhost:9000 > /dev/null 2>&1 &
+tidewave -p 9000 > /dev/null 2>&1 &
 
 bash
 EOF
@@ -139,7 +139,7 @@ docker run --rm -w $(pwd) \
   -v $(pwd):$(pwd) \
   --network my_app \
   -p 127.0.0.1:3000:3001 \
-  -p 127.0.0.1:9832:9833 \
+  -p 127.0.0.1:9000:9001 \
   -it tidewave-devcontainer /run.sh
 ```
 
@@ -155,7 +155,7 @@ Also pay close attention to the `-p` parameter above:
   (such as 4000:4001 for Phoenix).
 
 * We forward the ports for the Tidewave CLI as well, such that you can access it
-  at `http://localhost:9832`.
+  at `http://localhost:9000`.
 
 * We only bind to `127.0.0.1` for security purposes. Don't use `-p 3000:3001`,
   otherwise anyone on your local network can access your web app and Tidewave.
