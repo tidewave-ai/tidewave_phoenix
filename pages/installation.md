@@ -28,7 +28,7 @@ Then you can put the address of your web application and Tidewave will connect t
 * [Tidewave for Ruby on Rails](https://github.com/tidewave-ai/tidewave_rails)
 * [Tidewave for React](https://hexdocs.pm/tidewave/react.html)
 
-The Tidewave app will remaining running on your menu bar (top right on macOS/Linux, bottom right on Windows), you can click it to open up, configure, and update Tidewave.
+The Tidewave app will remain running on your menu bar (top right on macOS/Linux, bottom right on Windows), you can click it to open up, configure, and update Tidewave.
 
 ## CLI
 
