@@ -37,3 +37,17 @@ This step is not strictly required. If you have `npx` available in your PATH, Ti
 ```shell
 npm install -g @zed-industries/claude-code-acp
 ```
+
+## Customizing your environment
+
+Our integration will reuse your Claude Code settings. Furthermore, when we start Claude Code, we pass the same environment variables which you used to start your server to Claude Code.
+
+However, if you want to set any of [Claude Code's environment variables] to be used exclusively with Tidewave, you can do so by clicking on the Tidewave icon in your menu bar (top-right on macOS and Linux, bottom-right on Windows) and then on "Settings...". Doing so will open a file where you can add the desired environment variables, for example:
+
+```toml
+# This file is used to configure the Tidewave app.
+# If you change this file, you must restart Tidewave.
+
+[env]
+CLAUDE_CODE_USE_VERTEX = "1"
+```

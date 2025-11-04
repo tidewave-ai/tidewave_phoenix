@@ -2,7 +2,7 @@
 
 Tidewave Web directly integrates with [React](https://react.dev). We can automatically detect React components on the page, [inspect them](inspector.md), and send their source location to the agent.
 
-This page describes running React within Django, Flask, FastAPI, Phoenix, and Rails applications. If you are using Next.js or using React with a backend as a service (such as Supabase), see the [Tidewave.js](http://github.com/tidewave-ai/tidewave_js) project.
+This page describes running React within Django, Flask, FastAPI, Phoenix, and Rails applications. If you are using Next.js or using React with a backend as a service (such as Supabase) or non-officially supported frameworks, see the [Tidewave.js](http://github.com/tidewave-ai/tidewave_js) project.
 
 ## Requirements
 
