@@ -13,7 +13,7 @@ Once setup, Tidewave Web will use your Claude Code subscription and settings (in
 You can [install the Claude Code CLI in many different ways](https://docs.claude.com/en/docs/claude-code/setup). However, because installing the `Claude Code ACP`, in step 3, requires using `npm`, our recommendation is to [install `npm`](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) and then run:
 
 ```shell
-npm install -g @anthropic-ai/claude-code`
+npm install -g @anthropic-ai/claude-code
 ```
 
 If you install `claude` and Tidewave Web cannot detect it, please restart your web application and the Tidewave App/CLI.
