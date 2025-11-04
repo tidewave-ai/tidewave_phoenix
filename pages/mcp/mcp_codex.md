@@ -4,10 +4,11 @@ You can use Tidewave MCP with OpenAI's [Codex CLI](https://developers.openai.com
 
 ## Installation
 
-First, you must install a [`mcp-proxy`](guides/mcp_proxy.md).
+Invoke the `codex` CLI to add `tidewave` using the HTTP transport:
+
 
 ```shell
-$ codex mcp add tidewave /path/to/mcp-proxy http://localhost:$PORT/tidewave/mcp
+$ codex mcp add tidewave --url http://localhost:$PORT/tidewave/mcp
 ```
 
 Where `$PORT` is the port your web application is running on. And you are good to go!

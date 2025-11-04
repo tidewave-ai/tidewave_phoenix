@@ -30,7 +30,7 @@ And then at the center top choose "+ Add MCP Server..." and follow one of the op
 
 3. Add a name of your choice
 
-### MCP Proxy (recommended)
+### MCP Proxy
 
 See the [MCP proxy documentation](guides/mcp_proxy.md).
 
