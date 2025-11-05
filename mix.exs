@@ -55,8 +55,8 @@ defmodule Tidewave.MixProject do
       {:phoenix_live_reload, ">= 1.6.1", optional: true},
       {:igniter, "~> 0.6", optional: true},
       {:bandit, "~> 1.6", only: [:dev, :test]},
-      {:ex_doc, ">= 0.0.0", only: :docs},
-      {:makeup_syntect, ">= 0.0.0", only: :docs}
+      {:ex_doc, ">= 0.0.0", only: :dev},
+      {:makeup_syntect, ">= 0.0.0", only: :dev}
     ]
   end
 
@@ -72,13 +72,13 @@ defmodule Tidewave.MixProject do
       extras: [
         "pages/installation.md",
         "pages/features/agentsmd.md",
-        "pages/features/editors.md",
         "pages/features/inspector.md",
         "pages/features/notifications.md",
         "pages/features/providers.md",
-        "pages/features/react.md",
         "pages/features/teams.md",
-        "pages/guides/claude_code.md",
+        "pages/integrations/claude_code.md",
+        "pages/integrations/editors.md",
+        "pages/integrations/react.md",
         "pages/guides/containers.md",
         "pages/guides/security.md",
         "pages/guides/tips_and_tricks.md",
@@ -96,6 +96,7 @@ defmodule Tidewave.MixProject do
       ],
       groups_for_extras: [
         Features: ~r/(pages\/features\/.?)/,
+        Integrations: ~r/(pages\/integrations\/.?)/,
         Guides: ~r/(pages\/guides\/.?)/,
         MCP: ~r/pages\/mcp\/.?/
       ]

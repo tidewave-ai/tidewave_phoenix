@@ -1,4 +1,4 @@
-# Editor integration
+# Editors/IDEs
 
 Tidewave can open up files and page elements directly in your editor.
 

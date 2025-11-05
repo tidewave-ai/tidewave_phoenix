@@ -40,13 +40,7 @@ if Code.ensure_loaded?(Igniter) do
 
     @impl Igniter.Mix.Task
     def igniter(igniter) do
-      igniter
-      |> setup_phoenix()
-      |> Igniter.add_notice("""
-      Tidewave next steps:
-
-      * Enable Tidewave in your editor: https://hexdocs.pm/tidewave/mcp.html
-      """)
+      setup_phoenix(igniter)
     end
 
     defp setup_phoenix(igniter) do
@@ -54,7 +48,7 @@ if Code.ensure_loaded?(Igniter) do
         Igniter.Libs.Phoenix.select_endpoint(
           igniter,
           nil,
-          "Which endpoint should serve your tidewave MCP?"
+          "Which endpoint should serve tidewave?"
         )
 
       if endpoint do

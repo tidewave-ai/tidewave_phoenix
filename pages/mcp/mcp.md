@@ -4,7 +4,7 @@ You can access some of Tidewave's features from your editor/agent via the Model 
 
 > #### Tidewave Web features {: .info}
 >
-> Tidewave MCP includes only a subset of Tidewave's features. In-browser agents, point-and-click prompting, Figma integration, and contextual browser testing are all parts of [Tidewave Web](https://tidewave.ai), and are available under the `/tidewave` route of your application.
+> Tidewave MCP includes only a subset of Tidewave's features. In-browser agents, point-and-click prompting, Figma integration, and contextual browser testing are all parts of [Tidewave Web](https://tidewave.ai), and are available under the `/tidewave` route of your application. If you are using Tidewave Web, you don't need to configure the Tidewave MCP. That's done automatically for you.
 
 ## Editor/agent instructions
 

@@ -14,4 +14,4 @@ Note the Tidewave Team plan is separate from your Tidewave Pro account. You don'
 
 You can create invitation links in your Team page and share them with your team members. By clicking the link, they may request to join the team. Team admins will be notified of every request, which must then be explicitly approved.
 
-Team invitations can also be given as `token` in your Tidewave configuration. This allows your colleagues to request to join the team when they first open Tidewave Web.
+Team invitations can also be given as `token` in your Tidewave configuration. This allows your colleagues to request to join the team when they connect Tidewave to your application.
