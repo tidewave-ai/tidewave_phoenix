@@ -2,22 +2,22 @@
 
 You can connect Tidewave Web directly to [Claude Code](https://www.claude.com/product/claude-code) by following the steps below:
 
-1. Install the `claude` code CLI
+1. Install the `claude` CLI
 2. Authenticate with your Claude subscription
 3. Install Claude Code ACP
 4. Enable in Tidewave Web
 
 Once setup, Tidewave will use your Claude Code subscription and settings (including MCP servers, subagents, etc).
 
-## Install the `claude` code CLI
+## Install the `claude` CLI
 
-You can [install the Claude Code CLI in many different ways](https://docs.claude.com/en/docs/claude-code/setup). However, because installing the `Claude Code ACP`, in step 3, requires using `npm`, our recommendation is to [install `npm`](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) and then run:
+You can [install the Claude Code CLI in different ways](https://docs.claude.com/en/docs/claude-code/setup). However, because installing the `Claude Code ACP`, in step 3, requires using `npm`, our recommendation is to [install `npm`](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) and then run:
 
 ```shell
 npm install -g @anthropic-ai/claude-code`
 ```
 
-If you install `claude` and Tidewave cannot detect it, please restart your web application and the Tidewave App/CLI.
+If you install `claude` and Tidewave Web cannot detect it, please restart the Tidewave App/CLI by clicking its menu bar icon (top-right on macOS and Linux, bottom-right on Windows) and selecting "Restart".
 
 ## Authenticate with Claude
 
@@ -47,9 +47,9 @@ Once Tidewave Web connects to Claude Code, we will automatically configure Claud
 
 ## Customizing your environment
 
-Our integration will reuse your Claude Code settings. Furthermore, when we start Claude Code, we pass the same environment variables which you used to start your server to Claude Code.
+Our integration will reuse your Claude Code settings. Furthermore, when we start Claude Code, we give it the same environment variables which you used to start your server.
 
-However, if you want to set any of [Claude Code's environment variables] to be used exclusively with Tidewave, you can do so by clicking on the Tidewave icon in your menu bar (top-right on macOS and Linux, bottom-right on Windows) and then on "Settings...". Doing so will open a file where you can add the desired environment variables, for example:
+However, if you want to set any of [Claude Code's environment variables](https://code.claude.com/docs/en/settings#environment-variables) to be used exclusively with Tidewave, you can do so by clicking on the Tidewave icon in your menu bar (top-right on macOS and Linux, bottom-right on Windows) and then on "Settings...". Doing so will open a file where you can add the desired environment variables, for example:
 
 ```toml
 # This file is used to configure the Tidewave app.
@@ -58,3 +58,9 @@ However, if you want to set any of [Claude Code's environment variables] to be u
 [env]
 CLAUDE_CODE_USE_VERTEX = "1"
 ```
+
+## FAQ
+
+#### Using Tidewave Web with Claude Code emits "Authentication required"
+
+This means you haven't authenticated in the `claude` CLI. Remember to run `claude` and, if Tidewave Web still claims you are not authenticated, restart the Tidewave App/CLI by clicking its menu bar icon (top-right on macOS and Linux, bottom-right on Windows) and selecting "Restart".

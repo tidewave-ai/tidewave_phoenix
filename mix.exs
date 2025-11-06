@@ -77,6 +77,7 @@ defmodule Tidewave.MixProject do
         "pages/features/providers.md",
         "pages/features/teams.md",
         "pages/integrations/claude_code.md",
+        "pages/integrations/codex.md",
         "pages/integrations/editors.md",
         "pages/integrations/react.md",
         "pages/guides/containers.md",
