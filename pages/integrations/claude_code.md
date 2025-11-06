@@ -5,6 +5,7 @@ You can connect Tidewave Web directly to [Claude Code](https://www.claude.com/pr
 1. Install the `claude` code CLI
 2. Authenticate with your Claude subscription
 3. Install Claude Code ACP
+4. Enable in Tidewave Web
 
 Once setup, Tidewave will use your Claude Code subscription and settings (including MCP servers, subagents, etc).
 
@@ -37,6 +38,12 @@ This step is not strictly required. If you have `npx` available in your PATH, Ti
 ```shell
 npm install -g @zed-industries/claude-code-acp
 ```
+
+## Enable in Tidewave Web
+
+Now that Claude Code and Claude Code ACP are available, open up Tidewave Web settings, choose the Providers tab, and configure Claude Code accordingly.
+
+Once Tidewave Web connects to Claude Code, we will automatically configure Claude Code to also use Tidewave MCP. You may disable this option if (and only if) you have customize Claude Code to use Tidewave MCP.
 
 ## Customizing your environment
 
