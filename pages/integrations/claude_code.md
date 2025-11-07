@@ -27,10 +27,6 @@ Once `claude` is installed, you must authenticate with your Claude subscription.
 claude
 ```
 
-> #### Check your `claude /status` {: .warning}
->
-> If you have the `ANTHROPIC_API_KEY` environment variable set, `claude` will automatically use it if you don't log in. For this reason, we recommend running `claude /status` and double checking the "Login method" field to validate it is using one of your Claude Pro or Claude Max subscriptions. If you want to be double sure, consider unsetting the environment variable.
-
 ## Install Claude Code ACP
 
 This step is not strictly required. If you have `npx` available in your PATH, Tidewave will automatically use it to install [Claude Code ACP](https://github.com/zed-industries/claude-code-acp). If it fails, you can explicitly install it with:

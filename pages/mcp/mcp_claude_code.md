@@ -4,7 +4,7 @@ You can use Tidewave MCP with [Claude Code](https://docs.anthropic.com/en/docs/a
 
 > #### Tidewave Web vs Tidewave MCP {: .info}
 >
-> The instructions here are about connecting Tidewave MCP and Claude Code together. To use Tidewave Web (the one running in your browser) and Claude Code, please [read this guide](../guides/claude_code.md).
+> The instructions here are about connecting Tidewave MCP and Claude Code together. To use Tidewave Web (the one running in your browser) and Claude Code, please [read this guide](../integrations/claude_code.md).
 
 ## Installation
 
