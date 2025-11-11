@@ -77,6 +77,14 @@ Now run `mix tidewave` and [configure Tidewave as a MCP](https://hexdocs.pm/tide
 
 ## Troubleshooting
 
+### Content security policy
+
+If you have enabled Content-Security-Policy, Tidewave will automatically enable "unsafe-eval" under `script-src` in order for contextual browser testing to work correctly. It also disables the `frame-ancestors` directive.
+
+### Localhost requirement
+
+> This requirement only matters if you are not using the Tidewave app/CLI.
+
 Tidewave expects your web application to be running on `localhost`. If you are not running on localhost, you may need to set some additional configuration. In particular, you must pass `allow_remote_access: true` to `plug Tidewave` and optionally configure the origin you are accessing from, for example:
 
 ```elixir
@@ -86,10 +94,6 @@ Tidewave expects your web application to be running on `localhost`. If you are n
 ```
 
 If you want to use Docker for development, you either need to enable the configuration above or automatically redirect the relevant ports, as done by [devcontainers](https://code.visualstudio.com/docs/devcontainers/containers). See our [containers](https://hexdocs.pm/tidewave/containers.html) guide for more information.
-
-### Content security policy
-
-If you have enabled Content-Security-Policy, Tidewave will automatically enable "unsafe-eval" under `script-src` in order for contextual browser testing to work correctly. It also disables the `frame-ancestors` directive.
 
 ## Configuration
 
@@ -101,7 +105,7 @@ You may configure the `Tidewave` plug using the following syntax:
 
 The following options are available:
 
-  * `:allow_remote_access` - Tidewave only allows requests from localhost by default, even if your server listens on other interfaces as well. If you trust your network and need to access Tidewave from a different machine, this configuration can be set to `true`.
+  * `:allow_remote_access` - Tidewave only allows requests from localhost by default, even if your server listens on other interfaces. If you trust your network and need to access Tidewave from a different machine, this configuration can be set to `true`.
 
   * `:inspect_opts` - Custom options passed to `Kernel.inspect/2` when formatting some tool results. Defaults to: `[charlists: :as_lists, limit: 50, pretty: true]`
 
