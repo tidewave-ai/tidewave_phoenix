@@ -81,6 +81,7 @@ defmodule Tidewave.MixProject do
         "pages/integrations/editors.md",
         "pages/integrations/react.md",
         "pages/guides/containers.md",
+        "pages/guides/https.md",
         "pages/guides/security.md",
         "pages/guides/tips_and_tricks.md",
         "pages/mcp/mcp.md",
