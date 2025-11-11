@@ -18,29 +18,14 @@ configure it.
 
 ![VSCode AI panel](assets/vscode.png)
 
-And then at the center top choose "+ Add MCP Server..." and follow one of the options below:
+And then at the center top choose "+ Add MCP Server..." and follow one these steps:
 
-<!-- tabs-open -->
-
-### HTTP connection
 
 1. Choose "HTTP (HTTP or Server-Sent events)"
 
 2. Add the URL your web application is running on with `/tidewave/mcp` at the end, such as `http://localhost:$PORT/tidewave/mcp`, where `$PORT` is the port it is running on
 
 3. Add a name of your choice
-
-### MCP Proxy
-
-See the [MCP proxy documentation](guides/mcp_proxy.md).
-
-1. Choose "Command (stdio)"
-
-2. List the path to the mcp-proxy followed by the URL your web application is running on with `/tidewave/mcp` at the end, such as `/path/to/mcp-proxy http://localhost:$PORT/tidewave/mcp` on macOS/Linux or `c:\path\to\mcp-proxy.exe http://localhost:$PORT/tidewave/mcp` on Windows, where `$PORT` is the port it is running on
-
-3. Add a name of your choice
-
-<!-- tabs-close -->
 
 And you are good to go! Now the Copilot extension will list all tools from
 Tidewave available. If your application uses a SQL database, you can verify

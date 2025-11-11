@@ -6,18 +6,7 @@ Cursor allows you to place a file at `.cursor/mcp.json`, for configuration
 which is specific to your project. Given Tidewave is explicitly tied to your
 web application, that's our preferred approach.
 
-Create a file at `.cursor/mcp.json` and add the following contents.
-
-<!-- tabs-open -->
-
-### HTTP connection
-
-> #### Installing an MCP proxy {: .warning}
->
-> The HTTP integration of Cursor was shown to be unreliable in the past. For example,
-> whenever you restarted your dev server, Cursor would not properly reconnect, leading
-> to a frustrating user experience. If you run into such issues, consider using the
-> MCP proxy.
+Create a file at `.cursor/mcp.json` and add the following contents:
 
 ```json
 {
@@ -29,45 +18,7 @@ Create a file at `.cursor/mcp.json` and add the following contents.
 }
 ```
 
-Where `$PORT` is the port your web application is running on. If the `mcp-proxy` command
-
-### MCP Proxy (recommended)
-
-See the [MCP proxy documentation](guides/mcp_proxy.md).
-
-On macOS/Linux:
-
-```json
-{
-  "mcpServers": {
-    "tidewave": {
-      "command": "/path/to/mcp-proxy",
-      "args": [
-        "http://localhost:$PORT/tidewave/mcp"
-      ]
-    }
-  }
-}
-```
-
-On Windows:
-
-```json
-{
-  "mcpServers": {
-    "tidewave": {
-      "command": "/path/to/mcp-proxy.exe",
-      "args": [
-        "http://localhost:$PORT/tidewave/mcp"
-      ]
-    }
-  }
-}
-```
-
 Where `$PORT` is the port your web application is running on.
-
-<!-- tabs-close -->
 
 If you prefer, you can also add Tidewave globally to your editor
 by adding the same contents as above to the `~/.cursor/mcp.json`
