@@ -28,7 +28,7 @@ Then, for Phoenix applications, go to your `lib/my_app_web/endpoint.ex` and righ
    if code_reloading? do
 ```
 
-Now access `/tidewave` route of your web application to enjoy Tidewave Web!
+Now make sure [Tidewave is installed](https://hexdocs.pm/tidewave/installation.html) and you are ready to connect Tidewave to your app.
 
 > Tidewave Web works best with Phoenix LiveView v1.1 or later. Once you update it,
 > make sure to enable the following options in your `config/dev.exs`:
@@ -53,7 +53,7 @@ mix archive.install hex igniter_new
 mix igniter.install tidewave
 ```
 
-Now access `/tidewave` route of your web application to enjoy Tidewave Web!
+Now make sure [Tidewave is installed](https://hexdocs.pm/tidewave/installation.html) and you are ready to connect Tidewave to your app.
 
 ### Usage in non-Phoenix applications
 
@@ -100,8 +100,6 @@ You may configure the `Tidewave` plug using the following syntax:
 ```
 
 The following options are available:
-
-  * `:allowed_origins` - a list of values matched against the `Origin` header to prevent cross origin and DNS rebinding attacks. Each value must be a string of shape `[scheme:]//host[:port]`, where both scheme and port are optional. The host may also start with "*". Example: `["//localhost:8000", "//*.test"]`.
 
   * `:allow_remote_access` - Tidewave only allows requests from localhost by default, even if your server listens on other interfaces as well. If you trust your network and need to access Tidewave from a different machine, this configuration can be set to `true`.
 
