@@ -79,6 +79,7 @@ defmodule Tidewave.MixProject do
         "pages/integrations/claude_code.md",
         "pages/integrations/codex.md",
         "pages/integrations/editors.md",
+        "pages/integrations/figma.md",
         "pages/integrations/react.md",
         "pages/guides/containers.md",
         "pages/guides/https.md",
