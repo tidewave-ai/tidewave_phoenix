@@ -83,7 +83,7 @@ If you have enabled Content-Security-Policy, Tidewave will automatically enable 
 
 ### Localhost requirement
 
-> This requirement only matters if you are not using the Tidewave app/CLI.
+> This requirement only matters if you are not using the Tidewave App/CLI.
 
 Tidewave expects your web application to be running on `localhost`. If you are not running on localhost, you may need to set some additional configuration. In particular, you must pass `allow_remote_access: true` to `plug Tidewave` and optionally configure the origin you are accessing from, for example:
 

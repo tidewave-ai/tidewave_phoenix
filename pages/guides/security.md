@@ -13,7 +13,7 @@ assistant.
 
 Tidewave is made of two components:
 
-* The Tidewave server, running from the desktop app/cli
+* The Tidewave server, running from the desktop App/cli
 * The Tidewave MCP, running over the same host and port as your web application
 
 Theoretically, someone in the same network as you would be able to access Tidewave and its services to evaluate code. Luckily, there are best practices put in place to prevent that:

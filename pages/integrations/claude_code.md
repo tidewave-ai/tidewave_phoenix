@@ -57,8 +57,14 @@ However, if you want to set any of [Claude Code's environment variables](https:/
 CLAUDE_CODE_USE_VERTEX = "1"
 ```
 
+Note the environment variables used when starting your web server will override any variable defined in the Tidewave App/CLI.
+
 ## FAQ
 
 #### Using Tidewave Web with Claude Code emits "Authentication required"
 
 This means you haven't authenticated in the `claude` CLI. Remember to run `claude` and, if Tidewave Web still claims you are not authenticated, restart the Tidewave App/CLI by clicking its menu bar icon (top-right on macOS and Linux, bottom-right on Windows) and selecting "Restart".
+
+#### `claude` is available on my machine but Tidewave cannot find it
+
+Please double check `claude` is indeed available as an executable by running `which claude`. In some installations, `claude` is installed as an alias, which cannot be found nor used by Tidewave.
