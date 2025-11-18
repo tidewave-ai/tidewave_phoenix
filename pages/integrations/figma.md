@@ -2,6 +2,8 @@
 
 Tidewave Web supports direct integration with Figma Dev Mode, allowing you to attach Figma Selections to your prompts.
 
+<iframe width="640" height="360" src="https://www.youtube.com/embed/TXPC2KbkIeQ?si=VJ6SqUcTMms59VB_" title="Tidewave Figma integration" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 ## Configuration
 
 To enable this feature, you will need to:
