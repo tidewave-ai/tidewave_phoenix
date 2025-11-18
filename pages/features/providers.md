@@ -3,6 +3,7 @@
 In order to use Tidewave Web, you will need one of:
 
 * Claude Code subscription
+* OpenAI Codex subscription
 * GitHub Copilot subscription
 * Bring your own API keys (for Anthropic, OpenAI, or OpenRouter)
 
@@ -11,6 +12,10 @@ Read more below.
 ## Claude Code
 
 See [our step-by-step instructions to connect Tidewave to Claude Code](../guides/claude_code.md).
+
+## OpenAI Codex
+
+See [our step-by-step instructions to connect Tidewave to OpenAI Codex](../guides/codex.md).
 
 ## GitHub Copilot
 
