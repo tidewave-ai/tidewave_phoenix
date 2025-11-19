@@ -8,11 +8,11 @@ To get started with Tidewave, download our desktop app:
 
 * For macOS: [Apple Silicon](https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-app-aarch64.dmg), [Intel](https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-app-x64.dmg)
 * For Linux: [AppImage (x86_64)](https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-app-amd64.AppImage), [AppImage (ARM64)](https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-app-aarch64.AppImage)
-* For Windows: [Windows](https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-app-x64.exe) (if you are running your web application with WSL, you must use the CLI below)
+* For Windows: [Windows](https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-app-x64.exe)
 
 After installation, an icon should be appear in your menu bar (top-right on macOS and Linux, bottom-right on Windows).
 
-If your application is running inside Docker, read [our containers guide](../guides/containers.html). A [CLI](#cli) is also available for containers, WSL, and other uses.
+If your application is running inside Docker, read [our containers guide](../guides/containers.html). A [CLI](#cli) is also available for containers and other uses.
 
 ## Running Tidewave
 
@@ -34,10 +34,14 @@ The Tidewave app will remain running on your menu bar (top right on macOS/Linux,
 
 ## CLI
 
-For advanced users, or for running Tidewave inside containers, a CLI is also available:
+For running Tidewave inside containers and other advanced uses, a CLI is also available:
 
 * For macOS: [Apple Silicon](https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-cli-aarch64-apple-darwin), [Intel](https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-cli-x86_64-apple-darwin)
 * For Windows: [Windows](https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-cli-x86_64-pc-windows-msvc.exe)
 * For Linux: [aarch64-gnu](https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-cli-aarch64-unknown-linux-gnu), [aarch64-musl](https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-cli-aarch64-unknown-linux-gnu), [x86_64-gnu](https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-cli-x86_64-unknown-linux-gnu), [x86_64-musl](https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-cli-x86_64-unknown-linux-gnu)
 
-Once the CLI is installed, run it with `./tidewave`. Run `./tidewave --help` for options.
+Once the CLI is installed, run it with `./tidewave`.
+
+By default, for security reasons, the CLI only allows access from the same machine it is running on. Furthermore, it checks that browser requests come from `localhost` or `127.0.0.1`. You can pass the flags `--allow-remote-access` and `--allowed-origins` respectively to change this. You can also [enable HTTPS certificates](../guides/https.md) both for the App and the CLI.
+
+Run `./tidewave --help` for a list of all options.
