@@ -6,6 +6,7 @@ In order to use Tidewave Web, you will need one of:
 * OpenAI Codex subscription
 * GitHub Copilot subscription
 * Bring your own API keys (for Anthropic, OpenAI, or OpenRouter)
+* Local and third-party providers
 
 Read more below.
 
@@ -39,6 +40,10 @@ You can also use Tidewave with an OpenAI API key. You can [create an OpenAI API 
 
 You can also use Tidewave with OpenRouter. You can [create an OpenRouter API key](https://openrouter.ai/settings/keys) and paste it into your provider configuration in Settings. Alternatively, you may set the `OPENROUTER_API_KEY` as an [environment variable](https://en.wikipedia.org/wiki/Environment_variable), which will be automatically picked up by Tidewave.
 
-## Custom agents
+## Local and third-party providers
 
-Tidewave also supports any coding agent that implements the [Agent Client Protocol](http://agentclientprotocol.com) (ACP). You can enable them in "External Agents" tab under the advanced settings. However, given ACP is still evolving, Tidewave may not work as expected when using such agents.
+There are two mechanisms you can extend Tidewave beyond the providers listed above.
+
+* [By using Codex with custom providers](../integrations/codex.md#custom-providers) - the Codex CLI can be customized to run with any OpenAI compatible providers, which includes [Ollama](https://ollama.com) and external services
+
+* By using External Agents that implement the [Agent Client Protocol](http://agentclientprotocol.com) (ACP) - you can enable them in the "External Agents" tab under the advanced settings. Given ACP is still evolving, keep in mind Tidewave may not work as expected when using such agents

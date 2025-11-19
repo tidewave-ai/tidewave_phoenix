@@ -41,6 +41,23 @@ Now that Codex and Codex ACP are available, open up Tidewave Web settings, choos
 
 Once Tidewave Web connects to Codex, we will automatically configure Codex to also use Tidewave MCP. You may disable this option if (and only if) you have customize Codex to use Tidewave MCP.
 
+## Custom Providers
+
+Codex comes with the ablity of running custom providers. This can be used to configure [Ollama](https://docs.ollama.com/integrations/codex), OpenRouter, and other OpenAI compatible endpoints.
+
+For example, to use Codex with OpenRouter, add the following to `~/.codex/config.toml`:
+
+```toml
+model = "anthropic/claude-sonnet-4.5"
+model_provider = "openrouter"
+
+[model_providers.openrouter]
+name = "Openrouter"
+base_url = "https://openrouter.ai/api/v1"
+http_headers = { "Authorization" = "Bearer sk-or-v1-..." }
+wire_api = "chat"
+```
+
 ## FAQ
 
 #### Using Tidewave Web with Codex emits "Authentication required"
