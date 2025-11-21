@@ -55,6 +55,7 @@ However, if you want to set any of [Claude Code's environment variables](https:/
 
 [env]
 CLAUDE_CODE_USE_VERTEX = "1"
+CLAUDE_CODE_EXECUTABLE = "..."
 ```
 
 Note the environment variables used when starting your web server will override any variable defined in the Tidewave App/CLI.
