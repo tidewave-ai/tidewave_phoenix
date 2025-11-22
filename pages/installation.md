@@ -42,6 +42,6 @@ For running Tidewave inside containers and other advanced uses, a CLI is also av
 
 Once the CLI is installed, run it with `./tidewave`.
 
-By default, for security reasons, the CLI only allows access from the same machine it is running on. Furthermore, it checks that browser requests come from `localhost` or `127.0.0.1`. You can pass the flags `--allow-remote-access` and `--allowed-origins` respectively to change this. You can also [enable HTTPS certificates](../guides/https.md) both for the App and the CLI.
+For security reasons, the CLI only allows access from the same machine it is running on by default. Furthermore, it enforces that the CLI is being accessed from `localhost` or `127.0.0.1`. If you want to run the CLI on a custom server, you must pass `--allow-remote-access` and `--allowed-origins=https://HOSTNAME:PORT` respectively to change our defaults. You can also [enable HTTPS certificates](../guides/https.md) both for the App and the CLI.
 
 Run `./tidewave --help` for a list of all options.
