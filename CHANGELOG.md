@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.5.2 (2025-11-22)
+
+* Bug fixes
+  * Fix logging with Unicode charlists
+
 ## v0.5.1 (2025-11-01)
 
 * Enhancements
