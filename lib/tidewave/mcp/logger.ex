@@ -23,7 +23,7 @@ defmodule Tidewave.MCP.Logger do
     else
       %{formatter: {formatter_mod, formatter_config}} = config
       chardata = formatter_mod.format(event, formatter_config)
-      GenServer.cast(__MODULE__, {:log, IO.iodata_to_binary(chardata)})
+      GenServer.cast(__MODULE__, {:log, IO.chardata_to_string(chardata)})
     end
   end
 
