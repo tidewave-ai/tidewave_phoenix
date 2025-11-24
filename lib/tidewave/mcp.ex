@@ -34,11 +34,6 @@ defmodule Tidewave.MCP do
   def root, do: Application.fetch_env!(:tidewave, :root)
 
   @doc """
-  Returns the git root if any.
-  """
-  def git_root, do: Application.fetch_env!(:tidewave, :git_root)
-
-  @doc """
   Returns the project name.
   """
   def project_name, do: Application.fetch_env!(:tidewave, :project_name)
