@@ -29,11 +29,7 @@ claude
 
 ## Install Claude Code ACP
 
-This step is not strictly required. If you have `npx` available in your PATH, Tidewave will automatically use it to install [Claude Code ACP](https://github.com/zed-industries/claude-code-acp). If it fails, you can explicitly install it with:
-
-```shell
-npm install -g @zed-industries/claude-code-acp
-```
+This step is not strictly required. If you have `npx` available in your PATH, Tidewave will automatically use it to install [Claude Code ACP](https://github.com/zed-industries/claude-code-acp), which is the preferred method forward. If it fails (and only if it fails), you can explicitly install it with `npm install -g @zed-industries/claude-code-acp`.
 
 ## Enable in Tidewave Web
 
