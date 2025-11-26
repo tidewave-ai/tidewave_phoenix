@@ -29,7 +29,7 @@ codex
 
 ## Install Codex ACP
 
-This step is not strictly required. If you have `npx` available in your PATH, Tidewave will automatically use it to install [Codex ACP](https://github.com/zed-industries/codex-acp), which is the preferred method forward. If it fails (and only if it fails), you can explicitly install it with `npm install -g @zed-industries/codex-acp`.
+This step is not strictly required. If you have `npm`/`npx` available in your PATH, Tidewave will automatically use it to install [Codex ACP](https://github.com/zed-industries/codex-acp), which is the preferred method forward. If it fails (and only if it fails), you can explicitly install it with `npm install -g @zed-industries/codex-acp`.
 
 ## Enable in Tidewave Web
 
