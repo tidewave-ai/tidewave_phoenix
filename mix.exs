@@ -71,6 +71,7 @@ defmodule Tidewave.MixProject do
       end,
       extras: [
         "pages/installation.md",
+        "pages/features/accessibility.md",
         "pages/features/agentsmd.md",
         "pages/features/inspector.md",
         "pages/features/notifications.md",
