@@ -10,7 +10,7 @@ To get started with Tidewave, download our desktop app:
 * For Linux: [AppImage (x86_64)](https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-app-amd64.AppImage), [AppImage (ARM64)](https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-app-aarch64.AppImage)
 * For Windows: [Windows](https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-app-x64.exe)
 
-After installation, an icon should be appear in your menu bar (top-right on macOS and Linux, bottom-right on Windows).
+After installation, an icon should appear in your menu bar (top-right on macOS and Linux, bottom-right on Windows).
 
 If your application is running inside Docker, read [our containers guide](../guides/containers.html). A [CLI](#cli) is also available for containers and other uses.
 
