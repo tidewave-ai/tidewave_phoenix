@@ -4,8 +4,7 @@ You can connect Tidewave Web directly to [OpenAI Codex CLI](https://developers.o
 
 1. Install the `codex` CLI
 2. Authenticate with your OpenAI subscription
-3. Install OpenAI Codex ACP
-4. Enable in Tidewave Web
+3. Connect to Codex
 
 Once setup, Tidewave will use your OpenAI subscription and settings (including MCP servers, subagents, etc).
 
@@ -27,15 +26,13 @@ Once `codex` is installed, you must authenticate with your OpenAI subscription. 
 codex
 ```
 
-## Install Codex ACP
+## Connect to Codex
 
-This step is not strictly required. If you have `npm`/`npx` available in your PATH, Tidewave will automatically use it to install [Codex ACP](https://github.com/zed-industries/codex-acp), which is the preferred method forward. If it fails (and only if it fails), you can explicitly install it with `npm install -g @zed-industries/codex-acp`.
+If you have `npm`/`npx` available in your PATH, which is the preferred method forward, Tidewave will use it to automatically install and connect to [Codex ACP](https://github.com/zed-industries/codex-acp). Open up Tidewave Web settings, choose the Providers tab, choose "OpenAI Codex" and click "Connect".
 
-## Enable in Tidewave Web
+If "Connect" is not available, it is because `npm`/`npx` could not be found. You can check your `npm`/`npx` installation by running `which npx` (on macOS/Unix) or `where npx` (Windows) in the same terminal you start your web server. If it fails (and only if it fails), you can explicitly install `codex-acp` with `npm install -g @zed-industries/codex-acp`.
 
-Now that Codex and Codex ACP are available, open up Tidewave Web settings, choose the Providers tab, and configure "OpenAI Codex" accordingly.
-
-Once Tidewave Web connects to Codex, we will automatically configure Codex to also use Tidewave MCP. You may disable this option if (and only if) you have customize Codex to use Tidewave MCP.
+Once Tidewave Web connects to Codex, we will automatically configure Codex to also use Tidewave MCP. You may disable this option if (and only if) you have already customized Codex to use Tidewave MCP.
 
 ## Custom Providers
 
