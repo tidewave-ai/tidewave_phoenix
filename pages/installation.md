@@ -12,7 +12,7 @@ To get started with Tidewave, download our desktop app:
 
 After installation, an icon should appear in your menu bar (top-right on macOS and Linux, bottom-right on Windows).
 
-If your application is running inside Docker, read [our containers guide](../guides/containers.html). A [CLI](#cli) is also available for containers and other uses.
+We also offer a [CLI](#cli) if you are running your application remotely, inside containers, or other cases where the desktop application is not an option. If you are using Docker, read [our containers guide](../guides/containers.html).
 
 ## Running Tidewave
 
@@ -31,6 +31,8 @@ Then you can put the address of your web application and Tidewave will connect t
 * [Tidewave for React](https://hexdocs.pm/tidewave/react.html)
 
 The Tidewave app will remain running on your menu bar (top right on macOS/Linux, bottom right on Windows), you can click it to open up, configure, and update Tidewave.
+
+Remember Tidewave must always run on the same machine as your web server is running. If your web server is running on a separate machine, you will want to use our CLI.
 
 ## CLI
 
