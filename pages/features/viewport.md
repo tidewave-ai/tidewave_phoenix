@@ -3,7 +3,7 @@
 Tidewave Web offers the ability to customize the viewport, allowing developers to simulate different devices. To use it, click on the display icon on the top right:
 
 <img src="assets/viewport.png" alt="Tidewave Viewport" width="600px">
-  
+
 You can either resize the viewport by dragging its sides or by typing its dimensions. A list of commonly used presets is also available.
 
 Finally, the viewport is also available to coding agents. This means coding agents can automatically test and verify breakpoints. For example, you can ask how your app renders on mobile and the agent will match what the code says with how the app behaves in practice:

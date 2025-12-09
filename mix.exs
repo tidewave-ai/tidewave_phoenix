@@ -65,6 +65,7 @@ defmodule Tidewave.MixProject do
       api_reference: false,
       main: "installation",
       logo: "logo.svg",
+      footer: false,
       assets: %{"pages/assets" => "assets"},
       filter_modules: fn mod, _ ->
         raise "you forgot to add \"@moduledoc false\" to #{inspect(mod)}"
