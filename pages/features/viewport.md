@@ -4,8 +4,8 @@ Tidewave Web offers the ability to customize the viewport, allowing developers t
 
 <img src="assets/viewport.png" alt="Tidewave Viewport" width="600px">
 
-You can either resize the viewport by dragging its sides or by typing its dimensions. A list of commonly used presets is also available.
+Once enabled, you can either select one of the available presets or type custom dimensions.
 
-Finally, the viewport is also available to coding agents. This means coding agents can automatically test and verify breakpoints. For example, you can ask how your app renders on mobile and the agent will match what the code says with how the app behaves in practice:
+The viewport is also available to coding agents. This means coding agents can automatically test and verify breakpoints. For example, you can ask how your app renders on mobile and the agent will match what the code says with how the app behaves in practice:
 
 <iframe width="640" height="360" src="https://www.youtube.com/embed/Nsb-9BNpfuc?si=AfMcuMcVv8fkSU2R" title="Tidewave Viewport" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
