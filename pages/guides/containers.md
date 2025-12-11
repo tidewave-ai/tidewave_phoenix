@@ -2,30 +2,31 @@
 
 To isolate the agent environment from your local machine, you can use containers.
 Because Tidewave runs within your web application, running your app in a container
-automatically isolates Tidewave as well, this makes Tidewave simpler to containerize
-than other agents.
+automatically isolates Tidewave as well, this makes Tidewave simpler to containerize.
 
-> #### Tidewave CLI
->
-> In order to use Tidewave Web with [ACP support](https://agentclientprotocol.com/overview/introduction), you'll
-> also need to add the [Tidewave CLI](https://github.com/tidewave-ai/tidewave_app) to your container image and
-> start it alongside your web application. You cannot use the Tidewave Desktop app from outside the container
-> to connect to Tidewave inside the container.
+Furthermore, when using Tidewave Web with containers, you must not use the desktop app,
+instead you must use the [Tidewave CLI](https://github.com/tidewave-ai/tidewave_app).
+
+## Devcontainers
 
 One popular solution for this is [Visual Studio Code's dev containers](https://code.visualstudio.com/docs/devcontainers/containers).
-Tidewave works out of the box when using devcontainers. Just download the latest `tidewave` CLI binary with curl or wget in a
-Terminal inside your container:
+To use Tidewave Web with devcontainers, download the latest `tidewave` CLI binary
+with `curl` or `wget` in a Terminal inside your container:
 
 ```bash
 $ curl -sL -o tidewave https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-cli-aarch64-unknown-linux-musl
 $ chmod +x tidewave
-$ ./tidewave
-2025-11-03T16:27:00.232551Z  INFO tidewave_core::server: HTTP server bound to 127.0.0.1:9832
+$ ./tidewave --port 9000
+2025-11-03T16:27:00.232551Z  INFO tidewave_core::server: HTTP server bound to 127.0.0.1:9001
 ```
 
-In the section below, we'll be looking at a minimal, devcontainer-like, setup.
+In the example above, we use port 9000, in case you are also using the Tidewave App
+for other applications. If you don't have the Tidewave App installed in your desktop,
+you can skip the `--port` and use the default 9832.
 
 ## Build your own dev container
+
+In this section, we'll build a minimal devcontainer-like setup.
 
 > #### Windows users {: .info}
 >
@@ -68,7 +69,6 @@ based on your web framework below:
 <!-- tabs-open -->
 
 ### Ruby on Rails
-
 
 ```dockerfile
 FROM ruby:3.2
@@ -129,7 +129,8 @@ If you are using databases or other resources, such as Redis, you must also forw
 The examples above assume there is a PostgreSQL instance running on port 5421 and
 therefore we also use socat to forward any traffic from port 5432 to the `db` container.
 
-To comfortably start the container with all network settings, let's also create a `dev.sh` script:
+To comfortably start the container with all network settings, let's also create a
+`dev.sh` script:
 
 ```bash
 #!/bin/sh
@@ -155,7 +156,8 @@ Also pay close attention to the `-p` parameter above:
   (such as 4000:4001 for Phoenix).
 
 * We forward the ports for the Tidewave CLI as well, such that you can access it
-  at `http://localhost:9000`.
+  at `http://localhost:9000`. We gave it a custom port so it doesn't conflict with
+  the Tidewave App, if you have it installed.
 
 * We only bind to `127.0.0.1` for security purposes. Don't use `-p 3000:3001`,
   otherwise anyone on your local network can access your web app and Tidewave.
