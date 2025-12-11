@@ -9,9 +9,9 @@ instead you must use the [Tidewave CLI](https://github.com/tidewave-ai/tidewave_
 
 ## Devcontainers
 
-One popular solution for this is [Visual Studio Code's dev containers](https://code.visualstudio.com/docs/devcontainers/containers).
-To use Tidewave Web with devcontainers, download the latest `tidewave` CLI binary
-with `curl` or `wget` in a Terminal inside your container:
+One popular solution for this is [Visual Studio Code's dev containers](https://code.visualstudio.com/docs/devcontainers/containers). To use Tidewave Web with
+devcontainers, download the latest `tidewave` CLI binary with `curl` or `wget`
+in a Terminal inside your container:
 
 ```bash
 $ curl -sL -o tidewave https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-cli-aarch64-unknown-linux-musl
@@ -23,6 +23,18 @@ $ ./tidewave --port 9000
 In the example above, we use port 9000, in case you are also using the Tidewave App
 for other applications. If you don't have the Tidewave App installed in your desktop,
 you can skip the `--port` and use the default 9832.
+
+In case you want Tidewave up and running by default in your containers, you can update
+your `.devcontainer/devcontainer.json` with the following:
+
+```json
+{
+  ...
+  "postCreateCommand": "curl -sL -o /usr/local/bin/tidewave https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-cli-aarch64-unknown-linux-musl && chmod +x /usr/local/bin/tidewave",
+  "postStartCommand": "nohup tidewave --port 9000 > /tmp/tidewave.log 2>&1 &",
+  "forwardPorts": [9000]
+}
+```
 
 ## Build your own dev container
 
