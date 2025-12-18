@@ -1,8 +1,8 @@
-# React
+# Frontend
 
-Tidewave directly integrates with [React](https://react.dev). We can automatically detect React components on the page, [inspect them](inspector.md), and send their source location to the agent.
+Tidewave directly integrates with [React](https://react.dev) and [Vue](https://vuejs.org/). We can automatically detect React and Vue components on the page, [inspect them](inspector.md), and send their source location to the agent.
 
-This page describes running React within Django, Flask, FastAPI, Phoenix, and Rails applications. If you are using Next.js or using React with a backend as a service (such as Supabase) or non-officially supported frameworks, see the [Tidewave.js](http://github.com/tidewave-ai/tidewave_js) project.
+This page describes running React and Vue within Django, Flask, FastAPI, Phoenix, and Rails applications. If you are using Next.js or Vite exclusively, see the [Tidewave.js](http://github.com/tidewave-ai/tidewave_js) project.
 
 ## Requirements
 
@@ -10,7 +10,7 @@ For Tidewave to be capable of changing both your frontend and backend at once, y
 
 Additionally, if your backend (Django, Phoenix, Rails, etc) is the one serving your frontend, no further changes are necessary. However, if your frontend and backend are effectively two different servers in development running on different ports, you will need to proxy the `/tidewave` route in your frontend to your backend. Please see the steps below.
 
-Once set up, to verify it is all working as expected, you can [enable the Inspector on the top right](inspector.md) and then hover page elements defined by React components. By holding the `Ctrl` key (or `Cmd` key on macOS) while the inspector is enabled, a purple overlay will appear with the name of the containing React component. You may also click the element while `Ctrl` (or `Cmd`) are held and verify Tidewave will open up the appropriate React source location. See [the Inspector documentation](inspector.md) to learn more.
+Once set up, to verify it is all working as expected, you can [enable the Inspector on the top right](inspector.md) and then hover page elements defined by React/Vue components. By holding the `Ctrl` key (or `Cmd` key on macOS) while the inspector is enabled, a purple overlay will appear with the name of the container component. You may also click the element while `Ctrl` (or `Cmd`) are held and verify Tidewave will open up the appropriate React/Vue source file. See [the Inspector documentation](inspector.md) to learn more.
 
 ## Vite support
 
@@ -19,6 +19,7 @@ If your frontend and backend are served by two different hosts/ports, you must r
 ```javascript
 // https://vite.dev/config/
 export default defineConfig({
+  // Works react() and vue()
   plugins: [tailwindcss(), react()],
   server: {
     port: 3001, // your frontend port
@@ -31,7 +32,7 @@ export default defineConfig({
 
 Tidewave will also automatically detect error pages coming from Vite and present you with a tooltip for a one-click fix:
 
-<iframe width="640" height="360" src="https://www.youtube.com/embed/al_VaUWxK9I?si=eCUmP9YdzLa7TtgP" title="Tidewave autofix for Vite + React errors" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe width="640" height="360" src="https://www.youtube.com/embed/al_VaUWxK9I?si=eCUmP9YdzLa7TtgP" title="Tidewave autofix for Vite errors" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 If the error appears while Tidewave is testing your web application, Tidewave automatically feeds the error message and stacktrace to the agent.
 
