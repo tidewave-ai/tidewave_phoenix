@@ -8,11 +8,19 @@ You can find the inspector on the top right of your browser window. Once enabled
 
 ![Inspector example](assets/inspector.png)
 
-Once you click an element, the chat box will show an element is currently inspected:
+Once you click an element, it will be added as part of your prompt:
 
-<img src="assets/inspecting.png" alt="Update chat with inspected element" width="400px">
+<img src="assets/inspecting.png" alt="Prompt with inspected element" width="400px">
 
-If you send a message, Tidewave will include precise information about that element, such as its location on the page, part of its contents, as well as the server-side templates and client components involved in rendering the particular element.
+You can click multiple elements and ask multiple elements to be changed at once. Once you send the prompt, Tidewave will include precise information about that element, such as its location on the page, part of its contents, as well as the server-side templates and client components involved in rendering the particular element.
+
+## Depth-based inspector
+
+Sometimes you may want to select an element that is behind another element. To do so, simply right-click any position and Tidewave will open up a contextual menu with all DOM elements at the chosen point! Then you can either use the keyboard or the mouse to select the desired element:
+
+<img src="assets/depth-inspector.png" alt="Depth-based inspector" width="700px">
+
+In the screenshot above, after right-clicking the paragraph, a contextual menu appeared on the bottom right, which allows us to navigate all elements at that position.
 
 ## Framework overlay
 
@@ -25,6 +33,8 @@ Clicking the element while the `Ctrl` key (or `Cmd` key on macOS) are pressed wi
 ## Shortcuts
 
 The inspector supports the following shortcuts:
+
+* `Right-click`: enables a menu with all elements at the given position
 
 * `Ctrl+Click` or `Cmd+Click` (macOS): when hovering an element, you may Ctrl+Click it, and Tidewave will open up the element in your editor using your configured [editor integration](editors.md)
 
