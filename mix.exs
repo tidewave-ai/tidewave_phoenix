@@ -53,6 +53,7 @@ defmodule Tidewave.MixProject do
       {:circular_buffer, "~> 0.4 or ~> 1.0"},
       {:req, "~> 0.5"},
       {:phoenix_live_reload, ">= 1.6.1", optional: true},
+      {:phoenix_live_view, "~> 1.0", only: :test},
       {:igniter, "~> 0.6", optional: true},
       {:bandit, "~> 1.6", only: [:dev, :test]},
       {:ex_doc, ">= 0.0.0", only: :dev},
