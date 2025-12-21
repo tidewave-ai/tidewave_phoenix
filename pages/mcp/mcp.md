@@ -4,11 +4,13 @@ You can access some of Tidewave's features from your editor/agent via the Model 
 
 > #### Tidewave Web features {: .info}
 >
-> Tidewave MCP includes only a subset of Tidewave's features. In-browser agents, point-and-click prompting, Figma integration, and contextual browser testing are all parts of [Tidewave Web](https://tidewave.ai), and are available under the `/tidewave` route of your application. If you are using Tidewave Web, you don't need to configure the Tidewave MCP. That's done automatically for you.
+> Tidewave MCP includes only a subset of Tidewave's features. In-browser agents, point-and-click prompting, Figma integration, and more are all parts of [Tidewave Web](https://tidewave.ai). Furthermore, if you are using Tidewave Web, you don't need to configure the Tidewave MCP. That's done automatically for you.
 
 ## Editor/agent instructions
 
-We have specific instructions for:
+Add the Tidewave MCP server to your editor or MCP client configuration as the type "http" (streamable), pointing to the `/tidewave/mcp` path and port your web application is running at. For example, `http://localhost:4000/tidewave/mcp`.
+
+We also have specific instructions for:
 
   * [Claude Code](mcp_claude_code.md)
   * [Codex](mcp_codex.md)
@@ -18,12 +20,6 @@ We have specific instructions for:
   * [VS Code](mcp_vscode.md)
   * [Windsurf](mcp_windsurf.md)
   * [Zed](mcp_zed.md)
-
-## General instructions
-
-Add the Tidewave MCP server to your editor or MCP client configuration as the type "http" (streamable), pointing to the `/tidewave/mcp` path and port your web application is running at. For example, `http://localhost:4000/tidewave/mcp`.
-
-In case your tool of choice only supports "stdio" servers, you can use our MCP proxy (see below).
 
 ## Tips
 
@@ -53,3 +49,19 @@ Here is a baseline comparison of the tools supported by different frameworks/lan
 | `get_models` / `get_schemas` | ✅     | ✅       | ✅    |         | ✅      | ✅    |
 | `execute_sql_query`          | ✅     | ✅       | ✅    |         | ✅      | ✅    |
 | `search_package_docs`        |        |          |       |         | ✅      |       |
+
+## Tidewave MCP vs Language Server Protocol tools
+
+Some coding agents expose the [Language Server Protocol (LSP)](https://microsoft.github.io/language-server-protocol/) as tools to the agent. How does Tidewave MCP compare to those?
+
+The Language Server Protocol integration does provide benefits, such as the ability to read diagnostics and code actions when reading and editing a file. However, because LSP was designed for IDEs, many of its functionality are centered around FILE+LINE+COLUMN, which often means you cannot get information about a function or method unless your codebase already uses it.
+
+For example, imagine you ask your coding agent to use a function/method available in `some_library`. If `some_library` is not used anywhere in your codebase yet, the coding agent won't be able to read its docs or find its source, because there is no existing FILE+LINE+COLUMN the LSP could be pointed to.
+
+Tidewave MCP addresses this by using the notation of each programming language, which is familiar to developers and agents, to explore your codebase. For example, the Tidewave MCP for Ruby allows the agent to get the source location of any `Namespace::Class#instance_method`, the Tidewave MCP for JavaScript can read the documentation of `react:Component#render` as argument, and so on.
+
+Furthermore, Tidewave MCP was designed to perform runtime analysis, rather than static one. This is especially important in the context of web frameworks where meta-programming is often used to avoid repetitive work. For example, your web framework may automatically define models and properties based on your database tables, which often can't be find statically.
+
+Finally, commands to execute code or capture telemetry information within the runtime, such as `project_eval`, `execute_sql_query`, and `get_logs`, simply do not exist in LSP. In other words, Tidewave MCP is about the runtime intelligence of your applications.
+
+If you want use both, we recommend keeping the existing Tidewave MCP tools, and use LSP for diagnostics and symbol search (`workspaceSymbol` and `findReferences`).
