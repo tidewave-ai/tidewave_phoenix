@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.5.3 (2025-12-23)
+
+* Bug fixes
+  * Support flags and trailing spaces in CSP headers
+
 ## v0.5.2 (2025-11-22)
 
 * Bug fixes
