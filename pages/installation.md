@@ -12,7 +12,7 @@ To get started with Tidewave, download our desktop app:
 
 After installation, an icon should appear in your menu bar (top-right on macOS and Linux, bottom-right on Windows).
 
-We also offer a [CLI](#cli) if you are running your application remotely, inside containers, or other cases where the desktop application is not an option. If you are using Docker, read [our containers guide](../guides/containers.html).
+We also offer a [CLI](#cli) if you are running your application remotely, inside containers, or other cases where the desktop application is not an option. If you are using Docker, read [our containers guide](../guides/containers.md).
 
 ## Running Tidewave
 
@@ -28,7 +28,7 @@ Then you can put the address of your web application and Tidewave will connect t
 * [Tidewave for Next.js](https://github.com/tidewave-ai/tidewave_js#nextjs)
 * [Tidewave for Phoenix](https://github.com/tidewave-ai/tidewave_phoenix)
 * [Tidewave for Ruby on Rails](https://github.com/tidewave-ai/tidewave_rails)
-* [Tidewave for React](https://hexdocs.pm/tidewave/react.html)
+* [Tidewave for Vite](https://github.com/tidewave-ai/tidewave_js#vite)
 
 The Tidewave app will remain running on your menu bar (top right on macOS/Linux, bottom right on Windows), you can click it to open up, configure, and update Tidewave.
 
