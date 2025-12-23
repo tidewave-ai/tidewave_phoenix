@@ -29,7 +29,6 @@ defmodule Tidewave do
   @impl true
   def init(opts) do
     %{
-      allowed_origins: Keyword.get(opts, :allowed_origins, nil),
       allow_remote_access: Keyword.get(opts, :allow_remote_access, false),
       phoenix_endpoint: nil,
       team: Keyword.get(opts, :team, []),
