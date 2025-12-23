@@ -14,17 +14,16 @@ devcontainers, download the latest `tidewave` CLI binary with `curl` or `wget`
 in a Terminal inside your container:
 
 ```bash
-$ curl -sL -o tidewave https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-cli-aarch64-unknown-linux-musl
+$ curl -sL -o tidewave https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-cli-$(uname -m)-unknown-linux-musl
 $ chmod +x tidewave
 $ ./tidewave --port 9000
 2025-11-03T16:27:00.232551Z  INFO tidewave_core::server: HTTP server bound to 127.0.0.1:9001
 ```
 
-In the example above, we use port 9000, in case you are also using the Tidewave App
-for other applications. If you don't have the Tidewave App installed in your desktop,
-you can skip the `--port` and use the default 9832.
+In the example above, we run Tidewave on port 9000, in case you are also using the Tidewave App
+for other applications.
 
-In case you want Tidewave up and running by default in your containers, you can update
+If instead you want Tidewave up and running by default in your containers, you can update
 your `.devcontainer/devcontainer.json` with the following:
 
 ```json
@@ -35,6 +34,8 @@ your `.devcontainer/devcontainer.json` with the following:
   "forwardPorts": [9000]
 }
 ```
+
+You may need to change the Tidewave URL above to match your architecture. Consult our [Installation page](../installation.md#cli) for a complete listing of CLI versions per Operating System.
 
 ## Build your own dev container
 
