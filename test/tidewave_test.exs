@@ -245,22 +245,43 @@ defmodule TidewaveTest do
     assert conn.status == 200
   end
 
-  test "removes CSP and X-Frame-Options headers if set" do
+  test "removes X-Frame-Options headers if set" do
+    conn =
+      conn(:get, "/foo")
+      |> Plug.Conn.put_resp_header("x-frame-options", "DENY")
+      |> Tidewave.call(Tidewave.init([]))
+      |> Plug.Conn.send_resp(200, "foo")
+
+    assert Plug.Conn.get_resp_header(conn, "x-frame-options") == []
+  end
+
+  test "updates CSP header if set" do
     conn =
       conn(:get, "/foo")
       |> Plug.Conn.put_resp_header(
         "content-security-policy",
         "default-src 'self' http://example.com; connect-src 'none'; script-src 'self'; frame-ancestors 'none'"
       )
-      |> Plug.Conn.put_resp_header("x-frame-options", "DENY")
       |> Tidewave.call(Tidewave.init([]))
       |> Plug.Conn.send_resp(200, "foo")
 
     assert Plug.Conn.get_resp_header(conn, "content-security-policy") == [
              "default-src 'self' http://example.com; connect-src 'none'; script-src 'unsafe-eval' 'self'"
            ]
+  end
 
-    assert Plug.Conn.get_resp_header(conn, "x-frame-options") == []
+  test "updates CSP headers with flags and trailing space" do
+    conn =
+      conn(:get, "/foo")
+      |> Plug.Conn.put_resp_header(
+        "content-security-policy",
+        "upgrade-insecure-requests; script-src 'self'; frame-ancestors 'none';   "
+      )
+      |> Tidewave.call(Tidewave.init([]))
+      |> Plug.Conn.send_resp(200, "foo")
+
+    assert Plug.Conn.get_resp_header(conn, "content-security-policy") ==
+             ["upgrade-insecure-requests; script-src 'unsafe-eval' 'self'; "]
   end
 
   describe "/mcp" do

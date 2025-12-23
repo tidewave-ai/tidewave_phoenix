@@ -92,18 +92,19 @@ defmodule Tidewave do
 
     for policy_directive <- policy_directives,
         policy_directive = String.trim(policy_directive),
-        [policy, directives] = String.split(policy_directive, " ", parts: 2),
-        policy != "frame-ancestors" do
-      if policy == "script-src" do
-        case :binary.match(directives, "'unsafe-eval'") do
-          :nomatch ->
-            "#{policy} 'unsafe-eval' #{directives}"
+        not String.starts_with?(policy_directive, "frame-ancestors") do
+      case String.split(policy_directive, " ", parts: 2) do
+        ["script-src", directives] ->
+          case :binary.match(directives, "'unsafe-eval'") do
+            :nomatch -> "script-src 'unsafe-eval' #{directives}"
+            _ -> "script-src #{directives}"
+          end
 
-          _ ->
-            "#{policy} #{directives}"
-        end
-      else
-        "#{policy} #{directives}"
+        [policy, directives] ->
+          "#{policy} #{directives}"
+
+        [leftover] ->
+          leftover
       end
     end
     |> Enum.join("; ")
