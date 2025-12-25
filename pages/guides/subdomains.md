@@ -102,15 +102,12 @@ And make sure you are using `rack-session` version `2.1.0` or later.
 
 ### Phoenix
 
-Open up `lib/your_app_web/endpoint.ex` and add the following immediately `@session_options` definition:
+Open up `lib/your_app_web/endpoint.ex`, find the code block that says `if code_reloading? do`, and then add the following line at the top:
 
 ```elixir
-@session_options [
-  # ... your configuration
-]
-
 if code_reloading? do
   @session_options Keyword.merge(@session_options, same_site: "None", secure: true)
+  # here goes the remaining of the code reloading configuration
 end
 ```
 
