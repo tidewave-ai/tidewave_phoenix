@@ -7,6 +7,10 @@ automatically isolates Tidewave as well, this makes Tidewave simpler to containe
 Furthermore, when using Tidewave Web with containers, you must not use the desktop app,
 instead you must use the [Tidewave CLI](https://github.com/tidewave-ai/tidewave_app).
 
+> #### Matching hosts and ports {: .warning}
+>
+> When running your web application inside containers, you must ensure your application can be accessed using the same host and port inside and outside the container. For example, if your application is running at `localhost:3000` inside the container, then you must access it as `localhost:3000` outside the container as well.
+
 ## Devcontainers
 
 One popular solution for this is [Visual Studio Code's dev containers](https://code.visualstudio.com/docs/devcontainers/containers). To use Tidewave Web with
