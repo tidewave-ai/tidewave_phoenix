@@ -1,6 +1,6 @@
 # Setting up Tidewave MCP
 
-You can access some of Tidewave's features from your editor/agent via the Model Context Protocol (MCP).
+You can access some of Tidewave's features from your editor/agent via the Model Context Protocol (MCP). Our MCP integrates your coding agent directly with your framework runtime, allowing it to access logs, query the database, and run code within the context of your app.
 
 > #### Tidewave Web features {: .info}
 >
@@ -21,6 +21,20 @@ We also have specific instructions for:
   * [Windsurf](mcp_windsurf.md)
   * [Zed](mcp_zed.md)
 
+## Available tools
+
+Here is a baseline comparison of the tools supported by different frameworks/languages.
+
+| Features                     | Django | FastAPI | Flask | Next.js | Phoenix | Rails |
+| :--------------------------- | :----: | :-----: | :---: | :-----: | :-----: | :---: |
+| `project_eval`               | ✅     | ✅       | ✅    | ✅      | ✅      | ✅    |
+| `get_docs`                   | ✅     | ✅       | ✅    | ✅      | ✅      | ✅    |
+| `get_source_location`        | ✅     | ✅       | ✅    | ✅      | ✅      | ✅    |
+| `get_logs`                   | ✅     | ✅       | ✅    | ✅      | ✅      | ✅    |
+| `get_models` / `get_schemas` | ✅     | ✅       | ✅    |         | ✅      | ✅    |
+| `execute_sql_query`          | ✅     | ✅       | ✅    |         | ✅      | ✅    |
+| `search_package_docs`        |        |          |       |         | ✅      |       |
+
 ## Tips
 
 You may want to nudge your coding agent into using Tidewave MCP's capabilities more frequently by using rules, so you don't need to ask explicitly each time. Each editor places those rules at different locations, so make sure to consult their documentation.
@@ -35,20 +49,6 @@ find module/function definitions.
 ```
 
 From then on, your coding agent will automatically leverage Tidewave's deep framework integration without you having to explicitly ask. You can customize the rule to match your workflow.
-
-## Available tools
-
-Here is a baseline comparison of the tools supported by different frameworks/languages. Frameworks may support additional features.
-
-| Features                     | Django | FastAPI | Flask | Next.js | Phoenix | Rails |
-| :--------------------------- | :----: | :-----: | :---: | :-----: | :-----: | :---: |
-| `project_eval`               | ✅     | ✅       | ✅    | ✅      | ✅      | ✅    |
-| `get_docs`                   | ✅     | ✅       | ✅    | ✅      | ✅      | ✅    |
-| `get_source_location`        | ✅     | ✅       | ✅    | ✅      | ✅      | ✅    |
-| `get_logs`                   | ✅     | ✅       | ✅    | ✅      | ✅      | ✅    |
-| `get_models` / `get_schemas` | ✅     | ✅       | ✅    |         | ✅      | ✅    |
-| `execute_sql_query`          | ✅     | ✅       | ✅    |         | ✅      | ✅    |
-| `search_package_docs`        |        |          |       |         | ✅      |       |
 
 ## Tidewave MCP vs Language Server Protocol tools
 
