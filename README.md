@@ -2,7 +2,7 @@
 
 Tidewave is the coding agent for full-stack web app development, deeply integrated with Phoenix, from the database to the UI. [See our website](https://tidewave.ai) for more information.
 
-This project can also be used as a standalone Model Context Protocol (MCP) server for your editors.
+This project can also be used as [a standalone Model Context Protocol server](https://hexdocs.pm/tidewave/mcp.html).
 
 ## Installation
 
