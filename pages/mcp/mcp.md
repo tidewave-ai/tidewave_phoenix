@@ -25,15 +25,15 @@ We also have specific instructions for:
 
 Here is a baseline comparison of the tools supported by different frameworks/languages.
 
-| Features                     | Django | FastAPI | Flask | Next.js | Phoenix | Rails |
-| :--------------------------- | :----: | :-----: | :---: | :-----: | :-----: | :---: |
-| `project_eval`               | ✅     | ✅       | ✅    | ✅      | ✅      | ✅    |
-| `get_docs`                   | ✅     | ✅       | ✅    | ✅      | ✅      | ✅    |
-| `get_source_location`        | ✅     | ✅       | ✅    | ✅      | ✅      | ✅    |
-| `get_logs`                   | ✅     | ✅       | ✅    | ✅      | ✅      | ✅    |
-| `get_models` / `get_schemas` | ✅     | ✅       | ✅    |         | ✅      | ✅    |
-| `execute_sql_query`          | ✅     | ✅       | ✅    |         | ✅      | ✅    |
-| `search_package_docs`        |        |          |       |         | ✅      |       |
+| Features                     | Django | FastAPI | Flask | Next.js | Phoenix | Rails | TanStack Start |
+| :--------------------------- | :----: | :-----: | :---: | :-----: | :-----: | :---: | :------------: |
+| `project_eval`               | ✅     | ✅      | ✅    | ✅      | ✅      | ✅    | ✅             |
+| `get_docs`                   | ✅     | ✅      | ✅    | ✅      | ✅      | ✅    | ✅             |
+| `get_source_location`        | ✅     | ✅      | ✅    | ✅      | ✅      | ✅    | ✅             |
+| `get_logs`                   | ✅     | ✅      | ✅    | ✅      | ✅      | ✅    | ✅             |
+| `get_models` / `get_schemas` | ✅     | ✅      | ✅    |         | ✅      | ✅    |                |
+| `execute_sql_query`          | ✅     | ✅      | ✅    |         | ✅      | ✅    |                |
+| `search_package_docs`        |        |         |       |         | ✅      |       |                |
 
 ## Tips
 

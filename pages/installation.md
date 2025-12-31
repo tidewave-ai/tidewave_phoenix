@@ -28,6 +28,7 @@ Then you can put the address of your web application and Tidewave will connect t
 * [Tidewave for Next.js](https://github.com/tidewave-ai/tidewave_js#nextjs)
 * [Tidewave for Phoenix](https://github.com/tidewave-ai/tidewave_phoenix)
 * [Tidewave for Ruby on Rails](https://github.com/tidewave-ai/tidewave_rails)
+* [Tidewave for TanStack Start](https://github.com/tidewave-ai/tidewave_js#tanstack-start)
 * [Tidewave for Vite](https://github.com/tidewave-ai/tidewave_js#vite)
 
 The Tidewave app will remain running on your menu bar (top right on macOS/Linux, bottom right on Windows), you can click it to open up, configure, and update Tidewave.

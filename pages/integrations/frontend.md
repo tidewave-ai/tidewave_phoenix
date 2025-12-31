@@ -2,7 +2,7 @@
 
 Tidewave directly integrates with [React](https://react.dev) and [Vue](https://vuejs.org/). We can automatically detect React and Vue components on the page, [inspect them](inspector.md), and send their source location to the agent.
 
-This page describes running React and Vue within Django, Flask, FastAPI, Phoenix, and Rails applications. If you are using Next.js or Vite exclusively, see the [Tidewave.js](http://github.com/tidewave-ai/tidewave_js) project.
+This page describes running React and Vue within Django, Flask, FastAPI, Phoenix, and Rails applications. If you are using Next.js, TanStack Start, or Vite exclusively, see the [Tidewave.js](http://github.com/tidewave-ai/tidewave_js) project.
 
 ## Requirements
 
