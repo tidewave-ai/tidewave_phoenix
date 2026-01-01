@@ -40,7 +40,7 @@ $ tidewave --https-port 9833 --https-cert-path ./cert.pem --https-key-path ./key
 
 If you are using a proxy to enable HTTPS, we recommend using it to also proxy to Tidewave, so your application and Tidewave run in the same domain. The snippet below contains a sample Caddyfile that proxies `https://localhost:9833` to Tidewave running at `http://localhost:9832`.
 
-```
+```caddyfile
 https://localhost:9833 {
     # Uncommend if you want to use Caddy's own certificate
     # tls internal
