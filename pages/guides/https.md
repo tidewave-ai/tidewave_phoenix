@@ -1,10 +1,16 @@
 # HTTPS support
 
-If your application is running over HTTPS, you'll also need to configure the Tidewave App/CLI to expose its local server over HTTPS.
+If your application is running over HTTPS, you'll also need to configure the Tidewave App/CLI to expose its local server over HTTPS. There are three distinct ways to do so, depending on what tools you are using:
+
+1. Configure the Tidewave App
+2. Configure the Tidewave CLI
+3. Configure Caddy or your proxy
+
+Generally speaking, you want Tidewave and your application to run on the same host. Therefore, if you are running your server directly on localhost, you want to follow option 1 or 2. However, if you are using Caddy or a proxy to enable HTTPS, then you want them to also proxy to Tidewave itself.
 
 ## Configuring Tidewave App
 
-To do so, click on the Tidewave icon (top-right on macOS and Linux, bottom-right on Windows) and choose "Settings". It will open up a configuration file where you can add:
+If you are using the Tidewave App, click on the Tidewave icon (top-right on macOS and Linux, bottom-right on Windows) and choose "Settings". It will open up a configuration file where you can add:
 
 ```toml
 https_port = 9833
@@ -29,6 +35,24 @@ If you are using the Tidewave CLI, you can pass those values as options:
 ```shell
 $ tidewave --https-port 9833 --https-cert-path ./cert.pem --https-key-path ./key.pem
 ```
+
+## Configuring Caddy or a proxy
+
+If you are using a proxy to enable HTTPS, we recommend using it to also proxy to Tidewave, so your application and Tidewave run in the same domain. The snippet below contains a sample Caddyfile that proxies `https://localhost:9833` to Tidewave running at `http://localhost:9832`.
+
+```
+https://localhost:9833 {
+    # Uncommend if you want to use Caddy's own certificate
+    # tls internal
+
+    @hasOrigin header Origin https://localhost:9833
+    reverse_proxy http://localhost:9832 {
+        header_up @hasOrigin Origin "http://localhost:9832"
+    }
+}
+```
+
+If your app is running on `example.localhost`, you want to replace `localhost:9833` by `example.localhost:9833` in the snippet above. Also note that the Tidewave app checks the origin for security reasons, so you need to match and rewrite it accordingly.
 
 ## Troubleshooting
 
