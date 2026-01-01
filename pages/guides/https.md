@@ -45,14 +45,13 @@ https://localhost:9833 {
     # Uncommend if you want to use Caddy's own certificate
     # tls internal
 
-    @hasOrigin header Origin https://localhost:9833
     reverse_proxy http://localhost:9832 {
-        header_up @hasOrigin Origin "http://localhost:9832"
+        header_up Origin "https://localhost:9833" "http://localhost:9832"
     }
 }
 ```
 
-If your app is running on `example.localhost`, you want to replace `localhost:9833` by `example.localhost:9833` in the snippet above. Also note that the Tidewave app checks the origin for security reasons, so you need to match and rewrite it accordingly.
+If your app is running on `example.localhost`, you want to replace `localhost:9833` by `example.localhost:9833` in the snippet above. Also note that the Tidewave app checks the origin for security reasons, so we match and rewrite it accordingly.
 
 ## Troubleshooting
 
