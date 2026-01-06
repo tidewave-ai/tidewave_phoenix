@@ -20,7 +20,7 @@ https_key_path = "/path/to/key.pem"
 
 You can use your own certificates or generate one using:
 
-```
+```shell
 openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365 -nodes \
   -subj "/CN=localhost" \
   -addext "subjectAltName=DNS:localhost,IP:127.0.0.1"
@@ -55,20 +55,34 @@ If your app is running on `example.localhost`, you want to replace `localhost:98
 
 ## Troubleshooting
 
-When using Tidewave Web, three components are invoked:
+### Invalid certificate
+
+Tidewave Web is made of three components:
 
   * the Tidewave App/CLI
   * your web application
   * the browser
 
-The browser talks to the Tidewave App/CLI and your web application. If you can load Tidewave in the browser (such as `https://localhost:9833`) and your web application, then it means their web servers are running and accessible over HTTPS.
+The browser talks to the Tidewave App/CLI and your web application. If you can load Tidewave in the browser (such as `https://localhost:9833`) and your web application directly (say `https://localhost:4000`), then it means their web servers are running and accessible over HTTPS.
 
-However, the Tidewave App/CLI also needs to talk to your web application and it does so using the Operating System's trusted store. Therefore you need to install your web app certificate (the public .pem or .crt file) to your OS accordingly:
+However, when loading your web application inside Tidewave Web, the Tidewave App/CLI also needs to talk to your web application and it does so using the Operating System's trusted store. Therefore you need to install your web app certificate (the public .pem or .crt file) to your OS accordingly:
 
 * macOS: Keychain Access
 * Windows: Certificate Manager (certmgr.msc)
 * Linux: Usually /etc/ssl/certs/ or using update-ca-certificates
 
-And then restart the Tidewave App/CLI.
+After installed, make sure the certificates are marked as trusted. And then restart the Tidewave App/CLI.
 
 During Troubleshooting, you can use `curl` or `wget` to access your web application, as those tools also use the Operating System store. If they fail with certificate errors, Tidewave will likely experience the same issue.
+
+### Invalid name in certificate
+
+When generating a certificate, you must specify the name of the certificate. You must do so in two places, by passing the Common Name (CN) field to `subj`, and by passing `subjectAltName`, as shown below:
+
+```shell
+openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 365 -nodes \
+  -subj "/CN=localhost" \
+  -addext "subjectAltName=DNS:localhost,IP:127.0.0.1"
+```
+
+Certificates that specify only the Common Name (CN) are not considered valid by many HTTP clients. If your certificate does not have a `subjectAltName`, it won't work with Tidewave.
