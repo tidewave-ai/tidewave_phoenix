@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.5.4 (2026-01-06)
+
+* Bug fixes
+  * Add `bandit` as an optional dependency with `>= v1.10.1` to address deflate issue in Claude Code
+
 ## v0.5.3 (2025-12-23)
 
 * Bug fixes
