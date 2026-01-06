@@ -3,7 +3,7 @@ defmodule Tidewave.MixProject do
 
   @source_url "https://github.com/tidewave-ai/tidewave_phoenix"
   @homepage_url "https://tidewave.ai/"
-  @version "0.5.3"
+  @version "0.5.4"
 
   def project do
     [
@@ -52,9 +52,15 @@ defmodule Tidewave.MixProject do
       {:jason, "~> 1.4"},
       {:circular_buffer, "~> 0.4 or ~> 1.0"},
       {:req, "~> 0.5"},
-      {:phoenix_live_reload, ">= 1.6.1", optional: true},
       {:igniter, "~> 0.6", optional: true},
-      {:bandit, "~> 1.6", only: [:dev, :test]},
+
+      # We require v1.6.1 to detect if phoenix live reload is running too early or late
+      {:phoenix_live_reload, ">= 1.6.1", optional: true},
+
+      # We require v1.10.1 because previous versions had issues with deflate from Claude Code
+      {:bandit, ">= 1.10.1", optional: true},
+
+      # Dev deps
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:makeup_syntect, ">= 0.0.0", only: :dev}
     ]
