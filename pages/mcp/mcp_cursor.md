@@ -29,6 +29,6 @@ click "MCP" on the sidebar and follow the steps there.
 
 If your application uses a SQL database, you can verify it all works
 by asking it to run `SELECT 1` as database query.
-If it fails, check out [our MCP Troubleshooting guide](mcp_troubleshooting.md)
+If it fails, check out [our MCP Troubleshooting section](mcp.md#troubleshooting)
 or [Cursor's official docs](https://docs.cursor.com/context/model-context-protocol).
 

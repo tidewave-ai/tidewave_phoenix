@@ -6,7 +6,7 @@ You can use Tidewave MCP with [Claude Code](https://docs.anthropic.com/en/docs/a
 >
 > The instructions here are about connecting Tidewave MCP and Claude Code together. To use Tidewave Web (the one running in your browser) and Claude Code, please [read this guide](../integrations/claude_code.md).
 
-## Installation
+## Install
 
 Invoke the `claude` CLI to add `tidewave` using the HTTP transport:
 
@@ -16,7 +16,7 @@ $ claude mcp add --transport http tidewave http://localhost:$PORT/tidewave/mcp
 
 Where `$PORT` is the port your web application is running on. And you are good to go!
 
-## Troubleshooting
+## Verify
 
 You can verify the MCP connection is working by starting Claude Code and running the `/mcp` command. If the status is different from "✔ connected", please double check you are using the correct transport (SSE or HTTP) for your web framework as listed in the configuration above. If you see a 405 error, the root cause is most likely an incorrect transport.
 

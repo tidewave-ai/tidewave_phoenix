@@ -22,4 +22,4 @@ Where `$PORT` is the port your web application is running on.
 
 And you are good to go! If your application uses SQL database, you can verify
 it works by asking CodeCompanion/Avante to run `SELECT 1` as a database query.
-If it fails, check out [our MCP Troubleshooting guide](mcp_troubleshooting.md).
+If it fails, check out [our MCP Troubleshooting section](mcp.md#troubleshooting).

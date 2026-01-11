@@ -20,7 +20,6 @@ configure it.
 
 And then at the center top choose "+ Add MCP Server..." and follow one these steps:
 
-
 1. Choose "HTTP (HTTP or Server-Sent events)"
 
 2. Add the URL your web application is running on with `/tidewave/mcp` at the end, such as `http://localhost:$PORT/tidewave/mcp`, where `$PORT` is the port it is running on
@@ -30,4 +29,4 @@ And then at the center top choose "+ Add MCP Server..." and follow one these ste
 And you are good to go! Now the Copilot extension will list all tools from
 Tidewave available. If your application uses a SQL database, you can verify
 it all works by asking it to run `SELECT 1` as database query.
-If it fails, check out [our MCP Troubleshooting guide](mcp_troubleshooting.md).
+If it fails, check out [our MCP Troubleshooting section](mcp.md#troubleshooting).
