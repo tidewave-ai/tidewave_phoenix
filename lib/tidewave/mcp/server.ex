@@ -47,13 +47,7 @@ defmodule Tidewave.MCP.Server do
 
   defp tools() do
     {tools, _} = tools_and_dispatch()
-
-    for tool <- tools do
-      tool
-      |> Map.drop([:input_schema, :callback, :__struct__])
-      |> Map.put(:inputSchema, Tool.input_schema(tool))
-      |> Map.put(:description, String.trim(tool.description))
-    end
+    Enum.map(tools, &Tool.to_definition/1)
   end
 
   # A callback must return either

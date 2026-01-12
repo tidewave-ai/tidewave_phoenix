@@ -10,7 +10,9 @@ defmodule Tidewave.MCP.Tools.EctoTest do
       assert Enum.find(tools, &(&1.name == :get_ecto_schemas))
 
       assert execute_sql_query = Enum.find(tools, &(&1.name == :execute_sql_query))
-      Tool.input_schema(execute_sql_query)["properties"]["repo"]["description"] =~ "MockRepo"
+
+      Tool.to_definition(execute_sql_query).inputSchema["properties"]["repo"]["description"] =~
+        "MockRepo"
     end
   end
 
