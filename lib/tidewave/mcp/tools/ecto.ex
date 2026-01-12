@@ -67,25 +67,28 @@ defmodule Tidewave.MCP.Tools.Ecto do
     }
   end
 
+  def get_ecto_schemas_tool do
+    %Tidewave.MCP.Tool{
+      name: "get_ecto_schemas",
+      description: """
+      Lists all Ecto schema modules and their file path in the current project.
+
+      Use this tool to get an overview of available schemas if the project uses Ecto.
+      You should prefer this tool over grepping the file system when you need to find a specific schema.
+      """,
+      input_schema: fn params ->
+        []
+        |> Schemecto.new(params)
+      end,
+      callback: &__MODULE__.get_ecto_schemas/2
+    }
+  end
+
   def tools do
     if repos_configured?() do
       [
         execute_sql_query_tool(),
-        %{
-          name: "get_ecto_schemas",
-          description: """
-          Lists all Ecto schema modules and their file path in the current project.
-
-          Use this tool to get an overview of available schemas if the project uses Ecto.
-          You should prefer this tool over grepping the file system when you need to find a specific schema.
-          """,
-          inputSchema: %{
-            type: "object",
-            required: [],
-            properties: %{}
-          },
-          callback: &get_ecto_schemas/1
-        }
+        get_ecto_schemas_tool()
       ]
     else
       []
@@ -123,12 +126,12 @@ defmodule Tidewave.MCP.Tools.Ecto do
     end
   end
 
-  def get_ecto_schemas(_args) do
+  def get_ecto_schemas(_args, assigns) do
     schemas =
       for module <- project_modules(),
           Code.ensure_loaded?(module),
           function_exported?(module, :__changeset__, 0) do
-        case Source.get_source_location(%{"reference" => inspect(module)}) do
+        case Source.get_source_location(%{reference: inspect(module)}, assigns) do
           {:ok, source_location} ->
             "* #{inspect(module)} at #{source_location}"
 

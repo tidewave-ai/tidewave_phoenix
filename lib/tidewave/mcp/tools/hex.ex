@@ -3,75 +3,73 @@ defmodule Tidewave.MCP.Tools.Hex do
 
   require Logger
 
+  def search_package_docs_tool do
+    %Tidewave.MCP.Tool{
+      name: "search_package_docs",
+      description: """
+      Searches Hex documentation for the project's dependencies or a list of packages.
+
+      If you're trying to get documentation for a specific module or function, first try the `project_eval` tool with the `h` helper.
+      """,
+      input_schema: fn params ->
+        [
+          %{
+            name: :q,
+            type: :string,
+            description: "The search query"
+          },
+          %{
+            name: :packages,
+            type: {:array, :string},
+            description: """
+            Optional. The list of package names to filter the search results, e.g. ['phoenix'].
+            If not provided, the search will be performed on all dependencies of the project, which is a good default.
+            """,
+            default: []
+          }
+        ]
+        |> Schemecto.new(params)
+        |> Ecto.Changeset.validate_required([:q])
+      end,
+      callback: &__MODULE__.search_package_docs/2
+    }
+  end
+
   def tools do
     [
-      %{
-        name: "search_package_docs",
-        description: """
-        Searches Hex documentation for the project's dependencies or a list of packages.
-
-        If you're trying to get documentation for a specific module or function, first try the `project_eval` tool with the `h` helper.
-        """,
-        inputSchema: %{
-          type: "object",
-          required: ["q"],
-          properties: %{
-            q: %{
-              type: "string",
-              description: "The search query"
-            },
-            packages: %{
-              type: "array",
-              items: %{
-                type: "string"
-              },
-              description: """
-              Optional. The list of package names to filter the search results, e.g. ['phoenix'].
-              If not provided, the search will be performed on all dependencies of the project, which is a good default.
-              """
-            }
-          }
-        },
-        callback: &search_package_docs/1
-      }
+      search_package_docs_tool()
     ]
   end
 
-  def search_package_docs(args) do
-    case args do
-      %{"q" => q} ->
-        filter_by =
-          case args["packages"] do
-            p when p in [nil, []] ->
-              filter_from_mix_lock()
+  def search_package_docs(%{q: q, packages: packages}, _assigns) do
+    filter_by =
+      case packages do
+        p when p in [nil, []] ->
+          filter_from_mix_lock()
 
-            packages ->
-              filter_from_packages(packages)
-          end
+        packages ->
+          filter_from_packages(packages)
+      end
 
-        # Build query params
-        query_params = %{
-          q: q,
-          query_by: "doc,title",
-          filter_by: filter_by
-        }
+    # Build query params
+    query_params = %{
+      q: q,
+      query_by: "doc,title",
+      filter_by: filter_by
+    }
 
-        # Make the HTTP request with Req
-        opts = Keyword.merge(req_opts(), params: query_params)
+    # Make the HTTP request with Req
+    opts = Keyword.merge(req_opts(), params: query_params)
 
-        case Req.get("https://search.hexdocs.pm/", opts) do
-          {:ok, %{status: 200, body: body}} ->
-            {:ok, format_results(body)}
+    case Req.get("https://search.hexdocs.pm/", opts) do
+      {:ok, %{status: 200, body: body}} ->
+        {:ok, format_results(body)}
 
-          {:ok, %{status: status, body: body}} ->
-            {:error, "HTTP error #{status} - #{inspect(body)}"}
+      {:ok, %{status: status, body: body}} ->
+        {:error, "HTTP error #{status} - #{inspect(body)}"}
 
-          {:error, reason} ->
-            {:error, "Request failed\n\n#{inspect(reason)}"}
-        end
-
-      _ ->
-        {:error, :invalid_arguments}
+      {:error, reason} ->
+        {:error, "Request failed\n\n#{inspect(reason)}"}
     end
   end
 

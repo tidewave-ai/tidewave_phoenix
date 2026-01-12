@@ -121,7 +121,8 @@ defmodule Tidewave.MCP.Tools.EctoTest do
 
   describe "get_ecto_schemas/1" do
     test "returns list of Ecto schema modules and their file path" do
-      assert {:error, "No Ecto schemas found in the project"} = Ecto.get_ecto_schemas(%{})
+      assert {:error, "No Ecto schemas found in the project"} =
+               Tool.dispatch(Ecto.get_ecto_schemas_tool(), %{}, Tidewave.init([]))
 
       {:module, _, bin, _} =
         defmodule Elixir.TestSchema do
@@ -137,7 +138,7 @@ defmodule Tidewave.MCP.Tools.EctoTest do
         File.rm("#{compile_path}/Elixir.TestSchema.beam")
       end)
 
-      {:ok, text} = Ecto.get_ecto_schemas(%{})
+      {:ok, text} = Tool.dispatch(Ecto.get_ecto_schemas_tool(), %{}, Tidewave.init([]))
       assert text == "* TestSchema at test/mcp/tools/ecto_test.exs"
     end
   end

@@ -1,6 +1,7 @@
 defmodule Tidewave.MCP.Tools.HexTest do
   use ExUnit.Case, async: true
 
+  alias Tidewave.MCP.Tool
   alias Tidewave.MCP.Tools.Hex
 
   setup do
@@ -28,7 +29,12 @@ defmodule Tidewave.MCP.Tools.HexTest do
         })
       end)
 
-      assert {:ok, result} = Hex.search_package_docs(%{"q" => "controller"})
+      assert {:ok, result} =
+               Tool.dispatch(
+                 Hex.search_package_docs_tool(),
+                 %{"q" => "controller"},
+                 Tidewave.init([])
+               )
 
       assert result == """
              Results: 1
@@ -67,10 +73,14 @@ defmodule Tidewave.MCP.Tools.HexTest do
       end)
 
       assert {:ok, _} =
-               Hex.search_package_docs(%{
-                 "q" => "controller",
-                 "packages" => ["phoenix"]
-               })
+               Tool.dispatch(
+                 Hex.search_package_docs_tool(),
+                 %{
+                   "q" => "controller",
+                   "packages" => ["phoenix"]
+                 },
+                 Tidewave.init([])
+               )
     end
   end
 end
