@@ -4,7 +4,7 @@ defmodule Tidewave.MCP.Server do
   require Logger
 
   import Plug.Conn
-  alias Tidewave.MCP.Tools
+  alias Tidewave.MCP.{Tool, Tools}
 
   @protocol_version "2025-03-26"
   @vsn Mix.Project.config()[:version]
@@ -28,7 +28,7 @@ defmodule Tidewave.MCP.Server do
 
     dispatch_map =
       Map.new(tools, fn tool ->
-        {Atom.to_string(tool.name), {tool.input_schema, tool.callback}}
+        {Atom.to_string(tool.name), Tool.to_storage(tool)}
       end)
 
     # TODO: switch back to persistent_term when we don't support OTP 27 any more
@@ -49,17 +49,10 @@ defmodule Tidewave.MCP.Server do
     {tools, _} = tools_and_dispatch()
 
     for tool <- tools do
-      case tool do
-        %{input_schema: fun} when is_function(fun, 1) ->
-          tool
-          |> Map.delete(:input_schema)
-          |> Map.put(:inputSchema, Schemecto.to_json_schema(fun.(nil)))
-
-        %{} ->
-          tool
-      end
+      tool
+      |> Map.drop([:input_schema, :callback, :__struct__])
+      |> Map.put(:inputSchema, Tool.input_schema(tool))
       |> Map.put(:description, String.trim(tool.description))
-      |> Map.drop([:callback, :__struct__])
     end
   end
 
@@ -76,15 +69,8 @@ defmodule Tidewave.MCP.Server do
     {_tools, dispatch} = tools_and_dispatch()
 
     case dispatch do
-      %{^name => {schema, callback}} when is_function(callback, 2) ->
-        with {:ok, args} <- maybe_apply_args(schema, args) do
-          callback.(args, assigns)
-        end
-
-      %{^name => {schema, callback}} when is_function(callback, 1) ->
-        with {:ok, args} <- maybe_apply_args(schema, args) do
-          callback.(args)
-        end
+      %{^name => stored_tool} ->
+        Tool.dispatch(stored_tool, args, assigns)
 
       _ ->
         {:error,
@@ -93,18 +79,6 @@ defmodule Tidewave.MCP.Server do
            message: "Method not found",
            data: %{name: name}
          }}
-    end
-  end
-
-  defp maybe_apply_args(nil, args), do: {:ok, args}
-
-  defp maybe_apply_args(fun, args) do
-    changeset = fun.(args)
-
-    if changeset.valid? do
-      {:ok, Ecto.Changeset.apply_changes(changeset)}
-    else
-      {:error, %{code: -32602, message: "Invalid arguments for tool"}}
     end
   end
 
@@ -183,6 +157,16 @@ defmodule Tidewave.MCP.Server do
   end
 
   defp result_or_error(request_id, {:error, :invalid_arguments}) do
+    {:error,
+     %{
+       jsonrpc: "2.0",
+       id: request_id,
+       error: %{code: -32602, message: "Invalid arguments for tool"}
+     }}
+  end
+
+  # TODO: This should be moved inside the tool somehow
+  defp result_or_error(request_id, {:error, %Ecto.Changeset{}}) do
     {:error,
      %{
        jsonrpc: "2.0",
