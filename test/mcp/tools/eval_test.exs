@@ -30,6 +30,7 @@ defmodule Tidewave.MCP.Tools.EvalTest do
 
       assert {:ok, error} =
                Tool.dispatch(Eval.project_eval_tool(), %{"code" => code}, Tidewave.init([]))
+
       assert error =~ "ArithmeticError"
       assert error =~ "bad argument in arithmetic expression"
     end

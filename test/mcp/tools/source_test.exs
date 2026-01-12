@@ -23,6 +23,7 @@ defmodule Tidewave.MCP.Tools.SourceTest do
           %{"reference" => "Tidewave"},
           Tidewave.init([])
         )
+
       assert {:ok, text} = result
       assert text =~ "tidewave.ex"
     end
@@ -34,6 +35,7 @@ defmodule Tidewave.MCP.Tools.SourceTest do
           %{"reference" => "Enum"},
           Tidewave.init([])
         )
+
       assert message =~ "Cannot get source of core libraries"
     end
 
