@@ -2,27 +2,29 @@ defmodule Tidewave.MCP.Tools.Logs do
   @moduledoc false
 
   def get_logs_tool do
+    schema = [
+      %{
+        name: :tail,
+        type: :integer,
+        description: "The number of log entries to return from the end of the log"
+      },
+      %{
+        name: :grep,
+        type: :string,
+        description:
+          "Filter logs with the given regular expression (case insensitive). E.g. \"error\" when you want to capture errors in particular"
+      }
+    ]
+
     %Tidewave.MCP.Tool{
-      name: "get_logs",
+      name: :get_logs,
       description: """
       Returns all log output, excluding logs that were caused by other tool calls.
 
       Use this tool to check for request logs or potentially logged errors.
       """,
       input_schema: fn params ->
-        [
-          %{
-            name: :tail,
-            type: :integer,
-            description: "The number of log entries to return from the end of the log"
-          },
-          %{
-            name: :grep,
-            type: :string,
-            description:
-              "Filter logs with the given regular expression (case insensitive). E.g. \"error\" when you want to capture errors in particular"
-          }
-        ]
+        schema
         |> Schemecto.new(params)
         |> Ecto.Changeset.validate_required([:tail])
       end,

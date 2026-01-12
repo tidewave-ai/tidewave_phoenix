@@ -7,9 +7,9 @@ defmodule Tidewave.MCP.Tools.EctoTest do
   describe "tools/0" do
     test "returns list of tools when repos are configured" do
       assert tools = Ecto.tools()
-      assert Enum.find(tools, &(&1.name == "get_ecto_schemas"))
+      assert Enum.find(tools, &(&1.name == :get_ecto_schemas))
 
-      assert execute_sql_query = Enum.find(tools, &(&1.name == "execute_sql_query"))
+      assert execute_sql_query = Enum.find(tools, &(&1.name == :execute_sql_query))
       Tool.input_schema(execute_sql_query)["properties"]["repo"]["description"] =~ "MockRepo"
     end
   end

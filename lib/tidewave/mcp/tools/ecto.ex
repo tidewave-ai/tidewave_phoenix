@@ -12,8 +12,41 @@ defmodule Tidewave.MCP.Tools.Ecto do
 
     default_repo = List.first(repos)
 
+    schema = [
+      %{
+        name: :repo,
+        type: :string,
+        description: """
+        The module name of the Ecto repository to use.
+
+        The available repositories are:
+
+        #{Jason.encode!(repos, pretty: true)}
+
+        If no repository is specified, the first repository is used:
+
+        #{Jason.encode!(default_repo, pretty: true)}
+        """
+      },
+      %{
+        name: :query,
+        type: :string,
+        description: """
+        The SQL query to execute. Parameters can be passed using the appropriate database syntax,
+        such as $1, $2, for PostgreSQL, ? for MySQL, and so on
+        """
+      },
+      %{
+        name: :arguments,
+        type: {:array, :any},
+        description:
+          "The arguments to pass to the query. The query must contain corresponding parameters",
+        default: []
+      }
+    ]
+
     %Tidewave.MCP.Tool{
-      name: "execute_sql_query",
+      name: :execute_sql_query,
       description: """
       Executes the given SQL query against the given default or specified Ecto repository.
       Returns the result as an Elixir data structure.
@@ -28,38 +61,7 @@ defmodule Tidewave.MCP.Tools.Ecto do
       in PostgreSQL or using `BIN_TO_UUID(column)` on databases like MySQL.
       """,
       input_schema: fn params ->
-        [
-          %{
-            name: :repo,
-            type: :string,
-            description: """
-            The module name of the Ecto repository to use.
-
-            The available repositories are:
-
-            #{Jason.encode!(repos, pretty: true)}
-
-            If no repository is specified, the first repository is used:
-
-            #{Jason.encode!(default_repo, pretty: true)}
-            """
-          },
-          %{
-            name: :query,
-            type: :string,
-            description: """
-            The SQL query to execute. Parameters can be passed using the appropriate database syntax,
-            such as $1, $2, for PostgreSQL, ? for MySQL, and so on
-            """
-          },
-          %{
-            name: :arguments,
-            type: {:array, :any},
-            description:
-              "The arguments to pass to the query. The query must contain corresponding parameters",
-            default: []
-          }
-        ]
+        schema
         |> Schemecto.new(params)
         |> Ecto.Changeset.validate_required([:query])
       end,
@@ -69,7 +71,7 @@ defmodule Tidewave.MCP.Tools.Ecto do
 
   def get_ecto_schemas_tool do
     %Tidewave.MCP.Tool{
-      name: "get_ecto_schemas",
+      name: :get_ecto_schemas,
       description: """
       Lists all Ecto schema modules and their file path in the current project.
 
@@ -77,8 +79,7 @@ defmodule Tidewave.MCP.Tools.Ecto do
       You should prefer this tool over grepping the file system when you need to find a specific schema.
       """,
       input_schema: fn params ->
-        []
-        |> Schemecto.new(params)
+        Schemecto.new([], params)
       end,
       callback: &__MODULE__.get_ecto_schemas/2
     }

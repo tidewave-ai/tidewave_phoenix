@@ -4,8 +4,17 @@ defmodule Tidewave.MCP.Tools.Source do
   alias Tidewave.MCP
 
   def get_source_location_tool do
+    schema = [
+      %{
+        name: :reference,
+        type: :string,
+        description:
+          "The reference to get source location for. Can be a module name, a Module.function or Module.function/arity."
+      }
+    ]
+
     %Tidewave.MCP.Tool{
-      name: "get_source_location",
+      name: :get_source_location,
       description: """
       Returns the source location for the given reference.
 
@@ -18,14 +27,7 @@ defmodule Tidewave.MCP.Tools.Source do
       You can also use "dep:PACKAGE_NAME" to get the location of a specific dependency package.
       """,
       input_schema: fn params ->
-        [
-          %{
-            name: :reference,
-            type: :string,
-            description:
-              "The reference to get source location for. Can be a module name, a Module.function or Module.function/arity."
-          }
-        ]
+        schema
         |> Schemecto.new(params)
         |> Ecto.Changeset.validate_required([:reference])
       end,
@@ -34,8 +36,17 @@ defmodule Tidewave.MCP.Tools.Source do
   end
 
   def get_docs_tool do
+    schema = [
+      %{
+        name: :reference,
+        type: :string,
+        description:
+          "The reference to get documentation for. Can be a module name, a Module.function or Module.function/arity."
+      }
+    ]
+
     %Tidewave.MCP.Tool{
-      name: "get_docs",
+      name: :get_docs,
       description: """
       Returns the documentation for the given reference.
 
@@ -44,14 +55,7 @@ defmodule Tidewave.MCP.Tools.Source do
       You may also prepend a "c:" to the reference to get docs for a callback.
       """,
       input_schema: fn params ->
-        [
-          %{
-            name: :reference,
-            type: :string,
-            description:
-              "The reference to get documentation for. Can be a module name, a Module.function or Module.function/arity."
-          }
-        ]
+        schema
         |> Schemecto.new(params)
         |> Ecto.Changeset.validate_required([:reference])
       end,

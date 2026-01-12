@@ -11,7 +11,7 @@ defmodule Tidewave.MCP.Tools.LogsTest do
 
       assert is_list(tools)
       assert length(tools) == 1
-      assert Enum.any?(tools, &(&1.name == "get_logs"))
+      assert Enum.any?(tools, &(&1.name == :get_logs))
     end
   end
 

@@ -4,30 +4,32 @@ defmodule Tidewave.MCP.Tools.Hex do
   require Logger
 
   def search_package_docs_tool do
+    schema = [
+      %{
+        name: :q,
+        type: :string,
+        description: "The search query"
+      },
+      %{
+        name: :packages,
+        type: {:array, :string},
+        description: """
+        Optional. The list of package names to filter the search results, e.g. ['phoenix'].
+        If not provided, the search will be performed on all dependencies of the project, which is a good default.
+        """,
+        default: []
+      }
+    ]
+
     %Tidewave.MCP.Tool{
-      name: "search_package_docs",
+      name: :search_package_docs,
       description: """
       Searches Hex documentation for the project's dependencies or a list of packages.
 
       If you're trying to get documentation for a specific module or function, first try the `project_eval` tool with the `h` helper.
       """,
       input_schema: fn params ->
-        [
-          %{
-            name: :q,
-            type: :string,
-            description: "The search query"
-          },
-          %{
-            name: :packages,
-            type: {:array, :string},
-            description: """
-            Optional. The list of package names to filter the search results, e.g. ['phoenix'].
-            If not provided, the search will be performed on all dependencies of the project, which is a good default.
-            """,
-            default: []
-          }
-        ]
+        schema
         |> Schemecto.new(params)
         |> Ecto.Changeset.validate_required([:q])
       end,

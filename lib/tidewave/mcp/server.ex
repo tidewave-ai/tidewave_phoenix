@@ -27,7 +27,9 @@ defmodule Tidewave.MCP.Server do
     tools = raw_tools()
 
     dispatch_map =
-      Map.new(tools, fn tool -> {tool.name, {Map.get(tool, :input_schema), tool.callback}} end)
+      Map.new(tools, fn tool ->
+        {Atom.to_string(tool.name), {tool.input_schema, tool.callback}}
+      end)
 
     # TODO: switch back to persistent_term when we don't support OTP 27 any more
     # :persistent_term.put({__MODULE__, :tools_and_dispatch}, {tools, dispatch_map})

@@ -6,8 +6,35 @@ defmodule Tidewave.MCP.Tools.Eval do
   alias Tidewave.MCP.IOForwardGL
 
   def project_eval_tool do
+    schema = [
+      %{
+        name: :code,
+        type: :string,
+        description: "The Elixir code to evaluate"
+      },
+      %{
+        name: :arguments,
+        type: {:array, :any},
+        description:
+          "The arguments to pass to evaluation. They are available inside the evaluated code as `arguments`",
+        default: []
+      },
+      %{
+        name: :timeout,
+        type: :integer,
+        description:
+          "Optional. The maximum time to wait for execution, in milliseconds. Defaults to `30_000`",
+        default: 30_000
+      },
+      %{
+        name: :json,
+        type: :boolean,
+        default: false
+      }
+    ]
+
     %Tidewave.MCP.Tool{
-      name: "project_eval",
+      name: :project_eval,
       description: """
       Evaluates Elixir code in the context of the project.
 
@@ -23,32 +50,7 @@ defmodule Tidewave.MCP.Tools.Eval do
       `exports(String)`.
       """,
       input_schema: fn params ->
-        [
-          %{
-            name: :code,
-            type: :string,
-            description: "The Elixir code to evaluate"
-          },
-          %{
-            name: :arguments,
-            type: {:array, :any},
-            description:
-              "The arguments to pass to evaluation. They are available inside the evaluated code as `arguments`",
-            default: []
-          },
-          %{
-            name: :timeout,
-            type: :integer,
-            description:
-              "Optional. The maximum time to wait for execution, in milliseconds. Defaults to `30_000`",
-            default: 30_000
-          },
-          %{
-            name: :json,
-            type: :boolean,
-            default: false
-          }
-        ]
+        schema
         |> Schemecto.new(params)
         |> Ecto.Changeset.validate_required([:code])
       end,
