@@ -32,12 +32,6 @@ defmodule Tidewave.MCP.Tools.Logs do
     }
   end
 
-  def tools do
-    [
-      get_logs_tool()
-    ]
-  end
-
   def get_logs(%{tail: n} = args, _assigns) do
     grep = Map.get(args, :grep)
     {:ok, Enum.join(Tidewave.MCP.Logger.get_logs(n, grep), "\n")}

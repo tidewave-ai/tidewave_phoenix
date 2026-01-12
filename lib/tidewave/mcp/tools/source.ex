@@ -63,13 +63,6 @@ defmodule Tidewave.MCP.Tools.Source do
     }
   end
 
-  def tools do
-    [
-      get_source_location_tool(),
-      get_docs_tool()
-    ]
-  end
-
   def get_source_location(%{reference: "dep:" <> package}, _assigns) do
     path =
       try do

@@ -58,12 +58,6 @@ defmodule Tidewave.MCP.Tools.Eval do
     }
   end
 
-  def tools do
-    [
-      project_eval_tool()
-    ]
-  end
-
   @doc """
   Evaluates Elixir code using Code.eval_string/2.
 

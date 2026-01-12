@@ -5,16 +5,6 @@ defmodule Tidewave.MCP.Tools.LogsTest do
   alias Tidewave.MCP.Tool
   alias Tidewave.MCP.Tools.Logs
 
-  describe "tools/0" do
-    test "returns list of available tools" do
-      tools = Logs.tools()
-
-      assert is_list(tools)
-      assert length(tools) == 1
-      assert Enum.any?(tools, &(&1.name == :get_logs))
-    end
-  end
-
   describe "get_logs/2" do
     @tag :capture_log
     test "returns the logged content" do

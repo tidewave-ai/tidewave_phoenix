@@ -37,12 +37,6 @@ defmodule Tidewave.MCP.Tools.Hex do
     }
   end
 
-  def tools do
-    [
-      search_package_docs_tool()
-    ]
-  end
-
   def search_package_docs(%{q: q, packages: packages}, _assigns) do
     filter_by =
       case packages do

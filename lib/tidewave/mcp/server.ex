@@ -12,14 +12,14 @@ defmodule Tidewave.MCP.Server do
   ## Tool management functions
 
   defp raw_tools do
-    [
-      Tools.Logs.tools(),
-      Tools.Source.tools(),
-      Tools.Eval.tools(),
-      Tools.Ecto.tools(),
-      Tools.Hex.tools()
-    ]
-    |> List.flatten()
+    Tools.Ecto.tools() ++
+      [
+        Tools.Eval.project_eval_tool(),
+        Tools.Hex.search_package_docs_tool(),
+        Tools.Logs.get_logs_tool(),
+        Tools.Source.get_source_location_tool(),
+        Tools.Source.get_docs_tool()
+      ]
   end
 
   @doc false
