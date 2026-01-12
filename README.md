@@ -113,6 +113,29 @@ The following options are available:
 
   * `:team` - set your Tidewave Team configuration, such as `team: [id: "my-company"]`
 
+## Available tools
+
+- `execute_sql_query` - executes a SQL query within your application
+  database, useful for the agent to verify the result of an action
+
+- `get_docs` - get the documentation for a given module/function.
+  It consults the exact versions used by the project, ensuring you always
+  get correct information
+
+- `get_logs` - reads logs written by the server
+
+- `get_models` - lists all modules in the application and their location
+  for quick discovery
+
+- `get_source_location` - get the source location for a given module/function,
+  so an agent can directly read the source skipping search
+
+- `project_eval` - evaluates code within the your application itself, giving the agent
+  access to your runtime, dependencies, and in-memory data
+
+- `search_package_docs` - runs a search on https://hexdocs.pm/ filtered to the exact
+  dependencies in this project
+
 ## License
 
 Copyright (c) 2025 Dashbit
