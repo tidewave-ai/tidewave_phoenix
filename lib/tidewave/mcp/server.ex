@@ -25,7 +25,9 @@ defmodule Tidewave.MCP.Server do
   @doc false
   def init_tools do
     tools = raw_tools()
-    dispatch_map = Map.new(tools, fn tool -> {tool.name, tool.callback} end)
+
+    dispatch_map =
+      Map.new(tools, fn tool -> {tool.name, {Map.get(tool, :input_schema), tool.callback}} end)
 
     # TODO: switch back to persistent_term when we don't support OTP 27 any more
     # :persistent_term.put({__MODULE__, :tools_and_dispatch}, {tools, dispatch_map})
@@ -45,9 +47,17 @@ defmodule Tidewave.MCP.Server do
     {tools, _} = tools_and_dispatch()
 
     for tool <- tools do
-      tool
+      case tool do
+        %{input_schema: fun} when is_function(fun, 1) ->
+          tool
+          |> Map.delete(:input_schema)
+          |> Map.put(:inputSchema, Schemecto.to_json_schema(fun.(nil)))
+
+        %{} ->
+          tool
+      end
       |> Map.put(:description, String.trim(tool.description))
-      |> Map.drop([:callback])
+      |> Map.drop([:callback, :__struct__])
     end
   end
 
@@ -64,21 +74,35 @@ defmodule Tidewave.MCP.Server do
     {_tools, dispatch} = tools_and_dispatch()
 
     case dispatch do
-      %{^name => callback} when is_function(callback, 2) ->
-        callback.(args, assigns)
+      %{^name => {schema, callback}} when is_function(callback, 2) ->
+        with {:ok, args} <- maybe_apply_args(schema, args) do
+          callback.(args, assigns)
+        end
 
-      %{^name => callback} when is_function(callback, 1) ->
-        callback.(args)
+      %{^name => {schema, callback}} when is_function(callback, 1) ->
+        with {:ok, args} <- maybe_apply_args(schema, args) do
+          callback.(args)
+        end
 
       _ ->
         {:error,
          %{
            code: -32601,
            message: "Method not found",
-           data: %{
-             name: name
-           }
+           data: %{name: name}
          }}
+    end
+  end
+
+  defp maybe_apply_args(nil, args), do: {:ok, args}
+
+  defp maybe_apply_args(fun, args) do
+    changeset = fun.(args)
+
+    if changeset.valid? do
+      {:ok, Ecto.Changeset.apply_changes(changeset)}
+    else
+      {:error, %{code: -32602, message: "Invalid arguments for tool"}}
     end
   end
 

@@ -52,6 +52,7 @@ defmodule Tidewave.MixProject do
       {:jason, "~> 1.4"},
       {:circular_buffer, "~> 0.4 or ~> 1.0"},
       {:req, "~> 0.5"},
+      {:schemecto, github: "josevalim/schemecto"},
       {:igniter, "~> 0.6", optional: true},
 
       # We require v1.6.1 to detect if phoenix live reload is running too early or late
