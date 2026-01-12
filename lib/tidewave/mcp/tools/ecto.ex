@@ -4,66 +4,73 @@ defmodule Tidewave.MCP.Tools.Ecto do
   alias Tidewave.MCP.Tools.Source
   @limit 50
 
+  def execute_sql_query_tool do
+    repos =
+      Enum.map(ecto_repos(), fn repo ->
+        %{repo: inspect(repo), adapter: inspect(repo.__adapter__())}
+      end)
+
+    default_repo = List.first(repos)
+
+    %Tidewave.MCP.Tool{
+      name: "execute_sql_query",
+      description: """
+      Executes the given SQL query against the given default or specified Ecto repository.
+      Returns the result as an Elixir data structure.
+
+      Note that the output is limited to #{@limit} rows at a time. If you need to see more,
+      perform additional calls using LIMIT and OFFSET in the query. If you know that only
+      specific columns are relevant, only include those in the SELECT clause.
+
+      You can use this tool to introspect the database, select and manipulate user data.
+      Keep in mind data is returned in a low-level representation. For example, UUIDs are
+      16-byte binaries. If you run into issues, you may want to cast them, such as `id::text`
+      in PostgreSQL or using `BIN_TO_UUID(column)` on databases like MySQL.
+      """,
+      input_schema: fn params ->
+        [
+          %{
+            name: :repo,
+            type: :string,
+            description: """
+            The module name of the Ecto repository to use.
+
+            The available repositories are:
+
+            #{Jason.encode!(repos, pretty: true)}
+
+            If no repository is specified, the first repository is used:
+
+            #{Jason.encode!(default_repo, pretty: true)}
+            """
+          },
+          %{
+            name: :query,
+            type: :string,
+            description: """
+            The SQL query to execute. Parameters can be passed using the appropriate database syntax,
+            such as $1, $2, for PostgreSQL, ? for MySQL, and so on
+            """
+          },
+          %{
+            name: :arguments,
+            type: {:array, :any},
+            description:
+              "The arguments to pass to the query. The query must contain corresponding parameters",
+            default: []
+          }
+        ]
+        |> Schemecto.new(params)
+        |> Ecto.Changeset.validate_required([:query])
+      end,
+      callback: &__MODULE__.execute_sql_query/2
+    }
+  end
+
   def tools do
     if repos_configured?() do
-      repos =
-        Enum.map(ecto_repos(), fn repo ->
-          %{repo: inspect(repo), adapter: inspect(repo.__adapter__())}
-        end)
-
-      default_repo = List.first(repos)
-
       [
-        %{
-          name: "execute_sql_query",
-          description: """
-          Executes the given SQL query against the given default or specified Ecto repository.
-          Returns the result as an Elixir data structure.
-
-          Note that the output is limited to #{@limit} rows at a time. If you need to see more,
-          perform additional calls using LIMIT and OFFSET in the query. If you know that only
-          specific columns are relevant, only include those in the SELECT clause.
-
-          You can use this tool to introspect the database, select and manipulate user data.
-          Keep in mind data is returned in a low-level representation. For example, UUIDs are
-          16-byte binaries. If you run into issues, you may want to cast them, such as `id::text`
-          in PostgreSQL or using `BIN_TO_UUID(column)` on databases like MySQL.
-          """,
-          inputSchema: %{
-            type: "object",
-            required: ["query"],
-            properties: %{
-              repo: %{
-                type: "string",
-                description: """
-                The module name of the Ecto repository to use.
-
-                The available repositories are:
-
-                #{Jason.encode!(repos, pretty: true)}
-
-                If no repository is specified, the first repository is used:
-
-                #{Jason.encode!(default_repo, pretty: true)}
-                """
-              },
-              query: %{
-                type: "string",
-                description: """
-                The SQL query to execute. Parameters can be passed using the appropriate database syntax,
-                such as $1, $2, for PostgreSQL, ? for MySQL, and so on
-                """
-              },
-              arguments: %{
-                type: "array",
-                description:
-                  "The arguments to pass to the query. The query must contain corresponding parameters",
-                items: %{}
-              }
-            }
-          },
-          callback: &execute_sql_query/2
-        },
+        execute_sql_query_tool(),
         %{
           name: "get_ecto_schemas",
           description: """
@@ -85,14 +92,14 @@ defmodule Tidewave.MCP.Tools.Ecto do
     end
   end
 
-  def execute_sql_query(%{"query" => query} = args, assigns) do
+  def execute_sql_query(%{query: query, arguments: arguments} = args, assigns) do
     repo =
-      case args["repo"] do
+      case args[:repo] do
         nil -> List.first(ecto_repos())
         repo -> Module.concat([repo])
       end
 
-    case repo.query(query, args["arguments"] || []) do
+    case repo.query(query, arguments) do
       {:ok, result} ->
         {preamble, result} =
           case result do
@@ -114,10 +121,6 @@ defmodule Tidewave.MCP.Tools.Ecto do
       {:error, reason} ->
         {:error, "Failed to execute query: #{inspect(reason, assigns.inspect_opts)}"}
     end
-  end
-
-  def execute_sql_query(_) do
-    {:error, :invalid_arguments}
   end
 
   def get_ecto_schemas(_args) do
