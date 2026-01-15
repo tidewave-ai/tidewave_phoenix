@@ -186,3 +186,17 @@ still potentially dangerous if you let the agent use those without supervision.
 
 If you prefer to not run your web app on `localhost`, check the installation
 steps for each framework on GitHub to learn how to customize them.
+
+## Editor configuration
+
+Tidewave Web allows you to open files inside your favorite editor. However,
+when running inside containers, the file paths in the container won't align
+with the paths on the host machine. For this purpose, Tidewave allows setting
+the `TIDEWAVE_HOST_PATH` environment variable in your container, which should
+point to the path the project is located on your machine. When launching the
+container from the project's root directory, you can set it to the output of
+`pwd`. In Docker, for example, that would be:
+
+```bash
+docker run -e TIDEWAVE_HOST_PATH=$(pwd) ...
+```
