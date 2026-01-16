@@ -3,116 +3,112 @@ defmodule Tidewave.MCP.Tools.Source do
 
   alias Tidewave.MCP
 
-  def tools do
-    [
+  def get_source_location_tool do
+    schema = [
       %{
-        name: "get_source_location",
-        description: """
-        Returns the source location for the given reference.
-
-        This works for modules in the current project, as well as dependencies,
-        but not for modules included in Elixir itself.
-
-        This tool only works if you know the `Module`, `Module.function`, or `Module.function/arity` that is being targeted.
-        If that is the case, prefer this tool over grepping the file system.
-
-        You can also use "dep:PACKAGE_NAME" to get the location of a specific dependency package.
-        """,
-        inputSchema: %{
-          type: "object",
-          required: ["reference"],
-          properties: %{
-            reference: %{
-              type: "string",
-              description:
-                "The reference to get source location for. Can be a module name, a Module.function or Module.function/arity."
-            }
-          }
-        },
-        callback: &get_source_location/1
-      },
-      %{
-        name: "get_docs",
-        description: """
-        Returns the documentation for the given reference.
-
-        This works for modules and functions in the current project, as well as dependencies.
-        The reference can be a module name, a Module.function or Module.function/arity.
-        You may also prepend a "c:" to the reference to get docs for a callback.
-        """,
-        inputSchema: %{
-          type: "object",
-          required: ["reference"],
-          properties: %{
-            reference: %{
-              type: "string",
-              description:
-                "The reference to get documentation for. Can be a module name, a Module.function or Module.function/arity."
-            }
-          }
-        },
-        callback: &get_docs/1
+        name: :reference,
+        type: :string,
+        description:
+          "The reference to get source location for. Can be a module name, a Module.function or Module.function/arity."
       }
     ]
+
+    %Tidewave.MCP.Tool{
+      name: :get_source_location,
+      description: """
+      Returns the source location for the given reference.
+
+      This works for modules in the current project, as well as dependencies,
+      but not for modules included in Elixir itself.
+
+      This tool only works if you know the `Module`, `Module.function`, or `Module.function/arity` that is being targeted.
+      If that is the case, prefer this tool over grepping the file system.
+
+      You can also use "dep:PACKAGE_NAME" to get the location of a specific dependency package.
+      """,
+      input_schema: fn params ->
+        schema
+        |> Schemecto.new(params)
+        |> Ecto.Changeset.validate_required([:reference])
+      end,
+      callback: &__MODULE__.get_source_location/2
+    }
   end
 
-  def get_source_location(args) do
-    case args do
-      %{"reference" => "dep:" <> package} ->
-        path =
-          try do
-            Mix.Project.deps_paths()[String.to_existing_atom(package)]
-          rescue
-            _ -> nil
-          end
+  def get_docs_tool do
+    schema = [
+      %{
+        name: :reference,
+        type: :string,
+        description:
+          "The reference to get documentation for. Can be a module name, a Module.function or Module.function/arity."
+      }
+    ]
 
-        if path do
-          {:ok, Path.relative_to(path, MCP.root())}
-        else
-          {:error, "Package #{package} not found."}
-        end
+    %Tidewave.MCP.Tool{
+      name: :get_docs,
+      description: """
+      Returns the documentation for the given reference.
 
-      %{"reference" => ref} ->
-        case parse_reference(ref) do
-          {:ok, mod, fun, arity} ->
-            find_source_for_mfa(mod, fun, arity)
+      This works for modules and functions in the current project, as well as dependencies.
+      The reference can be a module name, a Module.function or Module.function/arity.
+      You may also prepend a "c:" to the reference to get docs for a callback.
+      """,
+      input_schema: fn params ->
+        schema
+        |> Schemecto.new(params)
+        |> Ecto.Changeset.validate_required([:reference])
+      end,
+      callback: &__MODULE__.get_docs/2
+    }
+  end
 
-          :error ->
-            {:error, "Failed to parse reference: #{inspect(ref)}"}
-        end
+  def get_source_location(%{reference: "dep:" <> package}, _assigns) do
+    path =
+      try do
+        Mix.Project.deps_paths()[String.to_existing_atom(package)]
+      rescue
+        _ -> nil
+      end
 
-      _ ->
-        {:error, :invalid_arguments}
+    if path do
+      {:ok, Path.relative_to(path, MCP.root())}
+    else
+      {:error, "Package #{package} not found."}
     end
   end
 
-  def get_docs(args) do
-    case args do
-      %{"reference" => ref} ->
-        {ref, lookup} =
-          case ref do
-            "c:" <> ref -> {ref, [:callback]}
-            _ -> {ref, [:function, :macro]}
-          end
+  def get_source_location(%{reference: ref}, _assigns) do
+    case parse_reference(ref) do
+      {:ok, mod, fun, arity} ->
+        find_source_for_mfa(mod, fun, arity)
 
-        case parse_reference(ref) do
-          {:ok, mod, fun, arity} ->
-            case Code.ensure_loaded(mod) do
-              {:module, _} ->
-                with {:ok, _, docs} <- find_docs_for_mfa(mod, fun, arity, lookup) do
-                  {:ok, docs}
-                end
+      :error ->
+        {:error, "Failed to parse reference: #{inspect(ref)}"}
+    end
+  end
 
-              {:error, reason} ->
-                {:error, "Could not load module #{inspect(mod)}, got: #{reason}"}
+  def get_docs(%{reference: ref}, _assigns) do
+    {ref, lookup} =
+      case ref do
+        "c:" <> ref -> {ref, [:callback]}
+        _ -> {ref, [:function, :macro]}
+      end
+
+    case parse_reference(ref) do
+      {:ok, mod, fun, arity} ->
+        case Code.ensure_loaded(mod) do
+          {:module, _} ->
+            with {:ok, _, docs} <- find_docs_for_mfa(mod, fun, arity, lookup) do
+              {:ok, docs}
             end
 
-          :error ->
-            {:error, "Failed to parse reference: #{inspect(ref)}"}
+          {:error, reason} ->
+            {:error, "Could not load module #{inspect(mod)}, got: #{reason}"}
         end
 
-      _ ->
-        {:error, :invalid_arguments}
+      :error ->
+        {:error, "Failed to parse reference: #{inspect(ref)}"}
     end
   end
 
