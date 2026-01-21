@@ -8,12 +8,13 @@ This project can also be used as [a standalone Model Context Protocol server](ht
 
 ### Manually
 
-You can install Tidewave by adding the `tidewave` package to your list of dependencies in `mix.exs`:
+You can install Tidewave by adding the `tidewave` package to your list of dependencies in the `mix.exs` of your Phoenix project:
 
 ```elixir
 def deps do
   [
-    {:tidewave, "~> 0.5", only: :dev}
+    {:tidewave, "~> 0.5", only: :dev},
+    {:phoenix, ...},
   ]
 end
 ```
@@ -52,6 +53,8 @@ mix archive.install hex igniter_new
 # install tidewave
 mix igniter.install tidewave
 ```
+
+If using an umbrella project, install Tidewave in your `your_project_web` folder (the one that defines your Phoenix application).
 
 Now make sure [Tidewave is installed](https://hexdocs.pm/tidewave/installation.html) and you are ready to connect Tidewave to your app.
 

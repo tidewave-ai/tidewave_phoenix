@@ -1,18 +1,6 @@
-defmodule Mix.Tasks.Tidewave.Install.Docs do
-  @moduledoc false
-
-  def short_doc do
-    "Installs `tidewave` into your project"
-  end
-
-  def example do
-    "mix igniter.install tidewave"
-  end
-end
-
 if Code.ensure_loaded?(Igniter) do
   defmodule Mix.Tasks.Tidewave.Install do
-    @shortdoc "#{__MODULE__.Docs.short_doc()}"
+    @shortdoc "Installs \"tidewave\" into your project"
 
     @moduledoc false
     @plug_example """
@@ -34,7 +22,7 @@ if Code.ensure_loaded?(Igniter) do
     def info(_argv, _composing_task) do
       %Igniter.Mix.Task.Info{
         group: :tidewave,
-        example: __MODULE__.Docs.example()
+        example: "mix igniter.install tidewave"
       }
     end
 
@@ -98,11 +86,7 @@ if Code.ensure_loaded?(Igniter) do
     end
 
     defp code_reloading?(zipper) do
-      Igniter.Code.Function.function_call?(
-        zipper,
-        :if,
-        2
-      ) &&
+      Igniter.Code.Function.function_call?(zipper, :if, 2) &&
         Igniter.Code.Function.argument_matches_predicate?(
           zipper,
           0,
@@ -112,7 +96,7 @@ if Code.ensure_loaded?(Igniter) do
   end
 else
   defmodule Mix.Tasks.Tidewave.Install do
-    @shortdoc "#{__MODULE__.Docs.short_doc()} | Install `igniter` to use"
+    @shortdoc "Installs tidewave into your project (requires \"igniter\")"
 
     @moduledoc false
 
