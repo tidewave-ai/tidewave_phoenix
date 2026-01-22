@@ -28,7 +28,7 @@ claude
 
 ## Connect to Claude Code
 
-If you have `npm`/`npx` available in your PATH, which is the preferred method forward, Tidewave will use it to automatically install and connect to [Claude Code ACP](https://github.com/zed-industries/claude-code-acp). Open up Tidewave Web settings, choose the Providers tab, choose "Claude Code" and click "Connect".
+If you have `npm`/`npx` available in your PATH, Tidewave will use it to automatically install and connect to [Claude Code ACP](https://github.com/zed-industries/claude-code-acp). Open up Tidewave Web settings, choose the Providers tab, choose "Claude Code" and click "Connect".
 
 <iframe width="640" height="360" src="https://www.youtube.com/embed/qxzPZ0PGd2s?si=mnci1z08B44y1F5z" title="Tidewave and Claude Code" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 

@@ -10,13 +10,7 @@ Once setup, Tidewave will use your OpenAI subscription and settings (including M
 
 ## Install the `codex` CLI
 
-You can [install the Codex CLI in different ways](https://developers.openai.com/codex/cli/). However, because installing the `OpenAI Codex ACP`, in step 3, requires using `npm`, our recommendation is to [install `npm`](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) and then run:
-
-```shell
-npm install -g @openai/codex
-```
-
-If you install `codex` and Tidewave Web cannot detect it, please restart the Tidewave App/CLI by clicking its menu bar icon (top-right on macOS and Linux, bottom-right on Windows) and selecting "Restart".
+Follow [OpenAI's official intructions to install the Codex CLI](https://developers.openai.com/codex/cli/).
 
 ## Authenticate with OpenAI
 
@@ -28,11 +22,9 @@ codex
 
 ## Connect to Codex
 
-If you have `npm`/`npx` available in your PATH, which is the preferred method forward, Tidewave will use it to automatically install and connect to [Codex ACP](https://github.com/zed-industries/codex-acp). Open up Tidewave Web settings, choose the Providers tab, choose "OpenAI Codex" and click "Connect".
+Open up Tidewave Web settings, choose the Providers tab, choose "OpenAI Codex" and click "Connect".
 
-If "Connect" is not available, it is because `npm`/`npx` could not be found. You can check your `npm`/`npx` installation by running `which npx` (on macOS/Unix) or `where npx` (Windows) in the same terminal you start your web server. If it fails (and only if it fails), you can explicitly install `codex-acp` with `npm install -g @zed-industries/codex-acp`.
-
-Once Tidewave Web connects to Codex, we will automatically configure Codex to also use Tidewave MCP. You may disable this option if (and only if) you have already customized Codex to use Tidewave MCP.
+Once connected, we will automatically configure Codex to also use Tidewave MCP. You may disable this option if (and only if) you have already customized Codex to use Tidewave MCP.
 
 ## Custom Providers
 
