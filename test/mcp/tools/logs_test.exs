@@ -30,7 +30,7 @@ defmodule Tidewave.MCP.Tools.LogsTest do
     end
 
     @tag :capture_log
-    test "filters by level" do
+    test "filters by grep" do
       Logger.debug("this will not be seen")
       Logger.error("hello darkness my old friend")
 
@@ -45,6 +45,38 @@ defmodule Tidewave.MCP.Tools.LogsTest do
       {:ok, logs} = Logs.get_logs(%{"tail" => 10, "grep" => "DARKNESS|seen"})
       assert logs =~ "hello darkness my old friend"
       assert logs =~ "this will not be seen"
+    end
+
+    @tag :capture_log
+    test "filters by log level" do
+      Logger.debug("debug message")
+      Logger.info("info message")
+      Logger.warning("warning message")
+      Logger.error("error message")
+
+      {:ok, logs} = Logs.get_logs(%{"tail" => 10, "level" => "error"})
+      assert logs =~ "error message"
+      refute logs =~ "debug message"
+      refute logs =~ "info message"
+      refute logs =~ "warning message"
+
+      {:ok, logs} = Logs.get_logs(%{"tail" => 10, "level" => "warning"})
+      assert logs =~ "warning message"
+      refute logs =~ "debug message"
+      refute logs =~ "info message"
+      refute logs =~ "error message"
+    end
+
+    @tag :capture_log
+    test "combines level and grep filters" do
+      Logger.error("database connection failed")
+      Logger.error("timeout waiting for response")
+      Logger.warning("database connection slow")
+
+      {:ok, logs} = Logs.get_logs(%{"tail" => 10, "level" => "error", "grep" => "database"})
+      assert logs =~ "database connection failed"
+      refute logs =~ "timeout waiting for response"
+      refute logs =~ "database connection slow"
     end
   end
 end
