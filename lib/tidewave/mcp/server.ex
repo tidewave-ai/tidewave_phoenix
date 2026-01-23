@@ -4,7 +4,7 @@ defmodule Tidewave.MCP.Server do
   require Logger
 
   import Plug.Conn
-  alias Tidewave.MCP.Tools
+  alias Tidewave.MCP.{Tool, Tools}
 
   @protocol_version "2025-03-26"
   @vsn Mix.Project.config()[:version]
@@ -12,20 +12,24 @@ defmodule Tidewave.MCP.Server do
   ## Tool management functions
 
   defp raw_tools do
-    [
-      Tools.Logs.tools(),
-      Tools.Source.tools(),
-      Tools.Eval.tools(),
-      Tools.Ecto.tools(),
-      Tools.Hex.tools()
-    ]
-    |> List.flatten()
+    Tools.Ecto.tools() ++
+      [
+        Tools.Eval.project_eval_tool(),
+        Tools.Hex.search_package_docs_tool(),
+        Tools.Logs.get_logs_tool(),
+        Tools.Source.get_source_location_tool(),
+        Tools.Source.get_docs_tool()
+      ]
   end
 
   @doc false
   def init_tools do
     tools = raw_tools()
-    dispatch_map = Map.new(tools, fn tool -> {tool.name, tool.callback} end)
+
+    dispatch_map =
+      Map.new(tools, fn tool ->
+        {Atom.to_string(tool.name), Tool.to_storage(tool)}
+      end)
 
     # TODO: switch back to persistent_term when we don't support OTP 27 any more
     # :persistent_term.put({__MODULE__, :tools_and_dispatch}, {tools, dispatch_map})
@@ -43,12 +47,7 @@ defmodule Tidewave.MCP.Server do
 
   defp tools() do
     {tools, _} = tools_and_dispatch()
-
-    for tool <- tools do
-      tool
-      |> Map.put(:description, String.trim(tool.description))
-      |> Map.drop([:callback])
-    end
+    Enum.map(tools, &Tool.to_definition/1)
   end
 
   # A callback must return either
@@ -64,20 +63,15 @@ defmodule Tidewave.MCP.Server do
     {_tools, dispatch} = tools_and_dispatch()
 
     case dispatch do
-      %{^name => callback} when is_function(callback, 2) ->
-        callback.(args, assigns)
-
-      %{^name => callback} when is_function(callback, 1) ->
-        callback.(args)
+      %{^name => stored_tool} ->
+        Tool.dispatch(stored_tool, args, assigns)
 
       _ ->
         {:error,
          %{
            code: -32601,
            message: "Method not found",
-           data: %{
-             name: name
-           }
+           data: %{name: name}
          }}
     end
   end
@@ -157,6 +151,16 @@ defmodule Tidewave.MCP.Server do
   end
 
   defp result_or_error(request_id, {:error, :invalid_arguments}) do
+    {:error,
+     %{
+       jsonrpc: "2.0",
+       id: request_id,
+       error: %{code: -32602, message: "Invalid arguments for tool"}
+     }}
+  end
+
+  # TODO: This should be moved inside the tool somehow
+  defp result_or_error(request_id, {:error, %Ecto.Changeset{}}) do
     {:error,
      %{
        jsonrpc: "2.0",

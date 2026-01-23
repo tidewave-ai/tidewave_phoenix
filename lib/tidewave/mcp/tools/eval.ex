@@ -5,48 +5,57 @@ defmodule Tidewave.MCP.Tools.Eval do
 
   alias Tidewave.MCP.IOForwardGL
 
-  def tools do
-    [
+  def project_eval_tool do
+    schema = [
       %{
-        name: "project_eval",
-        description: """
-        Evaluates Elixir code in the context of the project.
-
-        The current Elixir version is: #{System.version()}
-
-        Use this tool every time you need to evaluate Elixir code,
-        including to test the behaviour of a function or to debug
-        something. The tool also returns anything written to standard
-        output. DO NOT use shell tools to evaluate Elixir code.
-
-        It also includes IEx helpers in the evaluation context.
-        For example, to get all functions in a module, call
-        `exports(String)`.
-        """,
-        inputSchema: %{
-          type: "object",
-          required: ["code"],
-          properties: %{
-            code: %{
-              type: "string",
-              description: "The Elixir code to evaluate"
-            },
-            arguments: %{
-              type: "array",
-              description:
-                "The arguments to pass to evaluation. They are available inside the evaluated code as `arguments`",
-              items: %{}
-            },
-            timeout: %{
-              type: "integer",
-              description:
-                "Optional. The maximum time to wait for execution, in milliseconds. Defaults to `30_000`"
-            }
-          }
-        },
-        callback: &project_eval/2
+        name: :code,
+        type: :string,
+        description: "The Elixir code to evaluate"
+      },
+      %{
+        name: :arguments,
+        type: {:array, :any},
+        description:
+          "The arguments to pass to evaluation. They are available inside the evaluated code as `arguments`",
+        default: []
+      },
+      %{
+        name: :timeout,
+        type: :integer,
+        description:
+          "Optional. The maximum time to wait for execution, in milliseconds. Defaults to `30_000`",
+        default: 30_000
+      },
+      %{
+        name: :json,
+        type: :boolean,
+        default: false
       }
     ]
+
+    %Tidewave.MCP.Tool{
+      name: :project_eval,
+      description: """
+      Evaluates Elixir code in the context of the project.
+
+      The current Elixir version is: #{System.version()}
+
+      Use this tool every time you need to evaluate Elixir code,
+      including to test the behaviour of a function or to debug
+      something. The tool also returns anything written to standard
+      output. DO NOT use shell tools to evaluate Elixir code.
+
+      It also includes IEx helpers in the evaluation context.
+      For example, to get all functions in a module, call
+      `exports(String)`.
+      """,
+      input_schema: fn params ->
+        schema
+        |> Schemecto.new(params)
+        |> Ecto.Changeset.validate_required([:code])
+      end,
+      callback: &__MODULE__.project_eval/2
+    }
   end
 
   @doc """
@@ -54,17 +63,8 @@ defmodule Tidewave.MCP.Tools.Eval do
 
   Returns the formatted result of the evaluation.
   """
-  def project_eval(args, assigns) do
-    case args do
-      %{"code" => code} ->
-        arguments = Map.get(args, "arguments", [])
-        timeout = Map.get(args, "timeout", 30_000)
-        json? = Map.get(args, "json", false)
-        eval_code(code, arguments, timeout, json?, assigns)
-
-      _ ->
-        {:error, :invalid_arguments}
-    end
+  def project_eval(%{code: code, arguments: arguments, timeout: timeout, json: json?}, assigns) do
+    eval_code(code, arguments, timeout, json?, assigns)
   end
 
   defp eval_code(code, arguments, timeout, json?, assigns) do
