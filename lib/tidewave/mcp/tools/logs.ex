@@ -25,7 +25,7 @@ defmodule Tidewave.MCP.Tools.Logs do
             },
             level: %{
               type: "string",
-              enum: ["emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"],
+              enum: ~w(emergency alert critical error warning notice info debug),
               description: "Filter logs by log level (e.g. \"error\" for error logs only)"
             }
           }
@@ -39,10 +39,7 @@ defmodule Tidewave.MCP.Tools.Logs do
     case args do
       %{"tail" => n} ->
         opts =
-          [
-            grep: Map.get(args, "grep"),
-            level: Map.get(args, "level")
-          ]
+          [grep: Map.get(args, "grep"), level: Map.get(args, "level")]
           |> Enum.reject(fn {_k, v} -> is_nil(v) end)
 
         {:ok, Enum.join(Tidewave.MCP.Logger.get_logs(n, opts), "\n")}

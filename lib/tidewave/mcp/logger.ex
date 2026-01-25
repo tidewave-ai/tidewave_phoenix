@@ -62,7 +62,7 @@ defmodule Tidewave.MCP.Logger do
         logs
       end
 
-    messages = Stream.map(logs, &elem(&1,1))
+    messages = Stream.map(logs, &elem(&1, 1))
 
     {:reply, Enum.take(messages, -n), state}
   end
