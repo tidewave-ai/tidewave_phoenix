@@ -21,7 +21,12 @@ defmodule Tidewave.MCP.Tools.Logs do
             grep: %{
               type: "string",
               description:
-                "Filter logs with the given regular expression (case insensitive). E.g. \"error\" when you want to capture errors in particular"
+                "Filter logs with the given regular expression (case insensitive). E.g. \"timeout\" to find timeout-related messages"
+            },
+            level: %{
+              type: "string",
+              enum: ["emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"],
+              description: "Filter logs by log level (e.g. \"error\" for error logs only)"
             }
           }
         },
@@ -33,8 +38,14 @@ defmodule Tidewave.MCP.Tools.Logs do
   def get_logs(args) do
     case args do
       %{"tail" => n} ->
-        grep = Map.get(args, "grep")
-        {:ok, Enum.join(Tidewave.MCP.Logger.get_logs(n, grep), "\n")}
+        opts =
+          [
+            grep: Map.get(args, "grep"),
+            level: Map.get(args, "level")
+          ]
+          |> Enum.reject(fn {_k, v} -> is_nil(v) end)
+
+        {:ok, Enum.join(Tidewave.MCP.Logger.get_logs(n, opts), "\n")}
 
       _ ->
         {:error, :invalid_arguments}
