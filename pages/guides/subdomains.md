@@ -2,7 +2,11 @@
 
 Tidewave Web supports applications that run across multiple domains.
 
-If you are using multiple hosts/subdomains during development, you must use `*.localhost`, as such domains are considered secure by browsers. For example, by running your application on localhost, you can access it at `localhost:3000` and `admin.localhost:3000` from most browsers (Safari being a notable exception).
+If you are using multiple hosts/subdomains during development, you must use a secure domain. This implies you must either:
+
+* Use `*.localhost`. For example, by running your application on localhost, you can access it at `localhost:3000` and `admin.localhost:3000` from most browsers (Safari being a notable exception)
+
+* Use `https`, in those cases, see our [HTTPS](https.md) guide
 
 At the moment, a single Tidewave session cannot navigate across domains, so if you are working on both domains above at the same time, you will need at least two browser tabs running Tidewave. Generally speaking, you have two options to run Tidewave with multiple subdomains:
 
@@ -12,7 +16,7 @@ At the moment, a single Tidewave session cannot navigate across domains, so if y
 
 ## Configuring Cookies
 
-To configure your cookies to use `SameSite=None; Secure` across different frameworks, follow the step below. Note this requires you to run your application on a secure host, such as `localhost` and `*.localhost`, or use [HTTPS](../https.md).
+To configure your cookies to use `SameSite=None; Secure` across different frameworks, follow the step below. Note this requires you to run your application on a secure host, such as `localhost` and `*.localhost`, or use [HTTPS](https.md).
 
 <!-- tabs-open -->
 

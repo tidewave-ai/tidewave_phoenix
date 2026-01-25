@@ -94,6 +94,7 @@ defmodule Tidewave.MixProject do
         "pages/guides/https.md",
         "pages/guides/security.md",
         "pages/guides/subdomains.md",
+        "pages/guides/remote_access.md",
         "pages/guides/tips_and_tricks.md",
         "pages/mcp/mcp.md",
         "pages/mcp/mcp_claude_code.md",

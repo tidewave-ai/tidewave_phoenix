@@ -1,14 +1,35 @@
 # HTTPS support
 
-If your application is running over HTTPS, you'll also need to configure the Tidewave App/CLI to expose its local server over HTTPS. There are three distinct ways to do so, depending on what tools you are using:
+If you want to run your application over HTTPS, you'll also need to expose Tidewave over HTTPS. There are two distinct ways to do so, depending on what tools you are using:
 
-1. Configure the Tidewave App
-2. Configure the Tidewave CLI
-3. Configure Caddy or your proxy
+1. Configure Caddy or a proxy: this implies you are using a third party tool to expose your application over HTTPS. You can use the same tool to expose Tidewave too. This is often the simplest approach
 
-Generally speaking, you want Tidewave and your application to run on the same host. Therefore, if you are running your server directly on localhost, you want to follow option 1 or 2. However, if you are using Caddy or a proxy to enable HTTPS, then you want them to also proxy to Tidewave itself.
+2. Configure your application and Tidewave: you are directly configuring your framework or build tool to serve over HTTPS, and you need to match Tidewave accordingly
 
-## Configuring Tidewave App
+Once setup, please read the Security Considerations section at the end for additional configuration.
+
+## Configuring Caddy or a proxy
+
+If you are using a proxy to enable HTTPS, we recommend using it to also proxy to Tidewave, so your application and Tidewave run in the same domain. The snippet below contains a sample Caddyfile that proxies `https://localhost:9833` to Tidewave running at `http://localhost:9832`.
+
+```caddyfile
+https://localhost:9833 {
+    # Uncommend if you want to use Caddy's own certificate
+    # tls internal
+
+    reverse_proxy http://localhost:9832 {
+        header_up Origin "https://localhost:9833" "http://localhost:9832"
+    }
+}
+```
+
+If your app is running on `example.localhost`, you want to replace `localhost:9833` by `example.localhost:9833` in the snippet above. Also note that the Tidewave app checks the origin for security reasons, so we match and rewrite it accordingly.
+
+## Configuring your application and Tidewave
+
+If you are directly configuring your web framework or build tool to run over HTTPS, you must also configure Tidewave. The steps will differ if you are using Tidewave's Desktop App or the Tidewave CLI. 
+
+### Enabling HTTPS in the Tidewave App
 
 If you are using the Tidewave App, click on the Tidewave icon (top-right on macOS and Linux, bottom-right on Windows) and choose "Settings". It will open up a configuration file where you can add:
 
@@ -28,7 +49,7 @@ openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -sha256 -days 3
 
 Once you are done, remember to restart the application.
 
-## Configuring Tidewave CLI
+### Enabling HTTPS in the Tidewave CLI
 
 If you are using the Tidewave CLI, you can pass those values as options:
 
@@ -36,22 +57,30 @@ If you are using the Tidewave CLI, you can pass those values as options:
 $ tidewave --https-port 9833 --https-cert-path ./cert.pem --https-key-path ./key.pem
 ```
 
-## Configuring Caddy or a proxy
+## Security considerations
 
-If you are using a proxy to enable HTTPS, we recommend using it to also proxy to Tidewave, so your application and Tidewave run in the same domain. The snippet below contains a sample Caddyfile that proxies `https://localhost:9833` to Tidewave running at `http://localhost:9832`.
+For security reasons, the Tidewave App and Tidewave CLI only allow access from `localhost` and `*.localhost` addresses. Furthermore, Tidewave does not allow remote access by default. Therefore, if you want to run Tidewave in a separate address than `localhost` or allow remote access, you must configure it accordingly:
 
-```caddyfile
-https://localhost:9833 {
-    # Uncommend if you want to use Caddy's own certificate
-    # tls internal
+### Allowing origins and remote access in the Tidewave App
 
-    reverse_proxy http://localhost:9832 {
-        header_up Origin "https://localhost:9833" "http://localhost:9832"
-    }
-}
+Click on the Tidewave icon (top-right on macOS and Linux, bottom-right on Windows) and choose "Settings". It will open up a configuration file where you can add:
+
+```toml
+# Allow access from other machines, only enable it in safe networks
+allow_remote_access = true
+# Use the addresses you will insert in the browser to actually open up Tidewave 
+allowed_origins = ["https://example.com:9898"]
 ```
 
-If your app is running on `example.localhost`, you want to replace `localhost:9833` by `example.localhost:9833` in the snippet above. Also note that the Tidewave app checks the origin for security reasons, so we match and rewrite it accordingly.
+Once you are done, remember to restart the application.
+
+### Allowing origins and remote access in the Tidewave CLI
+
+If you are using the Tidewave CLI, you can pass those values as options:
+
+```
+$ tidewave --allow-remote-access --allowed-origins https://example.com:9898
+```
 
 ## Troubleshooting
 
