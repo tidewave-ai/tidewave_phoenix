@@ -38,9 +38,12 @@ Once Tidewave Web connects to Claude Code, we will automatically configure Claud
 
 ## Customizing your environment
 
-Our integration will reuse your Claude Code settings. Furthermore, when we start Claude Code, we give it the same environment variables which you used to start your server.
+Our integration will reuse your Claude Code settings. Furthermore, Tidewave will automatically pass your environment variables to Claude Code, using this level of priority:
 
-However, if you want to set any of [Claude Code's environment variables](https://code.claude.com/docs/en/settings#environment-variables) to be used exclusively with Tidewave, you can do so by clicking on the Tidewave icon in your menu bar (top-right on macOS and Linux, bottom-right on Windows) and then on "Settings...". Doing so will open a file where you can add the desired environment variables, for example:
+1. the environment variables used when starting your web app (higher priority)
+2. the environment variables configured in your Tidewave App (or given to the Tidewave CLI)
+
+To configure the Tidewave app to use [Claude Code's environment variables](https://code.claude.com/docs/en/settings#environment-variables), click on the Tidewave icon in your menu bar (top-right on macOS and Linux, bottom-right on Windows) and then on "Settings...". Doing so will open a file where you can add the desired environment variables, for example:
 
 ```toml
 # This file is used to configure the Tidewave app.
@@ -49,9 +52,10 @@ However, if you want to set any of [Claude Code's environment variables](https:/
 [env]
 CLAUDE_CODE_USE_VERTEX = "1"
 CLAUDE_CODE_EXECUTABLE = "..."
+MAX_THINKING_TOKENS = "9999"
 ```
 
-Note the environment variables used when starting your web server will override any variable defined in the Tidewave App/CLI.
+If you are using the CLI, you can set those variables when starting the CLI.
 
 ## FAQ
 
