@@ -52,10 +52,13 @@ To configure the Tidewave app to use [Claude Code's environment variables](https
 [env]
 CLAUDE_CODE_USE_VERTEX = "1"
 CLAUDE_CODE_EXECUTABLE = "..."
-MAX_THINKING_TOKENS = "9999"
 ```
 
 If you are using the CLI, you can set those variables when starting the CLI.
+
+> #### `MAX_THINKING_TOKENS` configuration {: .warning}
+>
+> The `MAX_THINKING_TOKENS` configuration, exclusively, cannot be set in the Tidewave App/CLI environment. You must set it in the same session that as your running app. This is because Tidewave sets a default of 31999 tokens (which is the same as Claude Code itself).
 
 ## FAQ
 
