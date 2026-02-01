@@ -3,7 +3,7 @@ defmodule Tidewave.MCP.Tools.Eval do
 
   @compile {:no_warn_undefined, Phoenix.CodeReloader}
 
-  alias Tidewave.MCP.IOForwardGL
+  alias Tidewave.MCP.StandardError
 
   def tools do
     [
@@ -101,7 +101,7 @@ defmodule Tidewave.MCP.Tools.Eval do
   defp eval_with_captured_io(code, arguments, json?, inspect_opts) do
     {{success?, result}, io} =
       capture_io(fn ->
-        IOForwardGL.with_forwarded_io(:standard_error, fn ->
+        StandardError.forward(fn ->
           try do
             {result, _bindings} = Code.eval_string(code, [arguments: arguments], env())
             {true, result}

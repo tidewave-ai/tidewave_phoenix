@@ -2,11 +2,10 @@
 # licensed under Apache License 2.0
 # https://github.com/livebook-dev/livebook/blob/main/LICENSE
 
-defmodule Tidewave.MCP.IOForwardGL do
+defmodule Tidewave.MCP.StandardError do
   @moduledoc false
 
-  # An IO device process forwarding all requests to sender's group
-  # leader.
+  # A replacement for standard error that allows multple captires.
   #
   # We register this device as `:standard_error` in order to capture
   # compile errors etc., but still forward them to the real stderr.
@@ -18,41 +17,40 @@ defmodule Tidewave.MCP.IOForwardGL do
 
   @doc """
   Starts the IO device.
-
-  ## Options
-
-    * `:name` - the name to register the process under. Optional.
-      If the name is already used, it will be unregistered before
-      starting the process and registered back when the server
-      terminates
-
   """
-  @spec start_link(keyword()) :: GenServer.on_start()
-  def start_link(opts \\ []) do
-    name = opts[:name]
+  def start_link(_) do
+    previous = Process.whereis(:standard_error)
 
-    if previous = name && Process.whereis(name) do
-      Process.unregister(name)
+    if previous do
+      Process.unregister(:standard_error)
     end
 
-    GenServer.start_link(__MODULE__, {name, previous}, opts)
+    with {:ok, pid} <- GenServer.start_link(__MODULE__, previous, name: :standard_error) do
+      :persistent_term.put(__MODULE__, pid)
+      {:ok, pid}
+    end
   end
 
-  @impl true
-  def init({name, previous}) do
-    Process.flag(:trap_exit, true)
-    {:ok, %{name: name, previous: previous, targets: %{}}}
-  end
-
-  def with_forwarded_io(name, fun) do
+  @doc """
+  Forwards standard error in the given function to group leader.
+  """
+  def forward(fun) do
     group_leader = Process.group_leader()
-    ref = GenServer.call(name, {:add_target, self(), group_leader})
+    # We go through the persistent term in case someone else hijacked standard error
+    pid = :persistent_term.get(__MODULE__)
+    ref = GenServer.call(pid, {:add_target, self(), group_leader})
 
     try do
       fun.()
     after
-      GenServer.call(name, {:remove_target, ref, group_leader})
+      GenServer.call(pid, {:remove_target, ref, group_leader})
     end
+  end
+
+  @impl true
+  def init(previous) do
+    Process.flag(:trap_exit, true)
+    {:ok, %{previous: previous, targets: %{}}}
   end
 
   @impl true
@@ -90,12 +88,9 @@ defmodule Tidewave.MCP.IOForwardGL do
   end
 
   @impl true
-  def terminate(_, %{name: name, previous: previous}) do
-    if name && previous do
-      Process.unregister(name)
-      Process.register(previous, name)
-    end
-
+  def terminate(_, %{previous: previous}) do
+    Process.unregister(:standard_error)
+    Process.register(previous, :standard_error)
     :ok
   end
 

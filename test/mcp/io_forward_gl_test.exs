@@ -1,7 +1,7 @@
-defmodule Tidewave.MCP.IOForwardGLTest do
+defmodule Tidewave.MCP.StandardErrorTest do
   use ExUnit.Case, async: true
 
-  alias Tidewave.MCP.IOForwardGL
+  alias Tidewave.MCP.StandardError
 
   defmacrop eventually(interval, tries, fun) do
     quote do
@@ -25,7 +25,7 @@ defmodule Tidewave.MCP.IOForwardGLTest do
       spawn(fn ->
         Process.group_leader(self(), gl_pid)
 
-        IOForwardGL.with_forwarded_io(:standard_error, fn ->
+        StandardError.forward(fn ->
           Process.sleep(10000)
         end)
       end)
