@@ -24,6 +24,21 @@ defmodule Tidewave.MCP.Tools.Eval do
         `exports(String)`.
         """,
         inputSchema: %{
+          "$defs" => %{
+            "anyValue" => %{
+              "anyOf" => [
+                %{"type" => "boolean"},
+                %{"type" => "null"},
+                %{"type" => "number"},
+                %{"type" => "object"},
+                %{"type" => "string"},
+                %{
+                  "type" => "array",
+                  "items" => %{"type" => ["boolean", "null", "number", "object", "string"]}
+                }
+              ]
+            }
+          },
           type: "object",
           required: ["code"],
           properties: %{
@@ -35,7 +50,7 @@ defmodule Tidewave.MCP.Tools.Eval do
               type: "array",
               description:
                 "The arguments to pass to evaluation. They are available inside the evaluated code as `arguments`",
-              items: %{}
+              items: %{"$ref" => "#/$defs/anyValue"}
             },
             timeout: %{
               type: "integer",

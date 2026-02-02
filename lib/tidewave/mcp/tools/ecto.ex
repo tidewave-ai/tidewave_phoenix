@@ -30,6 +30,21 @@ defmodule Tidewave.MCP.Tools.Ecto do
           in PostgreSQL or using `BIN_TO_UUID(column)` on databases like MySQL.
           """,
           inputSchema: %{
+            "$defs" => %{
+              "anyValue" => %{
+                "anyOf" => [
+                  %{"type" => "boolean"},
+                  %{"type" => "null"},
+                  %{"type" => "number"},
+                  %{"type" => "object"},
+                  %{"type" => "string"},
+                  %{
+                    "type" => "array",
+                    "items" => %{"type" => ["boolean", "null", "number", "object", "string"]}
+                  }
+                ]
+              }
+            },
             type: "object",
             required: ["query"],
             properties: %{
@@ -58,7 +73,7 @@ defmodule Tidewave.MCP.Tools.Ecto do
                 type: "array",
                 description:
                   "The arguments to pass to the query. The query must contain corresponding parameters",
-                items: %{}
+                items: %{"$ref" => "#/$defs/anyValue"}
               }
             }
           },
