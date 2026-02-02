@@ -35,7 +35,7 @@ defmodule Tidewave.MCP.Tools.Eval do
               type: "array",
               description:
                 "The arguments to pass to evaluation. They are available inside the evaluated code as `arguments`",
-              items: %{type: ["array", "boolean", "null", "number", "object", "string"]}
+              items: %{}
             },
             timeout: %{
               type: "integer",
