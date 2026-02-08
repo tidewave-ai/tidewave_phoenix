@@ -9,10 +9,16 @@ defmodule Tidewave.MCP.Tools.Ash do
           description: """
           Returns all Ash domains and their resources for the current project.
 
-          To find out what extensions a resource has, use `Spark.extensions/1`.
+          After retrieving the list of resources and their domains, you can use `project_eval` to
+          introspect them further. For example:
 
-          You can use Info modules like `Ash.Resource.Info` as well as any `*.Info` modules
-          from extensions to interrogate individual resources and domains for more details.
+          - `Spark.extensions(MyApp.MyResource)` - list all extensions on a resource
+          - `Ash.Resource.Info.attributes(MyApp.MyResource)` - list all attributes
+          - `Ash.Resource.Info.relationships(MyApp.MyResource)` - list all relationships
+          - `Ash.Resource.Info.actions(MyApp.MyResource)` - list all actions
+          - `Ash.Domain.Info.resources(MyApp.MyDomain)` - list all resources in a domain
+
+          Extensions also provide their own `*.Info` modules for further introspection.
           """,
           inputSchema: %{
             type: "object",
