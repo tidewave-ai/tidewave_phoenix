@@ -131,9 +131,9 @@ defmodule Tidewave.MCP.Tools.Ecto do
             _ -> ""
           end
 
-        ash_context = spark_is_context(module)
+        spark_context = spark_is_context(module)
 
-        "* #{inspect(module)}#{location}#{ash_context}"
+        "* #{inspect(module)}#{location}#{spark_context}"
       end
 
     case schemas do
