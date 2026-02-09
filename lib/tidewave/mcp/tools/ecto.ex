@@ -125,18 +125,28 @@ defmodule Tidewave.MCP.Tools.Ecto do
       for module <- project_modules(),
           Code.ensure_loaded?(module),
           function_exported?(module, :__changeset__, 0) do
-        case Source.get_source_location(%{"reference" => inspect(module)}) do
-          {:ok, source_location} ->
-            "* #{inspect(module)} at #{source_location}"
+        location =
+          case Source.get_source_location(%{"reference" => inspect(module)}) do
+            {:ok, source_location} -> " at #{source_location}"
+            _ -> ""
+          end
 
-          _ ->
-            "* #{inspect(module)}"
-        end
+        spark_context = spark_is_context(module)
+
+        "* #{inspect(module)}#{location}#{spark_context}"
       end
 
     case schemas do
       [] -> {:error, "No Ecto schemas found in the project"}
       schemas -> {:ok, Enum.join(schemas, "\n")}
+    end
+  end
+
+  defp spark_is_context(module) do
+    if function_exported?(module, :spark_is, 0) do
+      " (#{inspect(module.spark_is())})"
+    else
+      ""
     end
   end
 
