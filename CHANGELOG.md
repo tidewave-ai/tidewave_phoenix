@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.5.5 (2026-02-10)
+
+* Enhancements
+  * Include Spark metadata in `get_ecto_schemas`
+  * Include `get_ash_resources` tool
+  * Add log level filtering to `get_logs` MCP tool
+
 ## v0.5.4 (2026-01-06)
 
 * Bug fixes

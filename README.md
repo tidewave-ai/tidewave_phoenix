@@ -141,6 +141,8 @@ The following options are available:
 - `search_package_docs` - runs a search on https://hexdocs.pm/ filtered to the exact
   dependencies in this project
 
+`get_ecto_schemas` and `get_ash_resources` is also available if you are using Ecto and Ash respectively.
+
 ## License
 
 Copyright (c) 2025 Dashbit
