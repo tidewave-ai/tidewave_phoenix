@@ -126,5 +126,150 @@ defmodule Tidewave.MCP.ServerTest do
       assert response_body["id"] == "3"
       assert response_body["result"]["content"]
     end
+
+    test "handles prompts/list request", %{conn: conn} do
+      message = %{
+        "jsonrpc" => "2.0",
+        "method" => "prompts/list",
+        "id" => "4"
+      }
+
+      conn = %{conn | body_params: message}
+      response = Tidewave.MCP.Server.handle_http_message(conn)
+
+      assert response.status == 200
+      response_body = Jason.decode!(response.resp_body)
+      assert response_body["result"]["prompts"] == []
+    end
+
+    test "handles prompts/get request", %{conn: conn} do
+      message = %{
+        "jsonrpc" => "2.0",
+        "method" => "prompts/get",
+        "id" => "5",
+        "params" => %{"name" => "test"}
+      }
+
+      conn = %{conn | body_params: message}
+      response = Tidewave.MCP.Server.handle_http_message(conn)
+
+      assert response.status == 400
+      response_body = Jason.decode!(response.resp_body)
+      assert response_body["error"]["code"] == -32602
+      assert response_body["error"]["message"] == "No prompts available"
+    end
+
+    test "handles resources/list request", %{conn: conn} do
+      message = %{
+        "jsonrpc" => "2.0",
+        "method" => "resources/list",
+        "id" => "6"
+      }
+
+      conn = %{conn | body_params: message}
+      response = Tidewave.MCP.Server.handle_http_message(conn)
+
+      assert response.status == 200
+      response_body = Jason.decode!(response.resp_body)
+      assert response_body["result"]["resources"] == []
+    end
+
+    test "handles resources/read request", %{conn: conn} do
+      message = %{
+        "jsonrpc" => "2.0",
+        "method" => "resources/read",
+        "id" => "7",
+        "params" => %{"uri" => "test://resource"}
+      }
+
+      conn = %{conn | body_params: message}
+      response = Tidewave.MCP.Server.handle_http_message(conn)
+
+      assert response.status == 400
+      response_body = Jason.decode!(response.resp_body)
+      assert response_body["error"]["code"] == -32602
+      assert response_body["error"]["message"] == "No resources available"
+    end
+
+    test "handles resources/subscribe request", %{conn: conn} do
+      message = %{
+        "jsonrpc" => "2.0",
+        "method" => "resources/subscribe",
+        "id" => "8",
+        "params" => %{"uri" => "test://resource"}
+      }
+
+      conn = %{conn | body_params: message}
+      response = Tidewave.MCP.Server.handle_http_message(conn)
+
+      assert response.status == 200
+      response_body = Jason.decode!(response.resp_body)
+      assert response_body["result"] == %{}
+    end
+
+    test "handles resources/unsubscribe request", %{conn: conn} do
+      message = %{
+        "jsonrpc" => "2.0",
+        "method" => "resources/unsubscribe",
+        "id" => "9",
+        "params" => %{"uri" => "test://resource"}
+      }
+
+      conn = %{conn | body_params: message}
+      response = Tidewave.MCP.Server.handle_http_message(conn)
+
+      assert response.status == 200
+      response_body = Jason.decode!(response.resp_body)
+      assert response_body["result"] == %{}
+    end
+
+    test "handles resources/templates/list request", %{conn: conn} do
+      message = %{
+        "jsonrpc" => "2.0",
+        "method" => "resources/templates/list",
+        "id" => "10"
+      }
+
+      conn = %{conn | body_params: message}
+      response = Tidewave.MCP.Server.handle_http_message(conn)
+
+      assert response.status == 200
+      response_body = Jason.decode!(response.resp_body)
+      assert response_body["result"]["templates"] == []
+    end
+
+    test "handles completion/complete request", %{conn: conn} do
+      message = %{
+        "jsonrpc" => "2.0",
+        "method" => "completion/complete",
+        "id" => "11",
+        "params" => %{"ref" => %{}, "argument" => %{}}
+      }
+
+      conn = %{conn | body_params: message}
+      response = Tidewave.MCP.Server.handle_http_message(conn)
+
+      assert response.status == 200
+      response_body = Jason.decode!(response.resp_body)
+      assert response_body["result"]["completion"]["values"] == []
+      assert response_body["result"]["completion"]["total"] == 0
+      assert response_body["result"]["completion"]["hasMore"] == false
+    end
+
+    test "handles logging/setLevel request", %{conn: conn} do
+      message = %{
+        "jsonrpc" => "2.0",
+        "method" => "logging/setLevel",
+        "id" => "12",
+        "params" => %{"level" => "info"}
+      }
+
+      conn = %{conn | body_params: message}
+      response = Tidewave.MCP.Server.handle_http_message(conn)
+
+      assert response.status == 200
+      response_body = Jason.decode!(response.resp_body)
+      assert response_body["result"] == %{}
+    end
   end
 end

@@ -139,6 +139,58 @@ defmodule Tidewave.MCP.Server do
     result_or_error(request_id, {:ok, %{tools: tools()}})
   end
 
+  defp handle_list_prompts(request_id, _params) do
+    result_or_error(request_id, {:ok, %{prompts: []}})
+  end
+
+  defp handle_list_resources(request_id, _params) do
+    result_or_error(request_id, {:ok, %{resources: []}})
+  end
+
+  defp handle_list_templates(request_id, _params) do
+    result_or_error(request_id, {:ok, %{templates: []}})
+  end
+
+  defp handle_get_prompt(request_id, _params) do
+    {:error,
+     %{
+       jsonrpc: "2.0",
+       id: request_id,
+       error: %{
+         code: -32602,
+         message: "No prompts available"
+       }
+     }}
+  end
+
+  defp handle_read_resource(request_id, _params) do
+    {:error,
+     %{
+       jsonrpc: "2.0",
+       id: request_id,
+       error: %{
+         code: -32602,
+         message: "No resources available"
+       }
+     }}
+  end
+
+  defp handle_subscribe_resource(request_id, _params) do
+    result_or_error(request_id, {:ok, %{}})
+  end
+
+  defp handle_unsubscribe_resource(request_id, _params) do
+    result_or_error(request_id, {:ok, %{}})
+  end
+
+  defp handle_complete(request_id, _params) do
+    result_or_error(request_id, {:ok, %{completion: %{values: [], total: 0, hasMore: false}}})
+  end
+
+  defp handle_set_log_level(request_id, _params) do
+    result_or_error(request_id, {:ok, %{}})
+  end
+
   defp result_or_error(request_id, {:ok, text, metadata})
        when is_binary(text) and is_map(metadata) do
     result_or_error(request_id, {:ok, %{content: [%{type: "text", text: text}], _meta: metadata}})
@@ -249,6 +301,42 @@ defmodule Tidewave.MCP.Server do
         )
 
         safe_call_tool(id, message["params"], assigns)
+
+      "prompts/list" ->
+        Logger.debug("Handling prompts list request")
+        handle_list_prompts(id, message["params"])
+
+      "prompts/get" ->
+        Logger.debug("Handling prompt get request")
+        handle_get_prompt(id, message["params"])
+
+      "resources/list" ->
+        Logger.debug("Handling resources list request")
+        handle_list_resources(id, message["params"])
+
+      "resources/read" ->
+        Logger.debug("Handling resource read request")
+        handle_read_resource(id, message["params"])
+
+      "resources/subscribe" ->
+        Logger.debug("Handling resource subscribe request")
+        handle_subscribe_resource(id, message["params"])
+
+      "resources/unsubscribe" ->
+        Logger.debug("Handling resource unsubscribe request")
+        handle_unsubscribe_resource(id, message["params"])
+
+      "resources/templates/list" ->
+        Logger.debug("Handling templates list request")
+        handle_list_templates(id, message["params"])
+
+      "completion/complete" ->
+        Logger.debug("Handling completion request")
+        handle_complete(id, message["params"])
+
+      "logging/setLevel" ->
+        Logger.debug("Handling set log level request")
+        handle_set_log_level(id, message["params"])
 
       other ->
         Logger.warning("Received unsupported method: #{other}")
