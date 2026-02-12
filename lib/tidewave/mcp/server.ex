@@ -157,8 +157,8 @@ defmodule Tidewave.MCP.Server do
        jsonrpc: "2.0",
        id: request_id,
        error: %{
-         code: -32602,
-         message: "No prompts available"
+         code: -32601,
+         message: "Method not found"
        }
      }}
   end
@@ -169,26 +169,58 @@ defmodule Tidewave.MCP.Server do
        jsonrpc: "2.0",
        id: request_id,
        error: %{
-         code: -32602,
-         message: "No resources available"
+         code: -32601,
+         message: "Method not found"
        }
      }}
   end
 
   defp handle_subscribe_resource(request_id, _params) do
-    result_or_error(request_id, {:ok, %{}})
+    {:error,
+     %{
+       jsonrpc: "2.0",
+       id: request_id,
+       error: %{
+         code: -32601,
+         message: "Method not found"
+       }
+     }}
   end
 
   defp handle_unsubscribe_resource(request_id, _params) do
-    result_or_error(request_id, {:ok, %{}})
+    {:error,
+     %{
+       jsonrpc: "2.0",
+       id: request_id,
+       error: %{
+         code: -32601,
+         message: "Method not found"
+       }
+     }}
   end
 
   defp handle_complete(request_id, _params) do
-    result_or_error(request_id, {:ok, %{completion: %{values: [], total: 0, hasMore: false}}})
+    {:error,
+     %{
+       jsonrpc: "2.0",
+       id: request_id,
+       error: %{
+         code: -32601,
+         message: "Method not found"
+       }
+     }}
   end
 
   defp handle_set_log_level(request_id, _params) do
-    result_or_error(request_id, {:ok, %{}})
+    {:error,
+     %{
+       jsonrpc: "2.0",
+       id: request_id,
+       error: %{
+         code: -32601,
+         message: "Method not found"
+       }
+     }}
   end
 
   defp result_or_error(request_id, {:ok, text, metadata})

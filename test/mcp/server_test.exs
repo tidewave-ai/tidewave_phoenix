@@ -155,8 +155,8 @@ defmodule Tidewave.MCP.ServerTest do
 
       assert response.status == 400
       response_body = Jason.decode!(response.resp_body)
-      assert response_body["error"]["code"] == -32602
-      assert response_body["error"]["message"] == "No prompts available"
+      assert response_body["error"]["code"] == -32601
+      assert response_body["error"]["message"] == "Method not found"
     end
 
     test "handles resources/list request", %{conn: conn} do
@@ -187,8 +187,8 @@ defmodule Tidewave.MCP.ServerTest do
 
       assert response.status == 400
       response_body = Jason.decode!(response.resp_body)
-      assert response_body["error"]["code"] == -32602
-      assert response_body["error"]["message"] == "No resources available"
+      assert response_body["error"]["code"] == -32601
+      assert response_body["error"]["message"] == "Method not found"
     end
 
     test "handles resources/subscribe request", %{conn: conn} do
@@ -202,9 +202,10 @@ defmodule Tidewave.MCP.ServerTest do
       conn = %{conn | body_params: message}
       response = Tidewave.MCP.Server.handle_http_message(conn)
 
-      assert response.status == 200
+      assert response.status == 400
       response_body = Jason.decode!(response.resp_body)
-      assert response_body["result"] == %{}
+      assert response_body["error"]["code"] == -32601
+      assert response_body["error"]["message"] == "Method not found"
     end
 
     test "handles resources/unsubscribe request", %{conn: conn} do
@@ -218,9 +219,10 @@ defmodule Tidewave.MCP.ServerTest do
       conn = %{conn | body_params: message}
       response = Tidewave.MCP.Server.handle_http_message(conn)
 
-      assert response.status == 200
+      assert response.status == 400
       response_body = Jason.decode!(response.resp_body)
-      assert response_body["result"] == %{}
+      assert response_body["error"]["code"] == -32601
+      assert response_body["error"]["message"] == "Method not found"
     end
 
     test "handles resources/templates/list request", %{conn: conn} do
@@ -249,11 +251,10 @@ defmodule Tidewave.MCP.ServerTest do
       conn = %{conn | body_params: message}
       response = Tidewave.MCP.Server.handle_http_message(conn)
 
-      assert response.status == 200
+      assert response.status == 400
       response_body = Jason.decode!(response.resp_body)
-      assert response_body["result"]["completion"]["values"] == []
-      assert response_body["result"]["completion"]["total"] == 0
-      assert response_body["result"]["completion"]["hasMore"] == false
+      assert response_body["error"]["code"] == -32601
+      assert response_body["error"]["message"] == "Method not found"
     end
 
     test "handles logging/setLevel request", %{conn: conn} do
@@ -267,9 +268,10 @@ defmodule Tidewave.MCP.ServerTest do
       conn = %{conn | body_params: message}
       response = Tidewave.MCP.Server.handle_http_message(conn)
 
-      assert response.status == 200
+      assert response.status == 400
       response_body = Jason.decode!(response.resp_body)
-      assert response_body["result"] == %{}
+      assert response_body["error"]["code"] == -32601
+      assert response_body["error"]["message"] == "Method not found"
     end
   end
 end
