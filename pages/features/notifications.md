@@ -2,6 +2,8 @@
 
 Tidewave supports browser notifications for when the agent completes its work or requires your input.
 
+Furthermore, the icon of each tab also reflects the state of the coding agent (working, errored, idle).
+
 ## Usage
 
 To enable them, go to "Settings" by clicking on the cog icon on the top right of your chat application. Under "General", you will find a "Background Notifications" toggle. Clicking it will enable notifications (your browser will likely ask you for permissions).

@@ -80,6 +80,7 @@ defmodule Tidewave.MixProject do
         "pages/features/inspector.md",
         "pages/features/mermaid.md",
         "pages/features/notifications.md",
+        "pages/features/task_board.md",
         "pages/features/teams.md",
         "pages/features/viewport.md",
         "pages/providers/claude_code.md",
