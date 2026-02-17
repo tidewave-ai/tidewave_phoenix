@@ -1,6 +1,6 @@
-# Opencode
+# OpenCode
 
-You can use Tidewave MCP with [opencode](https://opencode.ai/) by adding the following to your opencode config, either:
+You can use Tidewave MCP with [OpenCode](https://opencode.ai/) by adding the following to your opencode config, either:
 
 - Globally, typically in `~/.config/opencode/opencode.json`, or
 - Per project, typically in `/path/to/your-project/opencode.json`

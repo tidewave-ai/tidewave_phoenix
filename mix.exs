@@ -77,19 +77,20 @@ defmodule Tidewave.MixProject do
       extras: [
         "pages/installation.md",
         "pages/features/accessibility.md",
-        "pages/features/agentsmd.md",
         "pages/features/inspector.md",
         "pages/features/mermaid.md",
         "pages/features/notifications.md",
-        "pages/features/providers.md",
         "pages/features/teams.md",
         "pages/features/viewport.md",
-        "pages/integrations/claude_code.md",
-        "pages/integrations/codex.md",
+        "pages/providers/claude_code.md",
+        "pages/providers/codex.md",
+        "pages/providers/github_copilot.md",
+        "pages/providers/opencode.md",
+        "pages/providers/openrouter.md",
+        "pages/providers/third_party.md",
         "pages/integrations/editors.md",
         "pages/integrations/figma.md",
         "pages/integrations/frontend.md",
-        "pages/integrations/opencode.md",
         "pages/integrations/supabase.md",
         "pages/guides/containers.md",
         "pages/guides/https.md",
@@ -108,6 +109,7 @@ defmodule Tidewave.MixProject do
         "pages/mcp/mcp_proxy.md"
       ],
       groups_for_extras: [
+        Providers: ~r/(pages\/providers\/.?)/,
         Features: ~r/(pages\/features\/.?)/,
         Integrations: ~r/(pages\/integrations\/.?)/,
         Guides: ~r/(pages\/guides\/.?)/,
@@ -116,7 +118,8 @@ defmodule Tidewave.MixProject do
       redirects: %{
         "react" => "frontend",
         "vue" => "frontend",
-        "mcp_troubleshooting" => "mcp"
+        "mcp_troubleshooting" => "mcp",
+        "providers" => "installation"
       }
     ]
   end

@@ -27,13 +27,9 @@ and their context.
 
 ## Configure your prompts
 
-Tidewave allows you to write an AGENTS.md file that is given as context
-to models. We have [a dedicated page to this feature](agentsmd.md),
-where you can learn more.
-
-Such files can also be used to prompt Tidewave to use certain tools
-above others, so you can steer them towards using your favorite
-Tidewave tools more frequently.
+All coding agents (except Claude Code) allows you to write an [`AGENTS.md`](https://agents.md/)
+file that is given as context to models, with specifics to your application
+and stack. If you are using Claude Code, you can use a `CLAUDE.md` file instead.
 
 ## Use eval: AI's swiss army knife
 
@@ -69,21 +65,3 @@ In our experience, models become less effective when there are too many
 tools, and work best with a few powerful ones. With our eval tools, Tidewave
 has the full power of your programming language within the context of your
 project.
-
-## Plan and think ahead
-
-Different models will require different techniques to produce the best
-results but the majority of them will output better code if you ask them
-to plan ahead.
-
-In particular, thinking models can be prompted into thinking, at different
-effort levels, by simply asking them to. For example, Claude says:
-
-> We recommend using the word "think" to trigger extended thinking mode,
-> which gives Claude additional computation time to evaluate alternatives
-> more thoroughly. These specific phrases are mapped directly to increasing
-> levels of thinking budget in the system: "think" < "think hard" <
-> "think harder" < "ultrathink." Each level allocates progressively more
-> thinking budget for Claude to use.
-
-- https://www.anthropic.com/engineering/claude-code-best-practices
