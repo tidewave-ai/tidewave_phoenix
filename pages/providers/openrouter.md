@@ -6,9 +6,9 @@ There are two options to connect Tidewave Web to OpenRouter:
 
 * [By using Codex with custom providers](codex.md#custom-providers). The Codex CLI can be customized to run with any OpenAI compatible providers, which includes OpenRouter
 
-## `OPENROUTER_API_KEY`
+## The `OPENROUTER_API_KEY` environment variable
 
-You can set the `OPENROUTER_API_KEY` environment variable in your Tidewave app and OpenCode should automatically pick it up. Click on the Tidewave icon in your menu bar (top-right on macOS and Linux, bottom-right on Windows) and then on "Settings...". Doing so will open a file where you can add the desired environment variables, for example:
+You optionally set the `OPENROUTER_API_KEY` environment variable in your Tidewave app and OpenCode should automatically pick it up. Click on the Tidewave icon in your menu bar (top-right on macOS and Linux, bottom-right on Windows) and then on "Settings...". Doing so will open a file where you can add the desired environment variables, for example:
 
 ```toml
 # This file is used to configure the Tidewave app.
