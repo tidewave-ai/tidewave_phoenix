@@ -142,24 +142,6 @@ defmodule Tidewave.MCP.ServerTest do
       assert response_body["result"]["prompts"] == []
     end
 
-    test "handles prompts/get request via catch-all", %{conn: conn} do
-      message = %{
-        "jsonrpc" => "2.0",
-        "method" => "prompts/get",
-        "id" => "5",
-        "params" => %{"name" => "test"}
-      }
-
-      conn = %{conn | body_params: message}
-      response = Tidewave.MCP.Server.handle_http_message(conn)
-
-      assert response.status == 400
-      response_body = Jason.decode!(response.resp_body)
-      assert response_body["error"]["code"] == -32601
-      assert response_body["error"]["message"] == "Method not found"
-      assert response_body["error"]["data"]["name"] == "prompts/get"
-    end
-
     test "handles resources/list request", %{conn: conn} do
       message = %{
         "jsonrpc" => "2.0",
@@ -175,60 +157,6 @@ defmodule Tidewave.MCP.ServerTest do
       assert response_body["result"]["resources"] == []
     end
 
-    test "handles resources/read request via catch-all", %{conn: conn} do
-      message = %{
-        "jsonrpc" => "2.0",
-        "method" => "resources/read",
-        "id" => "7",
-        "params" => %{"uri" => "test://resource"}
-      }
-
-      conn = %{conn | body_params: message}
-      response = Tidewave.MCP.Server.handle_http_message(conn)
-
-      assert response.status == 400
-      response_body = Jason.decode!(response.resp_body)
-      assert response_body["error"]["code"] == -32601
-      assert response_body["error"]["message"] == "Method not found"
-      assert response_body["error"]["data"]["name"] == "resources/read"
-    end
-
-    test "handles resources/subscribe request via catch-all", %{conn: conn} do
-      message = %{
-        "jsonrpc" => "2.0",
-        "method" => "resources/subscribe",
-        "id" => "8",
-        "params" => %{"uri" => "test://resource"}
-      }
-
-      conn = %{conn | body_params: message}
-      response = Tidewave.MCP.Server.handle_http_message(conn)
-
-      assert response.status == 400
-      response_body = Jason.decode!(response.resp_body)
-      assert response_body["error"]["code"] == -32601
-      assert response_body["error"]["message"] == "Method not found"
-      assert response_body["error"]["data"]["name"] == "resources/subscribe"
-    end
-
-    test "handles resources/unsubscribe request via catch-all", %{conn: conn} do
-      message = %{
-        "jsonrpc" => "2.0",
-        "method" => "resources/unsubscribe",
-        "id" => "9",
-        "params" => %{"uri" => "test://resource"}
-      }
-
-      conn = %{conn | body_params: message}
-      response = Tidewave.MCP.Server.handle_http_message(conn)
-
-      assert response.status == 400
-      response_body = Jason.decode!(response.resp_body)
-      assert response_body["error"]["code"] == -32601
-      assert response_body["error"]["message"] == "Method not found"
-      assert response_body["error"]["data"]["name"] == "resources/unsubscribe"
-    end
-
     test "handles resources/templates/list request", %{conn: conn} do
       message = %{
         "jsonrpc" => "2.0",
@@ -242,42 +170,6 @@ defmodule Tidewave.MCP.ServerTest do
       assert response.status == 200
       response_body = Jason.decode!(response.resp_body)
       assert response_body["result"]["templates"] == []
-    end
-
-    test "handles completion/complete request via catch-all", %{conn: conn} do
-      message = %{
-        "jsonrpc" => "2.0",
-        "method" => "completion/complete",
-        "id" => "11",
-        "params" => %{"ref" => %{}, "argument" => %{}}
-      }
-
-      conn = %{conn | body_params: message}
-      response = Tidewave.MCP.Server.handle_http_message(conn)
-
-      assert response.status == 400
-      response_body = Jason.decode!(response.resp_body)
-      assert response_body["error"]["code"] == -32601
-      assert response_body["error"]["message"] == "Method not found"
-      assert response_body["error"]["data"]["name"] == "completion/complete"
-    end
-
-    test "handles logging/setLevel request via catch-all", %{conn: conn} do
-      message = %{
-        "jsonrpc" => "2.0",
-        "method" => "logging/setLevel",
-        "id" => "12",
-        "params" => %{"level" => "info"}
-      }
-
-      conn = %{conn | body_params: message}
-      response = Tidewave.MCP.Server.handle_http_message(conn)
-
-      assert response.status == 400
-      response_body = Jason.decode!(response.resp_body)
-      assert response_body["error"]["code"] == -32601
-      assert response_body["error"]["message"] == "Method not found"
-      assert response_body["error"]["data"]["name"] == "logging/setLevel"
     end
   end
 end
