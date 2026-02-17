@@ -126,5 +126,50 @@ defmodule Tidewave.MCP.ServerTest do
       assert response_body["id"] == "3"
       assert response_body["result"]["content"]
     end
+
+    test "handles prompts/list request", %{conn: conn} do
+      message = %{
+        "jsonrpc" => "2.0",
+        "method" => "prompts/list",
+        "id" => "4"
+      }
+
+      conn = %{conn | body_params: message}
+      response = Tidewave.MCP.Server.handle_http_message(conn)
+
+      assert response.status == 200
+      response_body = Jason.decode!(response.resp_body)
+      assert response_body["result"]["prompts"] == []
+    end
+
+    test "handles resources/list request", %{conn: conn} do
+      message = %{
+        "jsonrpc" => "2.0",
+        "method" => "resources/list",
+        "id" => "6"
+      }
+
+      conn = %{conn | body_params: message}
+      response = Tidewave.MCP.Server.handle_http_message(conn)
+
+      assert response.status == 200
+      response_body = Jason.decode!(response.resp_body)
+      assert response_body["result"]["resources"] == []
+    end
+
+    test "handles resources/templates/list request", %{conn: conn} do
+      message = %{
+        "jsonrpc" => "2.0",
+        "method" => "resources/templates/list",
+        "id" => "10"
+      }
+
+      conn = %{conn | body_params: message}
+      response = Tidewave.MCP.Server.handle_http_message(conn)
+
+      assert response.status == 200
+      response_body = Jason.decode!(response.resp_body)
+      assert response_body["result"]["templates"] == []
+    end
   end
 end

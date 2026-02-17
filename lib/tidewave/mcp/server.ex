@@ -139,6 +139,18 @@ defmodule Tidewave.MCP.Server do
     result_or_error(request_id, {:ok, %{tools: tools()}})
   end
 
+  defp handle_list_prompts(request_id, _params) do
+    result_or_error(request_id, {:ok, %{prompts: []}})
+  end
+
+  defp handle_list_resources(request_id, _params) do
+    result_or_error(request_id, {:ok, %{resources: []}})
+  end
+
+  defp handle_list_templates(request_id, _params) do
+    result_or_error(request_id, {:ok, %{templates: []}})
+  end
+
   defp result_or_error(request_id, {:ok, text, metadata})
        when is_binary(text) and is_map(metadata) do
     result_or_error(request_id, {:ok, %{content: [%{type: "text", text: text}], _meta: metadata}})
@@ -249,6 +261,18 @@ defmodule Tidewave.MCP.Server do
         )
 
         safe_call_tool(id, message["params"], assigns)
+
+      "prompts/list" ->
+        Logger.debug("Handling prompts list request")
+        handle_list_prompts(id, message["params"])
+
+      "resources/list" ->
+        Logger.debug("Handling resources list request")
+        handle_list_resources(id, message["params"])
+
+      "resources/templates/list" ->
+        Logger.debug("Handling templates list request")
+        handle_list_templates(id, message["params"])
 
       other ->
         Logger.warning("Received unsupported method: #{other}")
