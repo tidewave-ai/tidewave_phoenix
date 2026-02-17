@@ -13,7 +13,7 @@ assistant.
 
 Tidewave is made of two components:
 
-* The Tidewave server, running from the desktop App/cli
+* The Tidewave server, running from the desktop App/CLI
 * The Tidewave MCP, running over the same host and port as your web application
 
 Theoretically, someone in the same network as you would be able to access Tidewave and its services to evaluate code. Luckily, there are best practices put in place to prevent that:
@@ -29,10 +29,12 @@ Theoretically, someone in the same network as you would be able to access Tidewa
   * **Origin checks** - For browser requests, Tidewave also verifies that
     the request's "origin" header matches your development URL.
 
-By default, both Tidewave server and Tidewave MCP only allow local access.
-In case you need to expose Tidewave remotely, you can pass the `--allow-remote-access`
-to the Tidewave CLI. In rare cases, you can also enable such configuration
-within your web frameworks. **Do so with care**.
+By default, both Tidewave server and Tidewave MCP only allow local access,
+keeping it constrained to your development environment. In case you need to
+expose Tidewave remotely (for example, you are running it inside a remote
+sandbox), you can pass the `--allow-remote-access` flag to the Tidewave CLI.
+In rare cases, you can also enable such configuration within your web frameworks.
+**Do so with caution**.
 
 ## Tool execution
 

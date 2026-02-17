@@ -22,7 +22,7 @@ end
 Then, for Phoenix applications, go to your `lib/my_app_web/endpoint.ex` and right above the `if code_reloading? do` block, add:
 
 ```diff
-+  if Code.ensure_loaded?(Tidewave) do
++  if Mix.env() == :dev do
 +    plug Tidewave
 +  end
 
@@ -112,7 +112,7 @@ You may configure the `Tidewave` plug using the following syntax:
 
 The following options are available:
 
-  * `:allow_remote_access` - Tidewave MCP only allows requests from localhost by default, even if your server listens on other interfaces. If you trust your network and need to access Tidewave MCP from a different machine, this configuration can be set to `true`.
+  * `:allow_remote_access` - Tidewave only allows requests from localhost by default, even if your server listens on other interfaces, for security purposes. Read [our security guidelines for more information and when to allow remote access](https://hexdocs.pm/tidewave/security.html) (if you know what you are doing)
 
   * `:inspect_opts` - Custom options passed to `Kernel.inspect/2` when formatting some tool results. Defaults to: `[charlists: :as_lists, limit: 50, pretty: true]`
 

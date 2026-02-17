@@ -4,7 +4,7 @@ if Code.ensure_loaded?(Igniter) do
 
     @moduledoc false
     @plug_example """
-    + if Code.ensure_loaded?(Tidewave) do
+    + if Mix.env() == :dev do
     +   plug Tidewave
     + end
 
@@ -62,7 +62,7 @@ if Code.ensure_loaded?(Igniter) do
            Igniter.Code.Common.add_code(
              zipper,
              """
-             if Code.ensure_loaded?(Tidewave) do
+             if Mix.env() == :dev do
                plug Tidewave
              end
              """,
