@@ -153,11 +153,15 @@ defmodule Tidewave.MCP.Tools.Ecto do
   defp apps do
     # This is the same code ecto uses to find repos for tasks like mix ecto.migrate
     # https://github.com/elixir-ecto/ecto/blob/cd0f70b4cdd949767ea7cbe7d635e70917384b38/lib/mix/ecto.ex#L24-L52
-    if apps_paths = Mix.Project.apps_paths() do
-      Enum.filter(Mix.Project.deps_apps(), &is_map_key(apps_paths, &1))
-    else
-      [Mix.Project.config()[:app]]
-    end
+    discovered =
+      if apps_paths = Mix.Project.apps_paths() do
+        Enum.filter(Mix.Project.deps_apps(), &is_map_key(apps_paths, &1))
+      else
+        [Mix.Project.config()[:app]]
+      end
+
+    extra = Application.get_env(:tidewave, :extra_apps, [])
+    Enum.uniq(discovered ++ extra)
   end
 
   defp ecto_repos do
