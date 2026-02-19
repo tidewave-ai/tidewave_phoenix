@@ -160,7 +160,7 @@ defmodule Tidewave.MCP.Tools.Ecto do
         [Mix.Project.config()[:app]]
       end
 
-    extra = Application.get_env(:tidewave, :ecto_apps, [])
+    extra = Application.get_env(:tidewave, :extra_apps, [])
     Enum.uniq(discovered ++ extra)
   end
 
