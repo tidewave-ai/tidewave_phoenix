@@ -26,6 +26,10 @@ Open up Tidewave Web settings, choose the Providers tab, choose "OpenAI Codex" a
 
 Once connected, we will automatically configure Codex to also use Tidewave MCP. You may disable this option if (and only if) you have already customized Codex to use Tidewave MCP.
 
+> #### Custom `codex-acp` installation
+>
+> It is possible to use a custom `codex-acp` implementation by setting the `TIDEWAVE_CODEX_ACP_EXECUTABLE` environment variable, either in your running web application, or in the Tidewave App/CLI. This is rarely needed in practice but it may be required in some operating systems like NixOS.
+
 ## Custom Providers
 
 Codex comes with the ablity of running custom providers. This can be used to configure [Ollama](https://docs.ollama.com/integrations/codex), OpenRouter, and other OpenAI compatible endpoints.

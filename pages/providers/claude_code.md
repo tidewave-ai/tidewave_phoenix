@@ -3,14 +3,13 @@
 You can connect Tidewave Web directly to [Claude Code](https://www.claude.com/product/claude-code) by following the steps below:
 
 1. Install the `claude` CLI
-2. Authenticate with your Claude subscription
-3. Connect to Claude Code
+2. Connect to Claude Code
 
 Once setup, Tidewave will use your Claude Code subscription and settings (including MCP servers, subagents, etc).
 
 ## Install the `claude` CLI
 
-You can [install the Claude Code CLI in different ways](https://docs.claude.com/en/docs/claude-code/setup). However, because installing the `Claude Code ACP`, in step 3, requires using `npm`, our recommendation is to [install `npm`](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) and then run:
+You can [install the Claude Code CLI in different ways](https://docs.claude.com/en/docs/claude-code/setup). However, because a later step requires using `npm`, our recommendation is to [install `npm`](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) and then run:
 
 ```shell
 npm install -g @anthropic-ai/claude-code`
@@ -18,21 +17,13 @@ npm install -g @anthropic-ai/claude-code`
 
 If you install `claude` and Tidewave Web cannot detect it, please restart the Tidewave App/CLI by clicking its menu bar icon (top-right on macOS and Linux, bottom-right on Windows) and selecting "Restart".
 
-## Authenticate with Claude
-
-Once `claude` is installed, you must authenticate with your Claude subscription. You can do this by simply running `claude` in any directory and then following the described steps:
-
-```shell
-claude
-```
-
 ## Connect to Claude Code
 
-If you have `npm`/`npx` available in your PATH, Tidewave will use it to automatically install and connect to [Claude Code ACP](https://github.com/zed-industries/claude-code-acp). Open up Tidewave Web settings, choose the Providers tab, choose "Claude Code" and click "Connect".
+If you have `npm`/`npx` available in your PATH, Tidewave will use it to automatically install and connect to [Claude Agent ACP](https://github.com/zed-industries/claude-agent-acp). Open up Tidewave Web settings, choose the Providers tab, choose "Claude Code" and click "Connect".
 
 <iframe width="640" height="360" src="https://www.youtube.com/embed/qxzPZ0PGd2s?si=mnci1z08B44y1F5z" title="Tidewave and Claude Code" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-If "Connect" is not available, it is because `npm`/`npx` could not be found. You can check your `npm`/`npx` installation by running `which npx` (on macOS/Unix) or `where npx` (Windows) in the same terminal you start your web server. If it fails (and only if it fails), you can explicitly install `claude-code-acp` with `npm install -g @zed-industries/claude-code-acp`.
+If "Connect" is not available, it is because `npm`/`npx` could not be found. You can check your `npm`/`npx` installation by running `which npx` (on macOS/Unix) or `where npx` (Windows) in the same terminal you start your web server.
 
 Once Tidewave Web connects to Claude Code, we will automatically configure Claude Code to also use Tidewave MCP. You may disable this option if (and only if) you have already customized Claude Code to use Tidewave MCP.
 

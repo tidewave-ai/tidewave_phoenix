@@ -6,6 +6,10 @@ Simply open up Tidewave Web settings, choose the Providers tab, choose "OpenCode
 
 Once connected, we will automatically configure OpenCode to also use Tidewave MCP. You may disable this option if (and only if) you have already customized Codex to use Tidewave MCP.
 
+> #### Custom `opencode` installation
+>
+> It is possible to use a custom `opencode` implementation by setting the `TIDEWAVE_OPENCODE_EXECUTABLE` environment variable, either in your running web application, or in the Tidewave App/CLI. This is rarely needed in practice but it may be required in some operating systems like NixOS.
+
 ## Adding models
 
 > #### Tidewave App/CLI minimum version {: .warning}
