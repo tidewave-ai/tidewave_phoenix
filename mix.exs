@@ -122,10 +122,10 @@ defmodule Tidewave.MixProject do
         "mcp_troubleshooting" => "mcp",
         "providers" => "installation"
       },
-      # Override version nodes to avoid confusion between TidewaveApp and TidewavePhoenix
-      before_closing_head_tag: fn
-        :html -> "<script>window.versionNodes = []</script>"
-        _ -> ""
+      before_closing_head_tag: fn _ ->
+        # Hide version nodes to avoid confusion between TidewaveApp and TidewavePhoenix.
+        # But we still keep go to latest.
+        "<style>.sidebar-projectVersion form label { display: none; }</style>"
       end
     ]
   end
