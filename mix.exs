@@ -121,7 +121,12 @@ defmodule Tidewave.MixProject do
         "vue" => "frontend",
         "mcp_troubleshooting" => "mcp",
         "providers" => "installation"
-      }
+      },
+      # Override version nodes to avoid confusion between TidewaveApp and TidewavePhoenix
+      before_closing_head_tag: fn
+        :html -> "<script>window.versionNodes = []</script>"
+        _ -> ""
+      end
     ]
   end
 end

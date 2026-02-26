@@ -10,7 +10,7 @@ Task boards are useful when you want to break a larger effort into smaller piece
   * **Parallel workstreams** — you can use one session to create and manage tasks, while a separate session claims and completes tasks from the same board.
   * **Resuming later** — close your session and come back the next day to continue right where you left off.
 
-To use task boards, you must assign a board to a chat before you send the first message.
+To use task boards, you must assign a board to a chat before you send the first message. When you assign a board to a chat, the "todo list" feature is replaced by task management tools that operate directly on the board.
 
 You must also keep in mind the following limitations:
 
