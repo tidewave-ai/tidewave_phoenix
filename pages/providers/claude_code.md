@@ -1,31 +1,14 @@
 # Claude Code
 
-You can connect Tidewave Web directly to [Claude Code](https://www.claude.com/product/claude-code) by following the steps below:
+You can connect Tidewave Web directly to [Claude Code](https://www.claude.com/product/claude-code).
 
-1. Install the `claude` CLI
-2. Connect to Claude Code
+Simply open up Tidewave Web settings, choose the Providers tab, choose "Claude Code" and click "Connect". Next we will automatically download and install Claude for you.
 
-Once setup, Tidewave will use your Claude Code subscription and settings (including MCP servers, subagents, etc).
+Once connected, we will automatically configure Claude to also use Tidewave MCP. You may disable this option if (and only if) you have already customized Claude Code to use Tidewave MCP.
 
-## Install the `claude` CLI
-
-You can [install the Claude Code CLI in different ways](https://docs.claude.com/en/docs/claude-code/setup). However, because a later step requires using `npm`, our recommendation is to [install `npm`](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) and then run:
-
-```shell
-npm install -g @anthropic-ai/claude-code`
-```
-
-If you install `claude` and Tidewave Web cannot detect it, please restart the Tidewave App/CLI by clicking its menu bar icon (top-right on macOS and Linux, bottom-right on Windows) and selecting "Restart".
-
-## Connect to Claude Code
-
-If you have `npm`/`npx` available in your PATH, Tidewave will use it to automatically install and connect to [Claude Agent ACP](https://github.com/zed-industries/claude-agent-acp). Open up Tidewave Web settings, choose the Providers tab, choose "Claude Code" and click "Connect".
-
-<iframe width="640" height="360" src="https://www.youtube.com/embed/qxzPZ0PGd2s?si=mnci1z08B44y1F5z" title="Tidewave and Claude Code" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-
-If "Connect" is not available, it is because `npm`/`npx` could not be found. You can check your `npm`/`npx` installation by running `which npx` (on macOS/Unix) or `where npx` (Windows) in the same terminal you start your web server.
-
-Once Tidewave Web connects to Claude Code, we will automatically configure Claude Code to also use Tidewave MCP. You may disable this option if (and only if) you have already customized Claude Code to use Tidewave MCP.
+> #### Custom `claude-agent-acp` installation
+>
+> Tidewave talks to Claude Code using the [Claude Agent ACP](https://github.com/zed-industries/claude-agent-acp) project. It is possible to use a custom `claude-agent-acp` executable by setting the `TIDEWAVE_CLAUDE_AGENT_ACP_EXECUTABLE` environment variable, either in your running web application, or in the Tidewave App/CLI. This is rarely needed in practice but it may be required in some operating systems like NixOS.
 
 ## Customizing your environment
 
@@ -55,8 +38,6 @@ If you are using the CLI, you can set those variables when starting the CLI.
 
 #### Using Tidewave Web with Claude Code emits "Authentication required"
 
-This means you haven't authenticated in the `claude` CLI. Remember to run `claude` and, if Tidewave Web still claims you are not authenticated, restart the Tidewave App/CLI by clicking its menu bar icon (top-right on macOS and Linux, bottom-right on Windows) and selecting "Restart".
+This means you haven't authenticated in the `claude` CLI. Go to "Settings", click "Providers", and then "Claude Code". If you are connected to Claude Code, you should see a "Open Terminal" option. Open up the terminal and type `/login` to authenticate. Alternatively, you can `claude` in your terminal of choice.
 
-#### `claude` is available on my machine but Tidewave cannot find it
-
-Please double check `claude` is indeed available as an executable by running `which claude`. In some installations, `claude` is installed as an alias, which cannot be found nor used by Tidewave.
+If Tidewave Web still claims you are not authenticated, restart the Tidewave App/CLI by clicking its menu bar icon (top-right on macOS and Linux, bottom-right on Windows) and selecting "Restart".

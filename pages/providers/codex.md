@@ -6,7 +6,7 @@ You can connect Tidewave Web directly to [OpenAI Codex CLI](https://developers.o
 2. Authenticate with your OpenAI subscription
 3. Connect to Codex
 
-Once setup, Tidewave will use your OpenAI subscription and settings (including MCP servers, subagents, etc).
+Once setup, Tidewave will use your OpenAI subscription and settings (including MCP servers, subagents, etc). Note you can also use your OpenAI subscription with [OpenCode](opencode.md).
 
 ## Install the `codex` CLI
 
@@ -28,7 +28,7 @@ Once connected, we will automatically configure Codex to also use Tidewave MCP. 
 
 > #### Custom `codex-acp` installation
 >
-> It is possible to use a custom `codex-acp` implementation by setting the `TIDEWAVE_CODEX_ACP_EXECUTABLE` environment variable, either in your running web application, or in the Tidewave App/CLI. This is rarely needed in practice but it may be required in some operating systems like NixOS.
+> Tidewave talks to Codex using the [Claude Agent ACP](https://github.com/zed-industries/codex-acp) project. It is possible to use a custom `codex-acp` executable by setting the `TIDEWAVE_CODEX_ACP_EXECUTABLE` environment variable, either in your running web application, or in the Tidewave App/CLI. This is rarely needed in practice but it may be required in some operating systems like NixOS.
 
 ## Custom Providers
 
