@@ -6,4 +6,4 @@ There are three mechanisms you can extend Tidewave Web beyond the providers list
 
 * [By using Codex with custom providers](codex.md#custom-providers). The Codex CLI can be customized to run with any OpenAI compatible providers, which includes [Ollama](https://ollama.com) and external services
 
-* By using External Agents that implement the [Agent Client Protocol](http://agentclientprotocol.com) (ACP) - you can enable them in the "External Agents" tab under the advanced settings. Given ACP is still evolving, keep in mind Tidewave may not work as expected when using such agents
+* By using External Agents that implement the [Agent Client Protocol](https://agentclientprotocol.com/get-started/registry) (ACP) - you can enable them in the "External Agents" tab under the advanced settings. Given ACP is still evolving, keep in mind Tidewave may not work as expected with all possible agents
