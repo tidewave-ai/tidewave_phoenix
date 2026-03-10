@@ -18,7 +18,7 @@ Create a file at `.cursor/mcp.json` and add the following contents:
 }
 ```
 
-Where `$PORT` is the port your web application is running on.
+Replace `$PORT` by the port your web application is running on.
 
 If you prefer, you can also add Tidewave globally to your editor
 by adding the same contents as above to the `~/.cursor/mcp.json`

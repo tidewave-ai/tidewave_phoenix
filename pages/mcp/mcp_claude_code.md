@@ -14,7 +14,7 @@ Invoke the `claude` CLI to add `tidewave` using the HTTP transport:
 $ claude mcp add --transport http tidewave http://localhost:$PORT/tidewave/mcp
 ```
 
-Where `$PORT` is the port your web application is running on. And you are good to go!
+Replace `$PORT` by the port your web application is running on. And you are good to go!
 
 ## Verify
 

@@ -17,7 +17,7 @@ In the new pane, select "Add Custom Server" to open a new dialog. Once the dialo
 }
 ```
 
-Where `$PORT` is the port your web application is running on.
+Replace `$PORT` by the port your web application is running on.
 
 And you are good to go! Now Zed will list all tools from Tidewave available.
 If your application uses a SQL database, you can verify it all works by asking

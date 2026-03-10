@@ -19,4 +19,4 @@ by adding the following:
 }
 ```
 
-Where `$PORT` is the port your web application is running on.
+Replace `$PORT` by the port your web application is running on.

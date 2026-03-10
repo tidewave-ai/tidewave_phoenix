@@ -15,7 +15,7 @@ Invoke the `codex` CLI to add `tidewave` using the HTTP transport:
 $ codex mcp add tidewave --url http://localhost:$PORT/tidewave/mcp
 ```
 
-Where `$PORT` is the port your web application is running on. And you are good to go!
+Replace `$PORT` by the port your web application is running on. And you are good to go!
 
 ## Verify
 
