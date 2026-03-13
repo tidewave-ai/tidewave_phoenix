@@ -14,7 +14,7 @@ In the example above, `https://example.com:9898` is the exact address you will t
 
 > #### HTTPS advised {: .warning}
 >
-> We stronly advise using HTTPS addresses for remote access. We currently do not guarantee remote Tidewave instances work without HTTPS. See [HTTPS](https.md) guide for more information.
+> We strongly advise using HTTPS addresses for remote access. We currently do not guarantee remote Tidewave instances work without HTTPS. See [HTTPS](https.md) guide for more information.
 
 > #### Loopback address required {: .warning}
 >
