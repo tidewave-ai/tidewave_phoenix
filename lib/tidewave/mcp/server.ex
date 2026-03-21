@@ -6,6 +6,8 @@ defmodule Tidewave.MCP.Server do
   import Plug.Conn
   alias Tidewave.MCP.Tools
 
+  @compile {:no_warn_undefined, {Phoenix.CodeReloader, :reload, 1}}
+
   @protocol_version "2025-03-26"
   @vsn Mix.Project.config()[:version]
 
@@ -26,7 +28,11 @@ defmodule Tidewave.MCP.Server do
   @doc false
   def init_tools do
     tools = raw_tools()
-    dispatch_map = Map.new(tools, fn tool -> {tool.name, tool.callback} end)
+
+    dispatch_map =
+      Map.new(tools, fn tool ->
+        {tool.name, {tool.callback, Map.get(tool, :recompile, false)}}
+      end)
 
     # TODO: switch back to persistent_term when we don't support OTP 27 any more
     # :persistent_term.put({__MODULE__, :tools_and_dispatch}, {tools, dispatch_map})
@@ -48,7 +54,7 @@ defmodule Tidewave.MCP.Server do
     for tool <- tools do
       tool
       |> Map.put(:description, String.trim(tool.description))
-      |> Map.drop([:callback])
+      |> Map.drop([:callback, :recompile])
     end
   end
 
@@ -65,11 +71,13 @@ defmodule Tidewave.MCP.Server do
     {_tools, dispatch} = tools_and_dispatch()
 
     case dispatch do
-      %{^name => callback} when is_function(callback, 2) ->
-        callback.(args, assigns)
+      %{^name => {callback, recompile}} ->
+        if recompile, do: maybe_reload(assigns)
 
-      %{^name => callback} when is_function(callback, 1) ->
-        callback.(args)
+        case Function.info(callback, :arity) do
+          {:arity, 2} -> callback.(args, assigns)
+          {:arity, 1} -> callback.(args)
+        end
 
       _ ->
         {:error,
@@ -80,6 +88,20 @@ defmodule Tidewave.MCP.Server do
              name: name
            }
          }}
+    end
+  end
+
+  defp maybe_reload(assigns) do
+    cond do
+      endpoint = assigns[:phoenix_endpoint] ->
+        Phoenix.CodeReloader.reload(endpoint)
+
+      Application.get_env(:tidewave, :recompile_on_tool_call, false) and
+          Code.ensure_loaded?(IEx.Helpers) ->
+        IEx.Helpers.recompile()
+
+      true ->
+        :ok
     end
   end
 

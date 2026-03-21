@@ -26,7 +26,9 @@ defmodule Tidewave.MCP.Tools.Ash do
             properties: %{}
           },
           annotations: %{readOnlyHint: true},
-          callback: &get_ash_resources/1
+
+          callback: &get_ash_resources/1,
+          recompile: true
         }
       ]
     else
