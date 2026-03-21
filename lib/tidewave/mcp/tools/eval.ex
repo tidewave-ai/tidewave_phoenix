@@ -1,8 +1,6 @@
 defmodule Tidewave.MCP.Tools.Eval do
   @moduledoc false
 
-  @compile {:no_warn_undefined, Phoenix.CodeReloader}
-
   alias Tidewave.MCP.StandardError
 
   def tools do
@@ -44,7 +42,8 @@ defmodule Tidewave.MCP.Tools.Eval do
             }
           }
         },
-        callback: &project_eval/2
+        callback: &project_eval/2,
+        recompile: true
       }
     ]
   end
@@ -69,11 +68,6 @@ defmodule Tidewave.MCP.Tools.Eval do
 
   defp eval_code(code, arguments, timeout, json?, assigns) do
     parent = self()
-
-    if endpoint = assigns[:phoenix_endpoint] do
-      Phoenix.CodeReloader.reload(endpoint)
-    end
-
     inspect_opts = assigns.inspect_opts
 
     {pid, ref} =

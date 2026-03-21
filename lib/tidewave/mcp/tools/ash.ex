@@ -25,7 +25,8 @@ defmodule Tidewave.MCP.Tools.Ash do
             required: [],
             properties: %{}
           },
-          callback: &get_ash_resources/1
+          callback: &get_ash_resources/1,
+          recompile: true
         }
       ]
     else
