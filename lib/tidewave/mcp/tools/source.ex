@@ -29,7 +29,8 @@ defmodule Tidewave.MCP.Tools.Source do
             }
           }
         },
-        callback: &get_source_location/1
+        callback: &get_source_location/1,
+        recompile: true
       },
       %{
         name: "get_docs",
@@ -51,7 +52,8 @@ defmodule Tidewave.MCP.Tools.Source do
             }
           }
         },
-        callback: &get_docs/1
+        callback: &get_docs/1,
+        recompile: true
       }
     ]
   end

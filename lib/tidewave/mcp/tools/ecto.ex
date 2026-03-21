@@ -77,7 +77,8 @@ defmodule Tidewave.MCP.Tools.Ecto do
             required: [],
             properties: %{}
           },
-          callback: &get_ecto_schemas/1
+          callback: &get_ecto_schemas/1,
+          recompile: true
         }
       ]
     else
