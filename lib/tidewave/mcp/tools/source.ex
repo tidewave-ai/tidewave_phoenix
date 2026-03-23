@@ -17,6 +17,10 @@ defmodule Tidewave.MCP.Tools.Source do
         If that is the case, prefer this tool over grepping the file system.
 
         You can also use "dep:PACKAGE_NAME" to get the location of a specific dependency package.
+
+        Fuzzy search: If an exact match is not found, the tool will suggest similar matches.
+        You can use partial names like "User.Token" to find "MyApp.Accounts.User.Token",
+        or slightly misspelled function names like "iniz" to find "init".
         """,
         inputSchema: %{
           type: "object",
@@ -25,7 +29,7 @@ defmodule Tidewave.MCP.Tools.Source do
             reference: %{
               type: "string",
               description:
-                "The reference to get source location for. Can be a module name, a Module.function or Module.function/arity."
+                "The reference to get source location for. Can be a module name (e.g., 'User'), a Module.function (e.g., 'User.changeset'), or Module.function/arity (e.g., 'User.changeset/2'). Supports fuzzy matching for partial or slightly misspelled names."
             }
           }
         },
@@ -243,6 +247,10 @@ defmodule Tidewave.MCP.Tools.Source do
   @otp_apps ~w(kernel stdlib)a
   @apps @elixir_apps ++ @otp_apps
 
+  # Similarity threshold for fuzzy matching (0.0 to 1.0)
+  # Higher values require closer matches
+  @fuzzy_threshold 0.75
+
   defp rewrite_source(module, source) do
     case :application.get_application(module) do
       {:ok, app} when app in @apps ->
@@ -371,13 +379,13 @@ defmodule Tidewave.MCP.Tools.Source do
     candidates =
       for candidate <- modules,
           distance = alias_aware_distance(mod, candidate),
-          distance > 0.8,
+          distance >= @fuzzy_threshold,
           do: {distance, candidate}
 
     candidates =
       candidates
       |> Enum.sort_by(fn {distance, _} -> distance end, :desc)
-      |> Enum.take(3)
+      |> Enum.take(5)
       |> Enum.map(fn {_, candidate} -> candidate end)
 
     try_find_and_halt = fn mod, fun, arity, acc ->
@@ -401,8 +409,24 @@ defmodule Tidewave.MCP.Tools.Source do
 
     case result do
       {:ok, {new_mod, new_fun, new_arity}} ->
-        {:error,
-         "Did not find exact match. Did you mean: #{format_mfa(new_mod, new_fun, new_arity)}"}
+        suggestion = format_mfa(new_mod, new_fun, new_arity)
+
+        context_hint =
+          cond do
+            mod == new_mod and function != nil and new_fun != nil and function != new_fun ->
+              " (similar function name)"
+
+            mod == new_mod and function != nil and new_fun != nil and function == new_fun ->
+              " (different arity)"
+
+            mod != new_mod and function == nil ->
+              " (similar module name)"
+
+            true ->
+              ""
+          end
+
+        {:error, "Did not find exact match. Did you mean: #{suggestion}#{context_hint}?"}
 
       {:error, error} ->
         if type == :project do
@@ -454,7 +478,6 @@ defmodule Tidewave.MCP.Tools.Source do
     jaro_score * (0.9 + 0.1 * length_penalty)
   end
 
-
   defp all_functions(module) do
     with [_ | _] = beam <- :code.which(module),
          {:ok, {_, [abstract_code: abstract_code]}} <- :beam_lib.chunks(beam, [:abstract_code]),
@@ -475,38 +498,39 @@ defmodule Tidewave.MCP.Tools.Source do
 
   defp find_same_function_different_arity(_mod, _fun, :*), do: :error
 
-  defp find_same_function_different_arity(mod, fun, _arity) do
+  defp find_same_function_different_arity(mod, fun, requested_arity) do
     functions = all_functions(mod)
 
-    if {fun, arity} = Enum.find(functions, fn {candidate_fun, _} -> candidate_fun == fun end) do
-      {:ok, {mod, fun, arity}}
-    else
-      :error
+    # Find functions with the same name but different arities
+    case Enum.filter(functions, fn {candidate_fun, _} -> candidate_fun == fun end) do
+      [] ->
+        :error
+
+      matches ->
+        # Prefer arities close to the requested one
+        {closest_fun, closest_arity} =
+          Enum.min_by(matches, fn {_, arity} -> abs(arity - requested_arity) end)
+
+        {:ok, {mod, closest_fun, closest_arity}}
     end
   end
 
-  defp find_similar_function(mod, fun, arity) do
+  defp find_similar_function(mod, fun, _arity) do
     functions = all_functions(mod)
-
-    mapper =
-      case arity do
-        :* -> fn fun, _arity -> "#{fun}" end
-        _ -> fn fun, arity -> "#{fun}/#{arity}" end
-      end
+    search_str = to_string(fun)
 
     candidates =
       for {candidate_fun, candidate_arity} <- functions,
-          distance =
-            String.jaro_distance(mapper.(fun, arity), mapper.(candidate_fun, candidate_arity)) >
-              0.8,
+          candidate_str = to_string(candidate_fun),
+          distance = String.jaro_distance(search_str, candidate_str),
+          distance >= @fuzzy_threshold,
           do: {distance, {candidate_fun, candidate_arity}}
 
     case candidates
          |> Enum.sort_by(fn {distance, _} -> distance end, :desc)
-         |> Enum.take(1)
-         |> Enum.map(fn {_, candidate} -> candidate end) do
-      [{fun, arity}] ->
-        {:ok, {mod, fun, arity}}
+         |> Enum.take(1) do
+      [{_, {matched_fun, matched_arity}}] ->
+        {:ok, {mod, matched_fun, matched_arity}}
 
       _ ->
         :error
