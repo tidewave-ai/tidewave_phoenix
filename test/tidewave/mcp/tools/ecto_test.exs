@@ -129,7 +129,7 @@ defmodule Tidewave.MCP.Tools.EctoTest do
       end)
 
       {:ok, text} = Ecto.get_ecto_schemas(%{})
-      assert text == "* TestSchema at test/mcp/tools/ecto_test.exs"
+      assert text == "* TestSchema at test/tidewave/mcp/tools/ecto_test.exs"
     end
   end
 end
