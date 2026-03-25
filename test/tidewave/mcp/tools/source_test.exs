@@ -51,6 +51,59 @@ defmodule Tidewave.MCP.Tools.SourceTest do
              |> Enum.fetch!(String.to_integer(line) - 1) =~
                "@doc \"\"\""
     end
+
+    test "fuzzy suggestions for modules" do
+      # Typo in module name - should suggest with context hint
+      assert {:error, message} = Source.get_source_location(%{"reference" => "Tidewav.MCP"})
+      assert message =~ "Did not find exact match. Did you mean:"
+      assert message =~ "Tidewave.MCP"
+
+      # Partial module name matching - includes "(similar module name)" hint
+      assert {:error, message} = Source.get_source_location(%{"reference" => "Source"})
+      assert message =~ "Did not find exact match. Did you mean:"
+      assert message =~ "Tidewave.MCP.Tools.Source"
+      assert message =~ "similar module name"
+
+      # prefers short matches
+      assert {:error, message} = Source.get_source_location(%{"reference" => "Plug.Con"})
+      assert message =~ "Did not find exact match. Did you mean:"
+      assert message =~ "Plug.Conn"
+    end
+
+    test "fuzzy suggestions for functions" do
+      # Typo in function name - includes "(similar function name)" hint
+      assert {:error, message} = Source.get_source_location(%{"reference" => "Tidewave.MCP.iniz"})
+      assert message =~ "Did not find exact match. Did you mean:"
+      assert message =~ "Tidewave.MCP.init/1"
+      assert message =~ "similar function name"
+
+      # Wrong arity - includes "(different arity)" hint
+      assert {:error, message} =
+               Source.get_source_location(%{"reference" => "Tidewave.MCP.init/2"})
+
+      assert message =~ "Did not find exact match. Did you mean:"
+      assert message =~ "Tidewave.MCP.init/1"
+      assert message =~ "different arity"
+
+      # Similar function name - searching for 'initz' should suggest 'init'
+      assert {:error, message} =
+               Source.get_source_location(%{"reference" => "Tidewave.MCP.initz"})
+
+      assert message =~ "Did not find exact match. Did you mean:"
+    end
+
+    test "fuzzy search handles partial matches" do
+      # Partial module names should work (searching for just "MCP" should suggest full module)
+      assert {:error, message} = Source.get_source_location(%{"reference" => "MCP"})
+      assert message =~ "Did not find exact match. Did you mean:"
+      assert message =~ "Tidewave.MCP"
+    end
+
+    test "exact match takes precedence over fuzzy" do
+      # Exact match should succeed even with fuzzy enabled
+      result = Source.get_source_location(%{"reference" => "Tidewave.MCP.init/1"})
+      assert {:ok, _} = result
+    end
   end
 
   describe "get_source_location/1 with dep: prefix" do
