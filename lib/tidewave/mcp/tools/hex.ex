@@ -32,6 +32,7 @@ defmodule Tidewave.MCP.Tools.Hex do
             }
           }
         },
+        annotations: %{readOnlyHint: true, openWorldHint: true},
         callback: &search_package_docs/1
       }
     ]

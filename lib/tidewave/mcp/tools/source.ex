@@ -29,6 +29,7 @@ defmodule Tidewave.MCP.Tools.Source do
             }
           }
         },
+        annotations: %{readOnlyHint: true},
         callback: &get_source_location/1
       },
       %{
@@ -51,6 +52,7 @@ defmodule Tidewave.MCP.Tools.Source do
             }
           }
         },
+        annotations: %{readOnlyHint: true},
         callback: &get_docs/1
       }
     ]

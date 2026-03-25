@@ -30,6 +30,7 @@ defmodule Tidewave.MCP.Tools.Logs do
             }
           }
         },
+        annotations: %{readOnlyHint: true},
         callback: &get_logs/1
       }
     ]

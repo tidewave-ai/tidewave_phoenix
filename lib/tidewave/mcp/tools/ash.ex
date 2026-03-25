@@ -25,6 +25,7 @@ defmodule Tidewave.MCP.Tools.Ash do
             required: [],
             properties: %{}
           },
+          annotations: %{readOnlyHint: true},
           callback: &get_ash_resources/1
         }
       ]

@@ -77,6 +77,7 @@ defmodule Tidewave.MCP.Tools.Ecto do
             required: [],
             properties: %{}
           },
+          annotations: %{readOnlyHint: true},
           callback: &get_ecto_schemas/1
         }
       ]
