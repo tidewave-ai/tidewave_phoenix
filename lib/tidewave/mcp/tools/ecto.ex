@@ -78,7 +78,8 @@ defmodule Tidewave.MCP.Tools.Ecto do
             properties: %{}
           },
           annotations: %{readOnlyHint: true},
-          callback: &get_ecto_schemas/1
+          callback: &get_ecto_schemas/1,
+          recompile: true
         }
       ]
     else
