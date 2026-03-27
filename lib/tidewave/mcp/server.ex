@@ -72,11 +72,17 @@ defmodule Tidewave.MCP.Server do
 
     case dispatch do
       %{^name => {callback, recompile}} ->
-        if recompile, do: maybe_reload(assigns)
+        reload_result = if recompile, do: maybe_reload(assigns), else: :ok
 
-        case Function.info(callback, :arity) do
-          {:arity, 2} -> callback.(args, assigns)
-          {:arity, 1} -> callback.(args)
+        case reload_result do
+          :ok ->
+            case Function.info(callback, :arity) do
+              {:arity, 2} -> callback.(args, assigns)
+              {:arity, 1} -> callback.(args)
+            end
+
+          {:error, _} = error ->
+            error
         end
 
       _ ->
@@ -94,15 +100,34 @@ defmodule Tidewave.MCP.Server do
   defp maybe_reload(assigns) do
     cond do
       endpoint = assigns[:phoenix_endpoint] ->
-        Phoenix.CodeReloader.reload(endpoint)
+        case Phoenix.CodeReloader.reload(endpoint) do
+          :ok -> :ok
+          {:error, output} -> {:error, "Compilation failed:\n\n#{output}"}
+        end
 
       Application.get_env(:tidewave, :recompile_on_tool_call, false) and
           Code.ensure_loaded?(IEx.Helpers) ->
-        IEx.Helpers.recompile()
+        try do
+          with_build_lock(fn ->
+            case IEx.Helpers.recompile() do
+              :ok -> :ok
+              :error -> {:error, "Compilation failed. Check your terminal output for details."}
+            end
+          end)
+        catch
+          kind, reason ->
+            {:error, "Compilation failed: #{Exception.format(kind, reason, __STACKTRACE__)}"}
+        end
 
       true ->
         :ok
     end
+  end
+
+  if Code.ensure_loaded?(Mix.Project) and function_exported?(Mix.Project, :with_build_lock, 1) do
+    defp with_build_lock(fun), do: Mix.Project.with_build_lock(fun)
+  else
+    defp with_build_lock(fun), do: fun.()
   end
 
   ## MCP message processing
