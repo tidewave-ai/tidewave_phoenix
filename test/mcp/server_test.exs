@@ -172,4 +172,79 @@ defmodule Tidewave.MCP.ServerTest do
       assert response_body["result"]["templates"] == []
     end
   end
+
+  describe "register_tools/1" do
+    test "registers a custom tool that can be called" do
+      conn =
+        conn(:post, "/tidewave/mcp", %{})
+        |> put_req_header("content-type", "application/json")
+        |> put_private(:tidewave_config, %{
+          allow_remote_access: false,
+          phoenix_endpoint: nil,
+          inspect_opts: [charlists: :as_lists, limit: 50, pretty: true]
+        })
+      tool = %{
+        name: "test_custom_tool",
+        description: "A test tool",
+        inputSchema: %{type: "object", properties: %{msg: %{type: "string"}}},
+        callback: fn args -> {:ok, "echo: #{args["msg"]}"} end
+      }
+
+      assert :ok = Tidewave.MCP.Server.register_tools([tool])
+
+      # Verify tool appears in tools/list
+      list_msg = %{
+        "jsonrpc" => "2.0",
+        "method" => "tools/list",
+        "id" => "100"
+      }
+
+      conn = %{conn | body_params: list_msg}
+      response = Tidewave.MCP.Server.handle_http_message(conn)
+      response_body = Jason.decode!(response.resp_body)
+      tool_names = Enum.map(response_body["result"]["tools"], & &1["name"])
+      assert "test_custom_tool" in tool_names
+
+      # Verify tool can be called
+      call_msg = %{
+        "jsonrpc" => "2.0",
+        "method" => "tools/call",
+        "id" => "101",
+        "params" => %{
+          "name" => "test_custom_tool",
+          "arguments" => %{"msg" => "hello"}
+        }
+      }
+
+      conn = conn(:post, "/tidewave/mcp", %{})
+             |> put_req_header("content-type", "application/json")
+             |> put_private(:tidewave_config, %{
+               allow_remote_access: false,
+               phoenix_endpoint: nil,
+               inspect_opts: [charlists: :as_lists, limit: 50, pretty: true]
+             })
+      conn = %{conn | body_params: call_msg}
+      response = Tidewave.MCP.Server.handle_http_message(conn)
+      response_body = Jason.decode!(response.resp_body)
+      [content] = response_body["result"]["content"]
+      assert content["text"] == "echo: hello"
+    end
+
+    test "skips duplicate tool names" do
+      {tools_before, _} = Tidewave.MCP.Server.tools_and_dispatch()
+      existing_name = hd(tools_before).name
+
+      duplicate = %{
+        name: existing_name,
+        description: "Duplicate",
+        inputSchema: %{},
+        callback: fn _args -> {:ok, "should not replace"} end
+      }
+
+      assert :ok = Tidewave.MCP.Server.register_tools([duplicate])
+
+      {tools_after, _} = Tidewave.MCP.Server.tools_and_dispatch()
+      assert length(tools_after) == length(tools_before)
+    end
+  end
 end

@@ -30,7 +30,7 @@ defmodule Tidewave.MCP.Server do
 
     # TODO: switch back to persistent_term when we don't support OTP 27 any more
     # :persistent_term.put({__MODULE__, :tools_and_dispatch}, {tools, dispatch_map})
-    :ets.new(:tidewave_tools, [:set, :named_table, read_concurrency: true])
+    :ets.new(:tidewave_tools, [:set, :public, :named_table, read_concurrency: true])
     :ets.insert(:tidewave_tools, {:tools, {tools, dispatch_map}})
   end
 
@@ -40,6 +40,60 @@ defmodule Tidewave.MCP.Server do
     # :persistent_term.get({__MODULE__, :tools_and_dispatch})
     [{:tools, tools}] = :ets.lookup(:tidewave_tools, :tools)
     tools
+  end
+
+  @doc """
+  Registers additional tools with the Tidewave MCP server.
+
+  Each tool must be a map with the following keys:
+
+    * `:name` - a unique string identifying the tool
+    * `:description` - a string describing what the tool does
+    * `:inputSchema` - a JSON Schema map describing the tool's parameters
+    * `:callback` - a function that implements the tool (arity 1 or 2)
+
+  Callbacks follow the same contract as built-in tools:
+
+    * Arity 1 receives `(args)` — a map of the tool's input arguments
+    * Arity 2 receives `(args, assigns)` — args plus the Tidewave connection config
+
+  And must return one of:
+
+    * `{:ok, result}` — success (result is a string or map)
+    * `{:error, reason}` — failure (reason is a string or map)
+
+  Tools with duplicate names (already registered) are skipped.
+  Returns `:ok`.
+
+  ## Example
+
+      Tidewave.MCP.Server.register_tools([
+        %{
+          name: "my_tool",
+          description: "Does something useful",
+          inputSchema: %{type: "object", properties: %{input: %{type: "string"}}},
+          callback: fn args -> {:ok, "Got: \#{args["input"]}"} end
+        }
+      ])
+
+  """
+  def register_tools(new_tools) when is_list(new_tools) do
+    {existing_tools, existing_dispatch} = tools_and_dispatch()
+    existing_names = MapSet.new(existing_tools, & &1.name)
+
+    tools_to_add = Enum.reject(new_tools, fn tool -> tool.name in existing_names end)
+
+    if tools_to_add != [] do
+      merged_tools = existing_tools ++ tools_to_add
+      merged_dispatch =
+        tools_to_add
+        |> Map.new(fn tool -> {tool.name, tool.callback} end)
+        |> then(&Map.merge(existing_dispatch, &1))
+
+      :ets.insert(:tidewave_tools, {:tools, {merged_tools, merged_dispatch}})
+    end
+
+    :ok
   end
 
   defp tools() do
