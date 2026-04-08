@@ -1,6 +1,6 @@
 # Mermaid
 
-Tidewave can render Mermaid diagrams, all you need to do is ask your coding agent to generate one!
+Tidewave Web can render Mermaid diagrams, all you need to do is ask your coding agent to generate one!
 
 <iframe width="640" height="360" src="https://www.youtube.com/embed/59rMrGLuG1s?si=2JUxE1wJEZSxw487" title="Mermaid in Tidewave" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 

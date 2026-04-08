@@ -1,6 +1,6 @@
 # Notifications
 
-Tidewave supports browser notifications for when the agent completes its work or requires your input.
+Tidewave Web supports browser notifications for when the agent completes its work or requires your input.
 
 Furthermore, the icon of each tab also reflects the state of the coding agent (working, errored, idle).
 
