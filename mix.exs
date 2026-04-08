@@ -83,6 +83,7 @@ defmodule Tidewave.MixProject do
         "pages/features/task_board.md",
         "pages/features/teams.md",
         "pages/features/viewport.md",
+        "pages/features/vision_mode.md",
         "pages/providers/claude_code.md",
         "pages/providers/codex.md",
         "pages/providers/github_copilot.md",
