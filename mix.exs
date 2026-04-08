@@ -85,10 +85,9 @@ defmodule Tidewave.MixProject do
         "pages/features/viewport.md",
         "pages/features/vision_mode.md",
         "pages/providers/claude_code.md",
-        "pages/providers/codex.md",
         "pages/providers/github_copilot.md",
+        "pages/providers/codex.md",
         "pages/providers/opencode.md",
-        "pages/providers/openrouter.md",
         "pages/providers/third_party.md",
         "pages/integrations/editors.md",
         "pages/integrations/figma.md",
@@ -102,13 +101,12 @@ defmodule Tidewave.MixProject do
         "pages/guides/tips_and_tricks.md",
         "pages/mcp/mcp.md",
         "pages/mcp/mcp_claude_code.md",
-        "pages/mcp/mcp_codex.md",
         "pages/mcp/mcp_cursor.md",
         "pages/mcp/mcp_neovim.md",
+        "pages/mcp/mcp_codex.md",
         "pages/mcp/mcp_opencode.md",
         "pages/mcp/mcp_vscode.md",
-        "pages/mcp/mcp_zed.md",
-        "pages/mcp/mcp_proxy.md"
+        "pages/mcp/mcp_zed.md"
       ],
       groups_for_extras: [
         Providers: ~r/(pages\/providers\/.?)/,

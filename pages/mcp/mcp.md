@@ -4,7 +4,7 @@ You can access some of Tidewave's features from your editor/agent via the Model 
 
 > #### Tidewave Web features {: .info}
 >
-> Tidewave MCP includes only a subset of Tidewave's features. In-browser agents, point-and-click prompting, Figma integration, and more are all parts of [Tidewave Web](https://tidewave.ai). Furthermore, if you are using Tidewave Web, you don't need to configure the Tidewave MCP. That's done automatically for you.
+> Tidewave MCP includes only a subset of Tidewave's features. In-browser agents, point-and-click prompting, code review, vision mode, and more are all parts of [Tidewave Web](https://tidewave.ai). Furthermore, if you are using Tidewave Web, you don't need to configure the Tidewave MCP. That's done automatically for you.
 
 ## Editor/agent instructions
 
@@ -68,7 +68,7 @@ If you want use both, we recommend keeping the existing Tidewave MCP tools, and 
 This page contains several steps to help debug issues when integrating Tidewave with an editor or MCP client. There are usually three distinct components to investigate:
 
 * Your web application
-* (optional) The [MCP proxy](../guides/mcp_proxy.md)
+* (optional) The MCP proxy
 * Your editor
 
 ### Your web application
@@ -116,13 +116,13 @@ Things to check for:
 
 * Does `localhost` resolve to an IPv6 address? The example above resolved to IPv4, but if `localhost` resolves to IPv6 for you, check that your web server can accept IPv6 connections. Alternatively, use `http://127.0.0.1:$PORT/tidewave/mcp` as your URL instead of using localhost.
 
-* Do the response headers (the lines starting with `<`) include a "transfer-encoding" that indicates compression? Some web servers may automatically compress responses, which may not be handled correctly by your editor or MCP client. In such cases, you may need to disable compression or use an [MCP proxy](../guides/mcp_proxy.md).
+* Do the response headers (the lines starting with `<`) include a "transfer-encoding" that indicates compression? Some web servers may automatically compress responses, which may not be handled correctly by your editor or MCP client. In such cases, you may need to disable compression or use an MCP proxy.
 
 * Are you using Docker or similar? By default, Tidewave and your web server only accept requests coming from localhost. Depending on the bridge mode you use, you need to configure both to allow external connections. (Remember to only expose your Docker ports locally.)
 
 ### The MCP proxy
 
-In case connections to your web application is working fine but your editor/MCP client still cannot connect to it, you may consider using a [MCP proxy](../guides/mcp_proxy.md) instead.
+In case connections to your web application is working fine but your editor/MCP client still cannot connect to it, you may consider using a [MCP proxy](https://github.com/tidewave-ai/mcp_proxy_rust#installation).
 
 If the MCP proxy does not work, here is what you can try to debug it:
 

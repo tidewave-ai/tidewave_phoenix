@@ -1,4 +1,4 @@
-# Codex
+# OpenAI Codex
 
 You can use Tidewave MCP with OpenAI's [Codex CLI](https://developers.openai.com/codex/cli/)
 
