@@ -38,3 +38,7 @@ Video recordings are stored in disk. You can select "View recordings" to list al
 The Tidewave team itself makes extensive use of video recordings. Almost every pull request we submit includes a video recording, recorded by humans or agents, which smooths the review process. Whenever you record a video, a toast will appear on the top-right, allowing you to view the video, reveal its location in disk, or list all of them:
 
 <img src="assets/vision-new-recording.png" alt="Agentic video" width="500px">
+
+## Tips
+
+You can combine video recording with the [Viewport](viewport.md) feature to control the dimensions of the recorded video. If using agentic recording, the agent is also capable of resizing the viewport. For example, you can ask the agent to record two videos, one for desktop, one for mobile. The agent can also resize while recording, which is supported by the .webm format, but not all players handle it accordingly.
