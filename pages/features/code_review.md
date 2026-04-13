@@ -1,5 +1,7 @@
 # Code review
 
+<iframe width="640" height="360" src="https://www.youtube.com/embed/vdMetEO7K4Q?si=xcGqoOIXwtR-7QCy" title="Tidewave Code Review" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 You can review code, in real-time, in Tidewave Web. Our code review is designed around two main workflows:
 
 * **Intercalated reviews** — in this scenario, the coding agent does the work in the background, and the developer reviews the work when the agent is done. During the review, you may request additional changes, which may require additional reviews
@@ -16,7 +18,11 @@ Within the code review pane, you can also comment on any change and send it to y
 
 <img src="assets/review-comment.png" alt="Code review: comments" width="600px">
 
-Once you have reviewed all code, click the "Stage reviewed" button at the top-right to stage all reviewed changes. You may optionally prompt your agent to "commit staged changes" next.
+Once you have reviewed all code, click the "Stage reviewed" button at the top-right to stage all reviewed changes. Then you may prompt your agent to "commit staged changes" next.
+
+> #### Opening up diffs and files in your editor {: .tip}
+>
+> If you `Ctrl+Click` (or `Cmd+Click`) a line number, either within the code review or while viewing a file, Tidewave will automatically open up that file+line in your editor of choice.
 
 ## Configuration
 
