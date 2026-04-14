@@ -53,7 +53,7 @@ You can enable voice narration, so the coding agent itself narrate the videos it
 
 The following video uses the "Voice narration" feature to show you how to enable it and how it works:
 
-TODO.
+<iframe width="640" height="360" src="https://www.youtube.com/embed/U4CCBWmu2D0?si=XgMnDTWoWWhSkGwu" title="Tidewave agentic video recoding + narration" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 For completeness, here is the prompt used to record the video above:
 
@@ -67,7 +67,7 @@ open up settings, focus on this element: {Selected element <div>}
 
 overlay: Then tell your agent what to record
 now close settings, focus on {Selected element <div>}
-(use scale 2.0 to ease in), and type "make an awesome video!", ease out
+(use 2x zoom in), and type "make an awesome video!", zoom out
 ```
 
 The `{Selected element <div>}` snippets are page elements selected with
