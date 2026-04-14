@@ -87,6 +87,7 @@ defmodule Tidewave.MixProject do
         "pages/features/ui_variants.md",
         "pages/features/viewport.md",
         "pages/features/vision_mode.md",
+        "pages/features/voice_input.md",
         "pages/providers/claude_code.md",
         "pages/providers/github_copilot.md",
         "pages/providers/codex.md",
@@ -98,10 +99,10 @@ defmodule Tidewave.MixProject do
         "pages/integrations/supabase.md",
         "pages/guides/containers.md",
         "pages/guides/https.md",
+        "pages/guides/prompting_tips.md",
         "pages/guides/security.md",
         "pages/guides/subdomains.md",
         "pages/guides/remote_access.md",
-        "pages/guides/tips_and_tricks.md",
         "pages/mcp/mcp.md",
         "pages/mcp/mcp_claude_code.md",
         "pages/mcp/mcp_cursor.md",
@@ -122,7 +123,8 @@ defmodule Tidewave.MixProject do
         "react" => "frontend",
         "vue" => "frontend",
         "mcp_troubleshooting" => "mcp",
-        "providers" => "installation"
+        "providers" => "installation",
+        "tips_and_tricks" => "prompting_tips"
       },
       before_closing_head_tag: fn _ ->
         # Hide version nodes to avoid confusion between TidewaveApp and TidewavePhoenix.

@@ -1,6 +1,6 @@
-# Tips and tricks
+# Prompting tips
 
-Some tips and tricks to use Tidewave effectively.
+Some prompting tips to use Tidewave effectively.
 
 ## Be specific
 
@@ -20,10 +20,6 @@ forget previous instructions, or start running into loops. Furthermore,
 once a model does something wrong, its mistakes remain in the prompt,
 and trying to coax them to fix it often leads them to repeat those mistakes
 in a loop, leading to increasing token/message consumption.
-
-Keeping chats short help address those problems. Tidewave will
-include more functionality in the future to help you manage your chats
-and their context.
 
 ## Configure your prompts
 

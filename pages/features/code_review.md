@@ -1,8 +1,10 @@
 # Code review
 
+You can review code, in real-time, with Tidewave Web.
+
 <iframe width="640" height="360" src="https://www.youtube.com/embed/vdMetEO7K4Q?si=xcGqoOIXwtR-7QCy" title="Tidewave Code Review" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-You can review code, in real-time, in Tidewave Web. Our code review is designed around two main workflows:
+Our code review is designed around two main workflows:
 
 * **Intercalated reviews** — in this scenario, the coding agent does the work in the background, and the developer reviews the work when the agent is done. During the review, you may request additional changes, which may require additional reviews
 
@@ -29,3 +31,11 @@ Once you have reviewed all code, click the "Stage reviewed" button at the top-ri
 We currently support both unified and split diffs and have an option to wrap lines. Click on the `⋮` button on the top-right to configure it:
 
 <img src="assets/review-config.png" alt="Code review: configuration" width="450px">
+
+## Branch switching
+
+You can switch and create branches by clicking the current branch name in the code bar:
+
+<img src="assets/code-bar.png" alt="Code bar" width="450px">
+  
+You can also click on the diff summary (`+-`) to be taken to the code review page.
