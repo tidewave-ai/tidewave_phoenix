@@ -2,6 +2,8 @@
 
 You can use your microphone to control the agent. Simply click the microphone icon, close to the send button, and start dictating.
 
+<iframe width="640" height="360" src="https://www.youtube.com/embed/nTthyHCzj-g?si=6B8gTK5o_S5j2CKY" title="Tidewave Voice Input" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 ## Browser considerations
 
 Note the voice input is fully controlled by your browser, which implies:

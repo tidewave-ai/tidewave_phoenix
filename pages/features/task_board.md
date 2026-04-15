@@ -7,7 +7,9 @@ Tidewave Web includes a task board which can be used to share tasks across sessi
 Task boards are useful when you want to break a larger effort into smaller pieces and track progress across multiple sessions. For example:
 
   * **Planning** — describe a large goal and break it into tasks. You get a structured plan on the board that you can then delegate to different sessions.
-  * **Parallel workstreams** — you can use one session to create and manage tasks, while a separate session claims and completes tasks from the same board.
+
+  * **Parallel workstreams** — you can use one session to create and manage tasks, while a separate session claims and completes tasks from the same board. [Watch this walkthrough video to learn more](https://www.youtube.com/watch?v=A1_LbrZArVk).
+
   * **Resuming later** — close your session and come back the next day to continue right where you left off.
 
 To use task boards, you must assign a board to a chat before you send the first message. When you assign a board to a chat, the "todo list" feature is replaced by task management tools that operate directly on the board.
