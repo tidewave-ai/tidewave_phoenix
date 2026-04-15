@@ -113,11 +113,10 @@ defmodule Tidewave.Router do
   defp tidewave_html() do
     client_url = Application.get_env(:tidewave, :client_url, "https://tidewave.ai")
 
-    # We return a basic page that loads script from Tidewave server to
-    # bootstrap the client app. Note that the script name does not
-    # include a hash, since is is very small and its main purpose is
-    # to fetch the latest assets, those include the hash and can be
-    # cached.
+    # We return a basic page that is used by Tidewave Web.
+    # Note that, by itself, this page is harmless and it
+    # cannot invoke any of the MCP endpoints, since the MCP
+    # refuses any requests with an Origin header.
     """
     <html>
       <head>
