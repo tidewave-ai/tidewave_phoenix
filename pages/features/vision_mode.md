@@ -45,13 +45,15 @@ From now on, whenever the agent takes a screenshot or record a video, you will s
 <img src="assets/vision-video.png" alt="Agentic video" width="400px">
 </div>
 
-Screenshots are always fed back into the coding agent. Videos are for your own use only (none of the supported coding agents accept videos as input).
+Screenshots are always fed back into the coding agent. Videos are for your consumption (none of the supported coding agents accept videos as input).
+
+Videos by default include overlays, animations, and sound effects (which you may ask the agent to disable). You may also opt-in into voice narration.
 
 ### Voice narration
 
 You can enable voice narration, so the coding agent itself narrate the videos it records. To do so, [an ElevenLabs API key will be necessary](https://elevenlabs.io/).
 
-The following video uses the "Voice narration" feature to show you how to enable it and how it works:
+The following video uses the "Voice narration" feature to show you how to enable it and how it works. It also includes animations and sound effects:
 
 <iframe width="640" height="360" src="https://www.youtube.com/embed/U4CCBWmu2D0?si=XgMnDTWoWWhSkGwu" title="Tidewave agentic video recoding + narration" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
