@@ -1,14 +1,30 @@
 # Editors/IDEs
 
-Tidewave can open up files and page elements directly in your editor.
+Tidewave Web can open up files and page elements directly in your editor.
 
-Whenever Tidewave renders a file location, you can directly click the filename to open it in your editor. They will be identified with an upward right facing arrow (↗):
+Whenever Tidewave renders a file location, you can directly `Ctrl+Click` (or `Cmd+Click`) the filename to open it in your editor. They will be identified with an upward right facing arrow (↗):
 
 <img src="assets/file-editor.png" alt="File editor integration" width="400px">
 
 When you click the filename for the first time, Tidewave will open up the "Editor integration" pane on Settings, where you can choose between a few preset editors, or set up a custom URL or a custom command.
 
-You can also use our editor integration alongside the [Inspector](inspector.md). Ctrl+Click or Cmd+Click (macOS) an element with the Inspector enabled will automatically open it in your editor.
+There are a few additional places you can open in editor:
+
+* In the [Inspector](../features/inspector.md), `Ctrl+Click` (or `Cmd+Click`) an element pointed by the inspector to open its source
+
+* Whenever viewing a file or a diff during [Code Review](../features/code_review.md), you can `Ctrl+Click` (or `Cmd+Click`) the line number of open up the file at that location
+
+## Custom URLs (or custom commands)
+
+Tidewave Web come with built-in support for a few editors.
+In case your editor is not supported, you can use a custom URL
+or a custom command. For example, if you are using one of JetBrains
+IDEs, you may configure a custom URL like this:
+
+```
+idea://open?file=__FILE__&line=__LINE__
+pycharm://open?file=__FILE__&line=__LINE__
+```
 
 ## Container configuration
 

@@ -12,9 +12,19 @@ Note the voice input is fully controlled by your browser, which implies:
 
 * The browser uses your default language. You can configure your default language in your browser settings.
 
-* The browser may use remote services for speech recognition. Some browsers (typically Chromium based browsers like Chrome, Edge, etc.) offer the ability to perform on-device recognition for certain languages. You can choose this option in Tidewave settings.
+* The browser may use remote services for speech recognition. Some browsers (typically Chromium based browsers like Chrome, Edge, etc.) offer the ability to perform on-device recognition for certain languages. You can choose this option in Tidewave settings (see below).
 
-* Not all browsers have speech recognition available (neither remotely or on-device).
+* Not all browsers have speech recognition available. In such cases, you will see an error message such as "Voice input failed: network error. Try enabling on-device recognition in Settings".
+
+## On-device recognition
+
+For browsers that do not provide remote speech recognition services or for privacy reasons, you may opt into on-device recognition, as long as your browser supports it.
+
+To enable it, open up Tidewave Settings and find the "Voice input recognition" label:
+
+<img src="assets/voice-input-settings.png" alt="Voice input settings" width="600">
+
+And choose "On-device" instead of "Default". Once selected, the relevant language pack will be installed locally. If your browser does not support "On-device" recognition, the option will be disabled.
 
 ## Tips
 

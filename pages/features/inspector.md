@@ -34,6 +34,10 @@ Clicking the element while the `Ctrl` key (or `Cmd` key on macOS) are pressed wi
 
 The inspector supports the following shortcuts:
 
+* `Ctrl+Shift+I` or `Cmd+Shift+I`: toggle inspector on and off
+
+While the inspector is enabled, you can:
+
 * `Right-click`: enables a menu with all elements at the given position
 
 * `Ctrl+Click` or `Cmd+Click` (macOS): when hovering an element, you may Ctrl+Click it, and Tidewave will open up the element in your editor using your configured [editor integration](editors.md)
