@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.5.6 (2026-03-13)
+
+* Enhancements
+  * Add `:extra_apps` config for additional app discovery
+
 ## v0.5.5 (2026-02-10)
 
 * Enhancements

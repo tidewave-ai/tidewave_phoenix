@@ -6,10 +6,6 @@ Simply open up Tidewave Web settings, choose the Providers tab, choose "Claude C
 
 Once connected, we will automatically configure Claude to also use Tidewave MCP. You may disable this option if (and only if) you have already customized Claude Code to use Tidewave MCP.
 
-> #### Custom `claude-agent-acp` installation
->
-> Tidewave talks to Claude Code using the [Claude Agent ACP](https://github.com/zed-industries/claude-agent-acp) project. It is possible to use a custom `claude-agent-acp` executable by setting the `TIDEWAVE_CLAUDE_AGENT_ACP_EXECUTABLE` environment variable, either in your running web application, or in the Tidewave App/CLI. This is rarely needed in practice but it may be required in some operating systems like NixOS.
-
 ## Customizing your environment
 
 Our integration will reuse your Claude Code settings. Furthermore, Tidewave will automatically pass your environment variables to Claude Code, using this level of priority:
@@ -30,9 +26,9 @@ CLAUDE_CODE_EXECUTABLE = "..."
 
 If you are using the CLI, you can set those variables when starting the CLI.
 
-> #### `MAX_THINKING_TOKENS` configuration {: .warning}
+> #### Custom `claude-agent-acp` installation {: .info}
 >
-> The `MAX_THINKING_TOKENS` configuration, exclusively, cannot be set in the Tidewave App/CLI environment. You must set it in the same session that as your running app. This is because Tidewave sets a default of 31999 tokens (which is the same as Claude Code itself).
+> Tidewave talks to Claude Code using the [Claude Agent ACP](https://github.com/zed-industries/claude-agent-acp) project. It is possible to use a custom `claude-agent-acp` executable by setting the `TIDEWAVE_CLAUDE_AGENT_ACP_EXECUTABLE` environment variable, either in your running web application, or in the Tidewave App/CLI. This is rarely needed in practice but it may be required in some operating systems like NixOS.
 
 ## FAQ
 
