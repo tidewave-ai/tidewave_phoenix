@@ -31,7 +31,7 @@ If you are directly configuring your web framework or build tool to run over HTT
 
 ### Enabling HTTPS in the Tidewave App
 
-If you are using the Tidewave App, click on the Tidewave icon (top-right on macOS and Linux, bottom-right on Windows) and choose "Settings". It will open up a configuration file where you can add:
+If you are using the Tidewave App, click on the Tidewave icon (top-right on macOS and Linux, bottom-right on Windows) and choose "Configuration". It will open up a configuration file where you can add:
 
 ```toml
 https_port = 9833
@@ -63,7 +63,7 @@ For security reasons, the Tidewave App and Tidewave CLI only allow access from `
 
 ### Allowing origins and remote access in the Tidewave App
 
-Click on the Tidewave icon (top-right on macOS and Linux, bottom-right on Windows) and choose "Settings". It will open up a configuration file where you can add:
+Click on the Tidewave icon (top-right on macOS and Linux, bottom-right on Windows) and choose "Configuration". It will open up a configuration file where you can add:
 
 ```toml
 # Allow access from other machines, only enable it in safe networks

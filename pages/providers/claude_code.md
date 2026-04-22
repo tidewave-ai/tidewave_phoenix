@@ -13,7 +13,7 @@ Our integration will reuse your Claude Code settings. Furthermore, Tidewave will
 1. the environment variables used when starting your web app (higher priority)
 2. the environment variables configured in your Tidewave App (or given to the Tidewave CLI)
 
-To configure the Tidewave app to use [Claude Code's environment variables](https://code.claude.com/docs/en/settings#environment-variables), click on the Tidewave icon in your menu bar (top-right on macOS and Linux, bottom-right on Windows) and then on "Settings...". Doing so will open a file where you can add the desired environment variables, for example:
+To configure the Tidewave app to use [Claude Code's environment variables](https://code.claude.com/docs/en/settings#environment-variables), click on the Tidewave icon in your menu bar (top-right on macOS and Linux, bottom-right on Windows) and then on "Configuration". Doing so will open a file where you can add the desired environment variables, for example:
 
 ```toml
 # This file is used to configure the Tidewave app.
