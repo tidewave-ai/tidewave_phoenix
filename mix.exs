@@ -98,10 +98,10 @@ defmodule Tidewave.MixProject do
         "pages/integrations/frontend.md",
         "pages/integrations/supabase.md",
         "pages/guides/containers.md",
+        "pages/guides/custom_domains.md",
         "pages/guides/https.md",
         "pages/guides/prompting_tips.md",
         "pages/guides/security.md",
-        "pages/guides/subdomains.md",
         "pages/guides/remote_access.md",
         "pages/mcp/mcp.md",
         "pages/mcp/mcp_claude_code.md",
@@ -124,7 +124,8 @@ defmodule Tidewave.MixProject do
         "vue" => "frontend",
         "mcp_troubleshooting" => "mcp",
         "providers" => "installation",
-        "tips_and_tricks" => "prompting_tips"
+        "tips_and_tricks" => "prompting_tips",
+        "subdomains" => "custom_domains"
       },
       before_closing_head_tag: fn _ ->
         # Hide version nodes to avoid confusion between TidewaveApp and TidewavePhoenix.

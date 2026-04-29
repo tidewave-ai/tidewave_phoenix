@@ -1,8 +1,8 @@
-# Subdomains
+# Custom domains
 
 Tidewave Web supports applications that run across multiple domains.
 
-If you are using multiple hosts/subdomains during development, you must use a secure domain. This implies you must either:
+If you are using multiple hosts or subdomains during development, you must use a secure domain. This implies you must either:
 
 * Use `*.localhost`. For example, by running your application on localhost, you can access it at `localhost:3000` and `admin.localhost:3000` from most browsers (Safari being a notable exception)
 
