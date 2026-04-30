@@ -14,6 +14,6 @@ You can control which Copilot models are available to Tidewave in [your GitHub C
 >
 > It is possible to use a custom `copilot` executable by setting the `TIDEWAVE_COPILOT_CLI_EXECUTABLE` environment variable, either in your running web application, or in the Tidewave App/CLI. This is rarely needed in practice but it may be required in some operating systems like NixOS.
 
-> #### Deprecated GitHub Copilot API {: .warn}
+> #### BYOK not supported {: .warn}
 >
-> Previously, Tidewave supported directly communicating with the "GitHub Copilot API". This has been deprecated in favor of the GitHub Copilot CLI steps documented above.
+> While GitHub Copilot does support [bringing your own key (BYOK)](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/use-byok-models), this functionality is not available via ACP (the protocol Tidewave uses to communicate with the `copilot` CLI) at the moment. Consider using OpenCode or Codex instead.
