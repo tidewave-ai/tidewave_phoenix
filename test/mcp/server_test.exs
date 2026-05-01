@@ -72,6 +72,19 @@ defmodule Tidewave.MCP.ServerTest do
       assert response.resp_body == "{\"status\":\"ok\"}"
     end
 
+    test "ignores unhandled notifications without crashing", %{conn: conn} do
+      message = %{
+        "jsonrpc" => "2.0",
+        "method" => "notifications/roots/list_changed"
+      }
+
+      conn = %{conn | body_params: message}
+      response = Tidewave.MCP.Server.handle_http_message(conn)
+
+      assert response.status == 202
+      assert response.resp_body == "{\"status\":\"ok\"}"
+    end
+
     test "handles tools/list request", %{conn: conn} do
       message = %{
         "jsonrpc" => "2.0",

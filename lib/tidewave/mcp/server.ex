@@ -76,9 +76,7 @@ defmodule Tidewave.MCP.Server do
          %{
            code: -32601,
            message: "Method not found",
-           data: %{
-             name: name
-           }
+           data: %{name: name}
          }}
     end
   end
@@ -224,24 +222,22 @@ defmodule Tidewave.MCP.Server do
   end
 
   # Built-in message routing
-  defp handle_message(%{"method" => "notifications/initialized"} = message, _assigns) do
+  defp handle_message(%{"method" => "notifications/initialized"}, _assigns) do
     Logger.info("Received initialized notification")
-    Logger.debug("Full message: #{inspect(message, pretty: true)}")
     {:ok, nil}
   end
 
-  defp handle_message(%{"method" => "notifications/cancelled"} = message, _assigns) do
-    Logger.info("Request cancelled: #{inspect(message["params"])}")
+  defp handle_message(%{"method" => "notifications/" <> _ = method}, _assigns) do
+    Logger.debug("Ignoring notification: #{method}")
     {:ok, nil}
   end
 
   defp handle_message(%{"method" => method, "id" => id} = message, assigns) do
-    Logger.info("Routing MCP message - Method: #{method}, ID: #{id}")
+    Logger.info("Routing MCP message: #{method} (id=#{id})")
     Logger.debug("Full message: #{inspect(message, pretty: true)}")
 
     case method do
       "ping" ->
-        Logger.debug("Handling ping request")
         handle_ping(id)
 
       "initialize" ->
@@ -252,7 +248,6 @@ defmodule Tidewave.MCP.Server do
         handle_initialize(id, message["params"])
 
       "tools/list" ->
-        Logger.debug("Handling tools list request")
         handle_list_tools(id, message["params"])
 
       "tools/call" ->
@@ -263,15 +258,12 @@ defmodule Tidewave.MCP.Server do
         safe_call_tool(id, message["params"], assigns)
 
       "prompts/list" ->
-        Logger.debug("Handling prompts list request")
         handle_list_prompts(id, message["params"])
 
       "resources/list" ->
-        Logger.debug("Handling resources list request")
         handle_list_resources(id, message["params"])
 
       "resources/templates/list" ->
-        Logger.debug("Handling templates list request")
         handle_list_templates(id, message["params"])
 
       other ->
