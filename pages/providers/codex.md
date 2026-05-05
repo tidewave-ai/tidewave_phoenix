@@ -28,7 +28,7 @@ Once connected, we will automatically configure Codex to also use Tidewave MCP. 
 
 > #### Custom `codex-acp` installation
 >
-> Tidewave talks to Codex using the [Claude Agent ACP](https://github.com/zed-industries/codex-acp) project. It is possible to use a custom `codex-acp` executable by setting the `TIDEWAVE_CODEX_ACP_EXECUTABLE` environment variable, either in your running web application, or in the Tidewave App/CLI. This is rarely needed in practice but it may be required in some operating systems like NixOS.
+> Tidewave talks to Codex using the [Claude Agent ACP](https://github.com/zed-industries/codex-acp) project. It is possible to use a custom `codex-acp` executable by setting the `TIDEWAVE_CODEX_ACP_EXECUTABLE` environment variable when starting your web application. This is rarely needed in practice but it may be required in some operating systems like NixOS.
 
 ## Custom Providers
 

@@ -28,7 +28,7 @@ If you are using the CLI, you can set those variables when starting the CLI.
 
 > #### Custom `claude-agent-acp` installation {: .info}
 >
-> Tidewave talks to Claude Code using the [Claude Agent ACP](https://github.com/zed-industries/claude-agent-acp) project. It is possible to use a custom `claude-agent-acp` executable by setting the `TIDEWAVE_CLAUDE_AGENT_ACP_EXECUTABLE` environment variable, either in your running web application, or in the Tidewave App/CLI. This is rarely needed in practice but it may be required in some operating systems like NixOS.
+> Tidewave talks to Claude Code using the [Claude Agent ACP](https://github.com/zed-industries/claude-agent-acp) project. It is possible to use a custom `claude-agent-acp` executable by setting the `TIDEWAVE_CLAUDE_AGENT_ACP_EXECUTABLE` environment variable when starting your web application. This is rarely needed in practice but it may be required in some operating systems like NixOS.
 
 ## FAQ
 

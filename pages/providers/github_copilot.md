@@ -12,7 +12,7 @@ You can control which Copilot models are available to Tidewave in [your GitHub C
 
 > #### Custom `copilot-cli` installation {: .info}
 >
-> It is possible to use a custom `copilot` executable by setting the `TIDEWAVE_COPILOT_CLI_EXECUTABLE` environment variable, either in your running web application, or in the Tidewave App/CLI. This is rarely needed in practice but it may be required in some operating systems like NixOS.
+> It is possible to use a custom `copilot` executable by setting the `TIDEWAVE_COPILOT_CLI_EXECUTABLE` environment variable when starting your web application. This is rarely needed in practice but it may be required in some operating systems like NixOS.
 
 > #### BYOK not supported {: .warn}
 >

@@ -8,7 +8,7 @@ Once connected, we will automatically configure OpenCode to also use Tidewave MC
 
 > #### Custom `opencode` installation {: .info}
 >
-> It is possible to use a custom `opencode` executable by setting the `TIDEWAVE_OPENCODE_EXECUTABLE` environment variable, either in your running web application, or in the Tidewave App/CLI. This is rarely needed in practice but it may be required in some operating systems like NixOS.
+> It is possible to use a custom `opencode` executable by setting the `TIDEWAVE_OPENCODE_EXECUTABLE` environment variable when starting your web application. This is rarely needed in practice but it may be required in some operating systems like NixOS.
 
 ## Adding models
 
