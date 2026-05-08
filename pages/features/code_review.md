@@ -20,7 +20,15 @@ Within the code review pane, you can also comment on any change and send it to y
 
 <img src="assets/review-comment.png" alt="Code review: comments" width="600px">
 
-Once you have reviewed all code, click the "Stage reviewed" button at the top-right to stage all reviewed changes. Then you may prompt your agent to "commit staged changes" next.
+Once you have reviewed your changes, you can click the "Commit reviewed" button on the top right or choose an alternative:
+
+* **Commit reviewed** - it will stage all reviewed changes and ask the agent to commit them
+* **Commit all** - it will stage all changes and ask the agent to commit them
+* **Stage reviewed** - it will stage all reviewed changes
+
+If you ask the agent to commit and you are in your default branch (typically `main`), Tidewave will ask prompt if you want to create a new branch.
+
+All commits done by Tidewave will append a "Assisted-by: Model Version Tidewave" line to the commit message. You can disable this behaviour or provide custom commit and branch naming instructions in Settings.
 
 > #### Opening up diffs and files in your editor {: .tip}
 >
