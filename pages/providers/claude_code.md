@@ -6,6 +6,12 @@ Simply open up Tidewave Web settings, choose the Providers tab, choose "Claude C
 
 Once connected, we will automatically configure Claude to also use Tidewave MCP. You may disable this option if (and only if) you have already customized Claude Code to use Tidewave MCP.
 
+> #### Claude Agent SDK {: .warning}
+>
+> Tidewave uses the Claude Agent SDK to integrate with Claude Code. From June 15th, 2026, programmatic usage of Claude Code (such as the Claude Agent SDK and `claude -p` itself) are no longer part of your subscription and will use API pricing. [Some users may be eligible to extra credits](https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan).
+>
+> In case those credits are not sufficient, consider using alternative subscriptions, such as Codex and OpenCode, which do not discriminate between programmatic and interactive usage.
+
 ## Customizing your environment
 
 Our integration will reuse your Claude Code settings. Furthermore, Tidewave will automatically pass your environment variables to Claude Code, using this level of priority:
