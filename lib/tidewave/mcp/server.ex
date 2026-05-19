@@ -17,7 +17,6 @@ defmodule Tidewave.MCP.Server do
       Tools.Source.tools(),
       Tools.Eval.tools(),
       Tools.Ecto.tools(),
-      Tools.Hex.tools(),
       Tools.Ash.tools()
     ]
     |> List.flatten()

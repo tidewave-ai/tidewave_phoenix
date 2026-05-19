@@ -32,7 +32,6 @@ Here is a baseline comparison of the tools supported by different frameworks/lan
 | `get_logs`                   | ✅     | ✅      | ✅    | ✅      | ✅      | ✅    | ✅             |
 | `get_models` / `get_schemas` | ✅     | ✅      | ✅    |         | ✅      | ✅    |                |
 | `execute_sql_query`          | ✅     | ✅      | ✅    |         | ✅      | ✅    |                |
-| `search_package_docs`        |        |         |       |         | ✅      |       |                |
 
 You may want to nudge your coding agent into using Tidewave MCP's capabilities more frequently by using rules, so you don't need to ask explicitly each time. Each editor places those rules at different locations, so make sure to consult their documentation.
 

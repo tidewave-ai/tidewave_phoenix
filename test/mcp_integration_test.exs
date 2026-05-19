@@ -15,8 +15,8 @@ defmodule Tidewave.MCPIntegrationTest do
     assert Stream.interval(10)
            |> Stream.take(10)
            |> Enum.reduce_while(nil, fn _, _ ->
-             case Req.post("http://127.0.0.1:9100") do
-               {:ok, _} -> {:halt, true}
+             case ping_server("http://127.0.0.1:9100") do
+               :ok -> {:halt, true}
                _ -> {:cont, false}
              end
            end),
@@ -129,9 +129,28 @@ defmodule Tidewave.MCPIntegrationTest do
   end
 
   defp send_http_request(message) do
-    {:ok, http_response} = Req.post(@base_url, json: message)
-    assert http_response.body
+    {:ok, body} = post_json(@base_url, message)
+    body
+  end
 
-    http_response.body
+  defp ping_server(url) do
+    case :httpc.request(String.to_charlist(url)) do
+      {:ok, _response} -> :ok
+      error -> error
+    end
+  end
+
+  defp post_json(url, message) do
+    headers = [{~c"content-type", ~c"application/json"}]
+    body = Jason.encode!(message)
+    request = {String.to_charlist(url), headers, ~c"application/json", body}
+
+    case :httpc.request(:post, request, [], body_format: :binary) do
+      {:ok, {{_http_version, _status, _reason_phrase}, _headers, response_body}} ->
+        {:ok, Jason.decode!(response_body)}
+
+      error ->
+        error
+    end
   end
 end
