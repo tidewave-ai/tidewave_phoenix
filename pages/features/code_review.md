@@ -40,10 +40,6 @@ We currently support both unified and split diffs and have an option to wrap lin
 
 <img src="assets/review-config.png" alt="Code review: configuration" width="450px">
 
-## Branch switching
+## Git integration
 
-You can switch and create branches by clicking the current branch name in the code bar:
-
-<img src="assets/code-bar.png" alt="Code bar" width="450px">
-  
-You can also click on the diff summary (`+-`) to be taken to the code review page.
+You can swap branches, push/pull, and more [from the Git bar](git.md).

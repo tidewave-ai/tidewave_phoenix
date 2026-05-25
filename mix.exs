@@ -78,6 +78,7 @@ defmodule Tidewave.MixProject do
         "pages/features/accessibility.md",
         "pages/features/browser_app.md",
         "pages/features/code_review.md",
+        "pages/features/git.md",
         "pages/features/inspector.md",
         "pages/features/mermaid.md",
         "pages/features/notifications.md",
