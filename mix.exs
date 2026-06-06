@@ -96,7 +96,6 @@ defmodule Tidewave.MixProject do
         "pages/integrations/editors.md",
         "pages/integrations/figma.md",
         "pages/integrations/frontend.md",
-        "pages/integrations/supabase.md",
         "pages/guides/containers.md",
         "pages/guides/custom_domains.md",
         "pages/guides/https.md",
