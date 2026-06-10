@@ -10,7 +10,9 @@ Additionally, for security reasons, the Tidewave CLI only allow access from `loc
 $ tidewave --allow-remote-access --allowed-origins https://example.com:9898
 ```
 
-In the example above, `https://example.com:9898` is the exact address you will type in the browser, without any path or trailing slash. Note it is very important to have some sort of authentication on the remote machine, otherwise everyone can access your Tidewave instance (which gives them access to a coding agent with access to your code). However, if you are using Tidewave Teams, only members of your team would be able to access that instance.
+In the example above, `https://example.com:9898` is the exact address you will type in the browser, without any path or trailing slash. Note it is very important to have some sort of authentication or gate access to the remote machine, otherwise everyone can access your Tidewave App/CLI directly.
+
+Finally, you must configure your web application itself to allow remote access. Most web frameworks bind to localhost by default and, similarly to Tidewave, do not allow remote access. Consult your framework documentation for more information.
 
 > #### HTTPS advised {: .warning}
 >
