@@ -45,6 +45,6 @@ If you are using the CLI, you can set those variables when starting the CLI.
 
 #### Using Tidewave Web with Claude Code emits "Authentication required"
 
-This means you haven't authenticated in the `claude` CLI. Go to "Settings", click "Providers", and then "Claude Code". If you are connected to Claude Code, you should see a "Open Terminal" option. Open up the terminal and type `/login` to authenticate. Alternatively, you can `claude` in your terminal of choice.
+This means you haven't authenticated in the `claude` CLI. Go to "Settings", click "Providers", and then "Claude Code". If you are connected to Claude Code, you should see a "Open Terminal" option. Open up the terminal and type `/login` to authenticate. Alternatively, you can run `claude` in your terminal of choice.
 
 If Tidewave Web still claims you are not authenticated, restart the Tidewave App/CLI by clicking its menu bar icon (top-right on macOS and Linux, bottom-right on Windows) and selecting "Restart".

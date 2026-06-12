@@ -2,33 +2,17 @@
 
 You can connect Tidewave Web directly to [OpenAI Codex CLI](https://developers.openai.com/codex/cli) by following the steps below:
 
-1. Install the `codex` CLI
-2. Authenticate with your OpenAI subscription
-3. Connect to Codex
+Simply open up Tidewave Web settings, choose the Providers tab, choose "Codex" and click "Connect". Next we will automatically download and install Codex for you.
 
-Once setup, Tidewave will use your OpenAI subscription and settings (including MCP servers, subagents, etc). Note you can also use your OpenAI subscription with [OpenCode](opencode.md).
+Once connected, we will automatically configure Codex to also use Tidewave MCP. You may disable this option if (and only if) you have already customized Claude Code to use Tidewave MCP.
 
-## Install the `codex` CLI
-
-Follow [OpenAI's official intructions to install the Codex CLI](https://developers.openai.com/codex/cli/).
-
-## Authenticate with OpenAI
-
-Once `codex` is installed, you must authenticate with your OpenAI subscription. You can do this by simply running `codex` in any directory and then following the described steps:
-
-```shell
-codex
-```
-
-## Connect to Codex
-
-Open up Tidewave Web settings, choose the Providers tab, choose "OpenAI Codex" and click "Connect".
-
-Once connected, we will automatically configure Codex to also use Tidewave MCP. You may disable this option if (and only if) you have already customized Codex to use Tidewave MCP.
+> #### ChatGPT subscription {: .warning}
+>
+> Tidewave usage of Codex is compatible with your ChatGPT subscription. Note you can also use your OpenAI subscription with [OpenCode](opencode.md).
 
 > #### Custom `codex-acp` installation
 >
-> Tidewave talks to Codex using the [Claude Agent ACP](https://github.com/zed-industries/codex-acp) project. It is possible to use a custom `codex-acp` executable by setting the `TIDEWAVE_CODEX_ACP_EXECUTABLE` environment variable when starting your web application. This is rarely needed in practice but it may be required in some operating systems like NixOS.
+> Tidewave talks to Codex using the [Codex ACP](https://github.com/agentclientprotocol/claude-agent-acp) project. It is possible to use a custom `codex-acp` executable by setting the `TIDEWAVE_CODEX_ACP_EXECUTABLE` environment variable when starting your web application. This is rarely needed in practice but it may be required in some operating systems like NixOS.
 
 ## Custom Providers
 
@@ -51,4 +35,6 @@ wire_api = "chat"
 
 #### Using Tidewave Web with Codex emits "Authentication required"
 
-This means you haven't authenticated in the `codex` CLI. Remember to run `codex` and, if Tidewave Web still claims you are not authenticated, restart the Tidewave App/CLI by clicking its menu bar icon (top-right on macOS and Linux, bottom-right on Windows) and selecting "Restart".
+This means you haven't authenticated in the `codex` CLI. Go to "Settings", click "Providers", and then "Codex". If you are connected to Codex, you should see a "Open Terminal" option. Open up the terminal and it will guide you through the login steps. Alternatively, you can run `codex` in your terminal of choice.
+
+If Tidewave Web still claims you are not authenticated, restart the Tidewave App/CLI by clicking its menu bar icon (top-right on macOS and Linux, bottom-right on Windows) and selecting "Restart".
