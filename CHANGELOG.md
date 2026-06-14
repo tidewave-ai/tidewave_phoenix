@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.6.0 (2026-06-14)
+
+* Enhancements
+  * Improve out of the box experience for remote control
+
+* Deprecations
+  * The `search_package_docs` tool has been moved to the Hex CLI
+
 ## v0.5.6 (2026-03-13)
 
 * Enhancements
