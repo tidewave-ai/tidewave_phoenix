@@ -17,7 +17,3 @@ Finally, you must configure your web application itself to allow remote access. 
 > #### HTTPS advised {: .warning}
 >
 > We strongly advise using HTTPS addresses for remote access. We currently do not guarantee remote Tidewave instances work without HTTPS. See [HTTPS](https.md) guide for more information.
-
-> #### Loopback address required {: .warning}
->
-> Tidewave currently has a limitation that the remote machine must be able to access itself via its own address. Therefore, if you are using `https://example.com:9898` to access Tidewave on a remote machine, and your application is running on `https://example.com:4000`, then your machine must also be able to access `https://example.com:4000` within itself.
