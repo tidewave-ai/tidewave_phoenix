@@ -6,7 +6,7 @@ Whenever Tidewave renders a file location, you can directly `Ctrl+Click` (or `Cm
 
 <img src="assets/file-editor.png" alt="File editor integration" width="400px">
 
-When you click the filename for the first time, Tidewave will open up the "Editor integration" pane on Settings, where you can choose between a few preset editors, or set up a custom URL or a custom command.
+When you click the filename for the first time, Tidewave will open up the "Editor integration" pane on Settings, where you can choose between a few preset editors, or set up a custom URL.
 
 There are a few additional places you can open in editor:
 
@@ -14,17 +14,20 @@ There are a few additional places you can open in editor:
 
 * Whenever viewing a file or a diff during [Code Review](../features/code_review.md), you can `Ctrl+Click` (or `Cmd+Click`) the line number of open up the file at that location
 
-## Custom URLs (or custom commands)
+## Custom URLs
 
 Tidewave Web come with built-in support for a few editors.
-In case your editor is not supported, you can use a custom URL
-or a custom command. For example, if you are using one of JetBrains
-IDEs, you may configure a custom URL like this:
+In case your editor is not supported, you can use a custom URL.
+For example, if you are using one of JetBrains IDEs, you may
+configure a custom URL like this:
 
 ```
 idea://open?file=__FILE__&line=__LINE__
 pycharm://open?file=__FILE__&line=__LINE__
 ```
+
+Some editors, such as Sublime Text, require extensions or
+additional packages that enable custom URLs.
 
 ## Container configuration
 
