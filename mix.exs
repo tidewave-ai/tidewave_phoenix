@@ -53,6 +53,10 @@ defmodule Tidewave.MixProject do
       {:circular_buffer, "~> 0.4 or ~> 1.0"},
       {:igniter, "~> 0.6", optional: true},
 
+      # Required for the browser control plane (socket/channel). Always present
+      # in a Phoenix host app; optional so it is not forced onto consumers.
+      {:phoenix, ">= 1.7.0", optional: true},
+
       # We require v1.6.1 to detect if phoenix live reload is running too early or late
       {:phoenix_live_reload, ">= 1.6.1", optional: true},
 

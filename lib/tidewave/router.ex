@@ -52,6 +52,28 @@ defmodule Tidewave.Router do
     |> halt()
   end
 
+  get "/control" do
+    if Tidewave.ControlPlane.enabled?() do
+      conn
+      |> put_resp_content_type("text/html")
+      |> send_resp(200, Tidewave.ControlPlane.page_html())
+      |> halt()
+    else
+      conn |> send_resp(404, "Not Found") |> halt()
+    end
+  end
+
+  get "/phoenix.js" do
+    if Tidewave.ControlPlane.enabled?() do
+      conn
+      |> put_resp_content_type("text/javascript")
+      |> send_file(200, Application.app_dir(:phoenix, "priv/static/phoenix.min.js"))
+      |> halt()
+    else
+      conn |> send_resp(404, "Not Found") |> halt()
+    end
+  end
+
   match "/*_ignored" do
     # Return 404 for /.well-known resources lookup and similar
     Logger.metadata(tidewave_mcp: true)
