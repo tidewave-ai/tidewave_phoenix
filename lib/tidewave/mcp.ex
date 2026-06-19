@@ -20,7 +20,7 @@ defmodule Tidewave.MCP do
 
     children = [
       {Registry, name: MCP.Registry, keys: :unique},
-      Tidewave.BrowserSessions,
+      {Registry, name: Tidewave.BrowserSessions, keys: :unique},
       Tidewave.MCP.Logger,
       Tidewave.MCP.StandardError
     ]

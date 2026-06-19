@@ -7,34 +7,34 @@ defmodule Tidewave.ControlPlaneTest do
 
   # The test environment enables the control plane (see config/config.exs).
 
-  describe "/tidewave/control" do
-    test "serves the control page" do
-      conn = conn(:get, "/tidewave/control") |> Tidewave.call(Tidewave.init([]))
+  describe "/tidewave" do
+    test "advertises the control plane via a meta tag when enabled" do
+      conn = conn(:get, "/tidewave") |> Tidewave.call(Tidewave.init([]))
 
       assert conn.status == 200
       assert get_resp_header_value(conn, "content-type") =~ "text/html"
-      assert conn.resp_body =~ "Tidewave Control"
-      assert conn.resp_body =~ ~s|new Socket("/tidewave/socket")|
-      assert conn.resp_body =~ ~s|src="/tidewave/phoenix.js"|
+      assert conn.resp_body =~ ~s(<meta name="tidewave:control-plane" content="enabled" />)
+      assert conn.resp_body =~ "/tc/tc.js"
     end
   end
 
-  describe "/tidewave/phoenix.js" do
-    test "serves the bundled phoenix.js" do
-      conn = conn(:get, "/tidewave/phoenix.js") |> Tidewave.call(Tidewave.init([]))
+  describe "/tidewave/ws" do
+    test "rejects a websocket upgrade from a foreign origin" do
+      conn =
+        conn(:get, "/tidewave/ws")
+        |> Plug.Conn.put_req_header("origin", "http://evil.example.com")
+        |> Tidewave.call(Tidewave.init([]))
 
-      assert conn.status == 200
-      assert get_resp_header_value(conn, "content-type") =~ "text/javascript"
-      assert conn.resp_body =~ "Phoenix"
+      assert conn.status == 403
     end
   end
 
   describe "tools" do
-    test "browser tools are registered when the control plane is enabled" do
+    test "browser_eval is registered when the control plane is enabled" do
       {_tools, dispatch} = Tidewave.MCP.Server.tools_and_dispatch()
 
-      assert Map.has_key?(dispatch, "browser_session")
       assert Map.has_key?(dispatch, "browser_eval")
+      refute Map.has_key?(dispatch, "browser_session")
     end
   end
 

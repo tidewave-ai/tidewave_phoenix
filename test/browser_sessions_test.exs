@@ -6,164 +6,153 @@ defmodule Tidewave.BrowserSessionsTest do
   alias Tidewave.BrowserSessions
 
   setup do
-    # Each test starts from a clean slate; the previous test's `on_exit`
-    # cleanup is given a moment to be processed by the registry.
-    wait_until(fn ->
-      BrowserSessions.list_controls() == [] and BrowserSessions.list_sessions() == []
-    end)
-
+    # Each test starts from a clean slate; the previous test's cleanup is given
+    # a moment to be processed by the registry.
+    wait_until(fn -> BrowserSessions.list_clients() == [] end)
     :ok
   end
 
-  describe "open_session/2" do
-    test "assigns a friendly name and is discoverable" do
-      start_control()
+  describe "register_client/2" do
+    test "registers and is discoverable" do
+      pid = start_client("nice-cactus")
 
-      assert {:ok, name} = BrowserSessions.open_session("/", 1_000)
-      assert name =~ ~r/^[a-z]+-[a-z]+$/
-
-      assert [%{name: ^name}] = BrowserSessions.list_sessions()
-      assert {:ok, %{name: ^name}} = BrowserSessions.lookup(name)
+      assert {:ok, ^pid} = BrowserSessions.lookup_client("nice-cactus")
+      assert [{"nice-cactus", ^pid}] = BrowserSessions.list_clients()
     end
 
-    test "errors when no control page is connected" do
-      assert {:error, :no_control} = BrowserSessions.open_session("/", 100)
+    test "rejects a duplicate name from another process" do
+      start_client("nice-cactus")
+      parent = self()
+
+      pid =
+        spawn(fn ->
+          send(parent, {:result, BrowserSessions.register_client("nice-cactus")})
+          receive do: (:stop -> :ok)
+        end)
+
+      on_exit(fn -> stop_client(pid) end)
+      assert_receive {:result, {:error, :name_taken}}
     end
 
-    test "propagates a browser error and forgets the reservation" do
-      start_control(:error_open)
+    test "is idempotent for the same process" do
+      parent = self()
 
-      assert {:error, "boom"} = BrowserSessions.open_session("/", 1_000)
-      assert BrowserSessions.list_sessions() == []
+      pid =
+        spawn(fn ->
+          send(parent, {:r1, BrowserSessions.register_client("nice-cactus")})
+          send(parent, {:r2, BrowserSessions.register_client("nice-cactus")})
+          receive do: (:stop -> :ok)
+        end)
+
+      on_exit(fn -> stop_client(pid) end)
+      assert_receive {:r1, :ok}
+      assert_receive {:r2, :ok}
     end
 
-    test "leaves the registry when the control page dies" do
-      pid = start_control()
-      assert {:ok, name} = BrowserSessions.open_session("/", 1_000)
-      assert {:ok, _} = BrowserSessions.lookup(name)
+    test "forgets a client when it dies" do
+      pid = start_client("nice-cactus")
+      assert {:ok, ^pid} = BrowserSessions.lookup_client("nice-cactus")
 
-      stop_control(pid)
+      stop_client(pid)
 
-      wait_until(fn -> BrowserSessions.lookup(name) == :error end)
-      assert BrowserSessions.list_sessions() == []
-    end
-  end
-
-  describe "resolve_session/1" do
-    test "errors when none are connected" do
-      assert {:error, :no_sessions} = BrowserSessions.resolve_session()
-    end
-
-    test "returns the sole session when one is open" do
-      start_control()
-      {:ok, name} = BrowserSessions.open_session("/", 1_000)
-
-      assert {:ok, %{name: ^name}} = BrowserSessions.resolve_session()
-    end
-
-    test "is ambiguous when several are open" do
-      start_control()
-      {:ok, name1} = BrowserSessions.open_session("/", 1_000)
-      {:ok, name2} = BrowserSessions.open_session("/other", 1_000)
-
-      assert {:error, {:ambiguous, names}} = BrowserSessions.resolve_session()
-      assert Enum.sort(names) == Enum.sort([name1, name2])
-    end
-
-    test "reports the available names for an unknown session" do
-      start_control()
-      {:ok, name} = BrowserSessions.open_session("/", 1_000)
-
-      assert {:error, {:unknown, "missing-name", [^name]}} =
-               BrowserSessions.resolve_session("missing-name")
+      wait_until(fn -> BrowserSessions.lookup_client("nice-cactus") == :error end)
+      assert BrowserSessions.list_clients() == []
     end
   end
 
   describe "eval/3" do
-    test "routes to the sole open session and returns its name" do
-      start_control(fn _name, input ->
-        %{"text" => "ran: " <> input["code"], "isError" => false}
+    test "routes to the client owning the sid" do
+      start_client("nice-cactus", fn sid, input ->
+        %{"text" => "ran #{input.code} in #{sid}", "isError" => false}
       end)
 
-      {:ok, name} = BrowserSessions.open_session("/", 1_000)
-
-      assert {:ok, %{"text" => "ran: 1 + 1", "isError" => false}, ^name} =
-               BrowserSessions.eval(nil, %{"code" => "1 + 1"}, 1_000)
+      assert {:ok, %{"text" => "ran 1+1 in nice-cactus@1"}} =
+               BrowserSessions.eval("nice-cactus@1", %{code: "1+1"}, 1_000)
     end
 
-    test "routes to the named session" do
-      start_control(fn name, _input -> %{"text" => name, "isError" => false} end)
-
-      {:ok, name1} = BrowserSessions.open_session("/", 1_000)
-      {:ok, name2} = BrowserSessions.open_session("/two", 1_000)
-
-      assert {:ok, %{"text" => ^name1}, ^name1} =
-               BrowserSessions.eval(name1, %{"code" => "x"}, 1_000)
-
-      assert {:ok, %{"text" => ^name2}, ^name2} =
-               BrowserSessions.eval(name2, %{"code" => "x"}, 1_000)
+    test "errors on a malformed sid" do
+      assert {:error, :invalid_sid} = BrowserSessions.eval("no-at-sign", %{code: ""}, 100)
     end
 
-    test "surfaces the ambiguous error without a session" do
-      start_control()
-      BrowserSessions.open_session("/", 1_000)
-      BrowserSessions.open_session("/two", 1_000)
-
-      assert {:error, {:ambiguous, _names}} =
-               BrowserSessions.eval(nil, %{"code" => "x"}, 1_000)
+    test "errors when no client owns the sid" do
+      assert {:error, :unknown_client} = BrowserSessions.eval("ghost@1", %{code: ""}, 100)
     end
 
-    test "times out when the browser does not reply" do
-      pid = start_control(:silent)
-      # The control never acks, so register the session directly.
-      name = create_session(pid)
-
-      assert {:error, :timeout} = BrowserSessions.eval(name, %{"code" => "x"}, 50)
+    test "times out when the client never replies" do
+      start_client("slow-otter", :silent)
+      assert {:error, :timeout} = BrowserSessions.eval("slow-otter@1", %{code: ""}, 50)
     end
 
-    test "reports a disconnect when the control dies mid-request" do
-      pid = start_control(:die)
-      name = create_session(pid)
+    test "reports a disconnect when the client dies mid-request" do
+      start_client("dying-comet", :die)
+      assert {:error, :disconnected} = BrowserSessions.eval("dying-comet@1", %{code: ""}, 1_000)
+    end
+  end
 
-      assert {:error, :disconnected} = BrowserSessions.eval(name, %{"code" => "x"}, 1_000)
+  describe "broadcast_eval/2" do
+    test "errors when no client is connected" do
+      assert {:error, :no_clients} = BrowserSessions.broadcast_eval(%{code: ""}, 100)
+    end
+
+    test "returns the first reply and passes a nil sid" do
+      start_client("first-robin", fn sid, _input ->
+        %{"text" => "from #{sid || "handshake"}", "isError" => false, "sid" => "first-robin@1"}
+      end)
+
+      assert {:ok, %{"text" => "from handshake", "sid" => "first-robin@1"}} =
+               BrowserSessions.broadcast_eval(%{code: ""}, 1_000)
+    end
+
+    test "times out when clients are silent" do
+      start_client("quiet-fjord", :silent)
+      assert {:error, :timeout} = BrowserSessions.broadcast_eval(%{code: ""}, 50)
     end
   end
 
   # ── helpers ───────────────────────────────────────────────────────────────
 
-  # Spawns a process that registers itself as a control page and services
-  # open_session/browser_eval requests according to `behavior`:
+  # Spawns a process that registers itself as a client and services
+  # browser_eval requests according to `behavior`:
   #
-  #   * a function `(name, input) -> result` — used for browser_eval replies;
-  #     open_session is acked with `:ok`
-  #   * `:error_open` — replies to open_session with `{:error, "boom"}`
-  #   * `:silent`     — never replies (to exercise timeouts)
-  #   * `:die`        — exits on the first request (to exercise disconnects)
-  defp start_control(behavior \\ fn _name, _input -> %{"text" => "ok", "isError" => false} end) do
+  #   * a function `(sid, input) -> result` — replies with its return value
+  #   * `:silent` — never replies (to exercise timeouts)
+  #   * `:die`    — exits on the first request (to exercise disconnects)
+  defp start_client(
+         name,
+         behavior \\ fn _sid, _input -> %{"text" => "ok", "isError" => false} end
+       ) do
     test = self()
 
     pid =
       spawn(fn ->
-        BrowserSessions.register_control()
-        send(test, {:control_ready, self()})
-        control_loop(behavior)
+        :ok = BrowserSessions.register_client(name)
+        send(test, {:ready, self()})
+        client_loop(behavior)
       end)
 
-    on_exit(fn -> stop_control(pid) end)
+    on_exit(fn -> stop_client(pid) end)
 
-    assert_receive {:control_ready, ^pid}, 1_000
+    assert_receive {:ready, ^pid}, 1_000
     pid
   end
 
-  # Registers a session directly (bypassing the open_session round-trip), for
-  # behaviors that never ack an open. The given control must be the most
-  # recently registered, since the registry picks that one.
-  defp create_session(_control_pid, path \\ "/") do
-    {:ok, name, _pid} = GenServer.call(BrowserSessions, {:create_session, path})
-    name
+  defp client_loop(behavior) do
+    receive do
+      {:browser_eval, ref, reply_to, sid, input} ->
+        case behavior do
+          :silent -> :ok
+          :die -> exit(:boom)
+          fun when is_function(fun) -> send(reply_to, {:browser_reply, ref, fun.(sid, input)})
+        end
+
+        client_loop(behavior)
+
+      :stop ->
+        :ok
+    end
   end
 
-  defp stop_control(pid) do
+  defp stop_client(pid) do
     if Process.alive?(pid) do
       ref = Process.monitor(pid)
       send(pid, :stop)
@@ -175,41 +164,11 @@ defmodule Tidewave.BrowserSessionsTest do
       end
     end
 
-    wait_until(fn -> pid not in BrowserSessions.list_controls() end)
+    wait_until(fn -> pid not in client_pids() end)
   end
 
-  defp control_loop(behavior) do
-    receive do
-      {:open_session, ref, reply_to, _name, _path} ->
-        case behavior do
-          :silent -> :ok
-          :die -> exit(:boom)
-          :error_open -> send(reply_to, {:browser_reply, ref, {:error, "boom"}})
-          _ -> send(reply_to, {:browser_reply, ref, :ok})
-        end
-
-        control_loop(behavior)
-
-      {:browser_eval, ref, reply_to, name, input} ->
-        case behavior do
-          :silent ->
-            :ok
-
-          :die ->
-            exit(:boom)
-
-          fun when is_function(fun) ->
-            send(reply_to, {:browser_reply, ref, fun.(name, input)})
-
-          _ ->
-            send(reply_to, {:browser_reply, ref, %{"text" => "ok", "isError" => false}})
-        end
-
-        control_loop(behavior)
-
-      :stop ->
-        :ok
-    end
+  defp client_pids do
+    BrowserSessions.list_clients() |> Enum.map(fn {_name, pid} -> pid end)
   end
 
   defp wait_until(fun, attempts \\ 100) do

@@ -18,7 +18,7 @@ defmodule Tidewave.MCP.Server do
       Tools.Eval.tools(),
       Tools.Ecto.tools(),
       Tools.Ash.tools(),
-      if(Tidewave.ControlPlane.enabled?(), do: Tools.Browser.tools(), else: [])
+      if(Tidewave.control_plane_enabled?(), do: Tools.Browser.tools(), else: [])
     ]
     |> List.flatten()
   end

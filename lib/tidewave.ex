@@ -26,6 +26,11 @@ defmodule Tidewave do
     Tidewave.MCP.Logger.clear_logs()
   end
 
+  @doc false
+  def control_plane_enabled? do
+    Application.get_env(:tidewave, :enable_control_plane, false)
+  end
+
   @impl true
   def init(opts) do
     %{

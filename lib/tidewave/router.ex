@@ -52,22 +52,10 @@ defmodule Tidewave.Router do
     |> halt()
   end
 
-  get "/control" do
-    if Tidewave.ControlPlane.enabled?() do
+  get "/ws" do
+    if Tidewave.control_plane_enabled?() do
       conn
-      |> put_resp_content_type("text/html")
-      |> send_resp(200, Tidewave.ControlPlane.page_html())
-      |> halt()
-    else
-      conn |> send_resp(404, "Not Found") |> halt()
-    end
-  end
-
-  get "/phoenix.js" do
-    if Tidewave.ControlPlane.enabled?() do
-      conn
-      |> put_resp_content_type("text/javascript")
-      |> send_file(200, Application.app_dir(:phoenix, "priv/static/phoenix.min.js"))
+      |> WebSockAdapter.upgrade(Tidewave.ControlSocket, %{}, timeout: 60_000)
       |> halt()
     else
       conn |> send_resp(404, "Not Found") |> halt()
@@ -116,6 +104,12 @@ defmodule Tidewave.Router do
       {["config"], _} ->
         conn
 
+      # The control-plane WebSocket is the one endpoint that legitimately
+      # receives an Origin header (browsers always send it on WebSocket
+      # upgrades), so it gets a same-origin check instead.
+      {["ws"], origin} ->
+        check_ws_origin(conn, origin)
+
       # No origin header is always allowed
       {_, []} ->
         conn
@@ -126,6 +120,22 @@ defmodule Tidewave.Router do
         For security reasons, Tidewave does not accept requests with an origin header for this endpoint.
         """)
     end
+  end
+
+  defp check_ws_origin(conn, []), do: conn
+
+  defp check_ws_origin(conn, [origin | _]) do
+    if origin_host(origin) == conn.host do
+      conn
+    else
+      log_and_send_403(conn, """
+      For security reasons, the Tidewave control plane only accepts WebSocket connections from the application's own origin.
+      """)
+    end
+  end
+
+  defp origin_host(origin) do
+    URI.parse(origin).host
   end
 
   defp log_and_send_403(conn, message) do
@@ -140,6 +150,17 @@ defmodule Tidewave.Router do
   defp tidewave_html() do
     client_url = Application.get_env(:tidewave, :client_url, "https://tidewave.ai")
 
+    # When the control plane is enabled, we signal it to Tidewave Web (tc.js)
+    # via a meta tag. The client then runs the browser control plane against
+    # this same-origin app (connecting to /tidewave/ws) instead of the normal
+    # Tidewave Web experience.
+    control_plane_meta =
+      if Tidewave.control_plane_enabled?() do
+        ~s(    <meta name="tidewave:control-plane" content="enabled" />\n)
+      else
+        ""
+      end
+
     # We return a basic page that is used by Tidewave Web.
     # Note that, by itself, this page is harmless and it
     # cannot invoke any of the MCP endpoints, since the MCP
@@ -149,6 +170,7 @@ defmodule Tidewave.Router do
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        #{control_plane_meta}
         <script type="module" src="#{client_url}/tc/tc.js"></script>
       </head>
       <body></body>
