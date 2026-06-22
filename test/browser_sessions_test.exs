@@ -60,66 +60,73 @@ defmodule Tidewave.BrowserSessionsTest do
     end
   end
 
-  describe "eval/3" do
+  describe "run/4" do
     test "routes to the client owning the sid" do
-      start_client("nice-cactus", fn sid, input ->
-        %{"text" => "ran #{input.code} in #{sid}", "isError" => false}
+      start_client("nice-cactus", fn sid, name, input ->
+        %{"text" => "ran #{name} with #{input.code} in #{sid}", "isError" => false}
       end)
 
-      assert {:ok, %{"text" => "ran 1+1 in nice-cactus@1"}} =
-               BrowserSessions.eval("nice-cactus@1", %{code: "1+1"}, 1_000)
+      assert {:ok, %{"text" => "ran browser_eval with 1+1 in nice-cactus#1"}} =
+               BrowserSessions.run("nice-cactus#1", "browser_eval", %{code: "1+1"}, 1_000)
     end
 
     test "errors on a malformed sid" do
-      assert {:error, :invalid_sid} = BrowserSessions.eval("no-at-sign", %{code: ""}, 100)
+      assert {:error, :invalid_sid} =
+               BrowserSessions.run("no-hash", "browser_eval", %{code: ""}, 100)
     end
 
     test "errors when no client owns the sid" do
-      assert {:error, :unknown_client} = BrowserSessions.eval("ghost@1", %{code: ""}, 100)
+      assert {:error, :unknown_client} =
+               BrowserSessions.run("ghost#1", "browser_eval", %{code: ""}, 100)
     end
 
     test "times out when the client never replies" do
       start_client("slow-otter", :silent)
-      assert {:error, :timeout} = BrowserSessions.eval("slow-otter@1", %{code: ""}, 50)
+
+      assert {:error, :timeout} =
+               BrowserSessions.run("slow-otter#1", "browser_eval", %{code: ""}, 50)
     end
 
     test "reports a disconnect when the client dies mid-request" do
       start_client("dying-comet", :die)
-      assert {:error, :disconnected} = BrowserSessions.eval("dying-comet@1", %{code: ""}, 1_000)
+
+      assert {:error, :disconnected} =
+               BrowserSessions.run("dying-comet#1", "browser_eval", %{code: ""}, 1_000)
     end
   end
 
-  describe "broadcast_eval/2" do
+  describe "broadcast_run/3" do
     test "errors when no client is connected" do
-      assert {:error, :no_clients} = BrowserSessions.broadcast_eval(%{code: ""}, 100)
+      assert {:error, :no_clients} =
+               BrowserSessions.broadcast_run("browser_eval", %{code: ""}, 100)
     end
 
     test "returns the first reply and passes a nil sid" do
-      start_client("first-robin", fn sid, _input ->
-        %{"text" => "from #{sid || "handshake"}", "isError" => false, "sid" => "first-robin@1"}
+      start_client("first-robin", fn sid, _name, _input ->
+        %{"text" => "from #{sid || "handshake"}", "isError" => false, "sid" => "first-robin#1"}
       end)
 
-      assert {:ok, %{"text" => "from handshake", "sid" => "first-robin@1"}} =
-               BrowserSessions.broadcast_eval(%{code: ""}, 1_000)
+      assert {:ok, %{"text" => "from handshake", "sid" => "first-robin#1"}} =
+               BrowserSessions.broadcast_run("browser_eval", %{code: ""}, 1_000)
     end
 
     test "times out when clients are silent" do
       start_client("quiet-fjord", :silent)
-      assert {:error, :timeout} = BrowserSessions.broadcast_eval(%{code: ""}, 50)
+      assert {:error, :timeout} = BrowserSessions.broadcast_run("browser_eval", %{code: ""}, 50)
     end
   end
 
   # ── helpers ───────────────────────────────────────────────────────────────
 
   # Spawns a process that registers itself as a client and services
-  # browser_eval requests according to `behavior`:
+  # run_tool requests according to `behavior`:
   #
   #   * a function `(sid, input) -> result` — replies with its return value
   #   * `:silent` — never replies (to exercise timeouts)
   #   * `:die`    — exits on the first request (to exercise disconnects)
   defp start_client(
          name,
-         behavior \\ fn _sid, _input -> %{"text" => "ok", "isError" => false} end
+         behavior \\ fn _sid, _name, _input -> %{"text" => "ok", "isError" => false} end
        ) do
     test = self()
 
@@ -138,11 +145,16 @@ defmodule Tidewave.BrowserSessionsTest do
 
   defp client_loop(behavior) do
     receive do
-      {:browser_eval, ref, reply_to, sid, input} ->
+      {:run_tool, reply_to, sid, name, input} ->
         case behavior do
-          :silent -> :ok
-          :die -> exit(:boom)
-          fun when is_function(fun) -> send(reply_to, {:browser_reply, ref, fun.(sid, input)})
+          :silent ->
+            :ok
+
+          :die ->
+            exit(:boom)
+
+          fun when is_function(fun) ->
+            send(reply_to, {:browser_reply, reply_to, fun.(sid, name, input)})
         end
 
         client_loop(behavior)

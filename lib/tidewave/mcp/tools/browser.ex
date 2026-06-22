@@ -21,7 +21,7 @@ defmodule Tidewave.MCP.Tools.Browser do
             sid: %{
               type: "string",
               description:
-                "The session to target, e.g. \"nice-cactus@1\". Omit it to use a new primary session (returned to you as `sid`)."
+                "The session to target, e.g. \"nice-cactus#1\". Omit it to use a new primary session (returned to you as `sid`)."
             },
             timeout: %{
               type: "number",
@@ -40,10 +40,10 @@ defmodule Tidewave.MCP.Tools.Browser do
 
     case args["sid"] do
       sid when is_binary(sid) and sid != "" ->
-        sid |> BrowserSessions.eval(input, timeout) |> direct_result(sid)
+        BrowserSessions.run(sid, "browser_eval", input, timeout) |> direct_result(sid)
 
       _ ->
-        input |> broadcast_with_retry(timeout) |> broadcast_result()
+        broadcast_with_retry("browser_eval", input, timeout) |> broadcast_result()
     end
   end
 
@@ -56,17 +56,20 @@ defmodule Tidewave.MCP.Tools.Browser do
 
   # A pure handshake (no code) has no side effects, so a missed first broadcast
   # is worth retrying once. We never retry code, which could run twice.
-  defp broadcast_with_retry(input, timeout) do
-    case BrowserSessions.broadcast_eval(input, timeout) do
-      {:error, :timeout} when input.code == "" -> BrowserSessions.broadcast_eval(input, timeout)
-      other -> other
+  defp broadcast_with_retry(name, input, timeout) do
+    case BrowserSessions.broadcast_run(name, input, timeout) do
+      {:error, :timeout} when input.code == "" ->
+        BrowserSessions.broadcast_run(name, input, timeout)
+
+      other ->
+        other
     end
   end
 
   defp direct_result({:ok, result}, _sid), do: {:ok, relay(result)}
 
   defp direct_result({:error, :invalid_sid}, sid) do
-    {:error, "Invalid sid \"#{sid}\". A sid looks like \"nice-cactus@1\"."}
+    {:error, "Invalid sid \"#{sid}\". A sid looks like \"nice-cactus#1\"."}
   end
 
   defp direct_result({:error, :unknown_client}, sid) do
@@ -88,7 +91,7 @@ defmodule Tidewave.MCP.Tools.Browser do
   defp broadcast_result({:error, :timeout}), do: {:error, no_browser_message()}
 
   defp no_browser_message do
-    "No browser is connected to the Tidewave control plane. " <>
+    "No browser is connected to the Tidewave control page. " <>
       "Open #{@control_path} in your browser and try again."
   end
 

@@ -8,17 +8,7 @@ defmodule Tidewave.MCP.ServerTest do
 
   describe "handle_message/1" do
     setup do
-      # Create a simple conn with the needed configuration
-      conn =
-        conn(:post, "/tidewave/mcp?include_fs_tools=true", %{})
-        |> put_req_header("content-type", "application/json")
-        |> put_private(:tidewave_config, %{
-          allow_remote_access: false,
-          phoenix_endpoint: nil,
-          inspect_opts: [charlists: :as_lists, limit: 50, pretty: true]
-        })
-
-      %{conn: conn}
+      %{conn: mcp_conn()}
     end
 
     test "handles initialization message", %{conn: conn} do
@@ -43,6 +33,7 @@ defmodule Tidewave.MCP.ServerTest do
       assert response_body["id"] == "1"
       assert response_body["result"]["protocolVersion"] == "2025-03-26"
       assert is_list(response_body["result"]["tools"])
+      refute "browser_eval" in Enum.map(response_body["result"]["tools"], & &1["name"])
     end
 
     test "handles initialized notification", %{conn: conn} do
@@ -100,6 +91,54 @@ defmodule Tidewave.MCP.ServerTest do
       assert response_body["jsonrpc"] == "2.0"
       assert response_body["id"] == "2"
       assert is_list(response_body["result"]["tools"])
+      refute "browser_eval" in Enum.map(response_body["result"]["tools"], & &1["name"])
+    end
+
+    test "includes browser tools when requested" do
+      message = %{
+        "jsonrpc" => "2.0",
+        "method" => "tools/list",
+        "id" => "2"
+      }
+
+      conn = %{mcp_conn("/tidewave/mcp?include_browser_tools=true") | body_params: message}
+      response = Tidewave.MCP.Server.handle_http_message(conn)
+
+      assert response.status == 200
+      response_body = Jason.decode!(response.resp_body)
+      assert "browser_eval" in Enum.map(response_body["result"]["tools"], & &1["name"])
+    end
+
+    test "does not dispatch browser tools unless requested", %{conn: conn} do
+      message = %{
+        "jsonrpc" => "2.0",
+        "method" => "tools/call",
+        "id" => "3",
+        "params" => %{"name" => "browser_eval", "arguments" => %{}}
+      }
+
+      conn = %{conn | body_params: message}
+      response = Tidewave.MCP.Server.handle_http_message(conn)
+
+      assert response.status == 400
+      response_body = Jason.decode!(response.resp_body)
+      assert response_body["error"]["code"] == -32601
+    end
+
+    test "dispatches browser tools when requested" do
+      message = %{
+        "jsonrpc" => "2.0",
+        "method" => "tools/call",
+        "id" => "3",
+        "params" => %{"name" => "browser_eval", "arguments" => "invalid"}
+      }
+
+      conn = %{mcp_conn("/tidewave/mcp?include_browser_tools=true") | body_params: message}
+      response = Tidewave.MCP.Server.handle_http_message(conn)
+
+      assert response.status == 400
+      response_body = Jason.decode!(response.resp_body)
+      assert response_body["error"]["code"] == -32602
     end
 
     test "returns error for invalid JSON-RPC message", %{conn: conn} do
@@ -184,5 +223,15 @@ defmodule Tidewave.MCP.ServerTest do
       response_body = Jason.decode!(response.resp_body)
       assert response_body["result"]["templates"] == []
     end
+  end
+
+  defp mcp_conn(path \\ "/tidewave/mcp") do
+    conn(:post, path, %{})
+    |> put_req_header("content-type", "application/json")
+    |> put_private(:tidewave_config, %{
+      allow_remote_access: false,
+      phoenix_endpoint: nil,
+      inspect_opts: [charlists: :as_lists, limit: 50, pretty: true]
+    })
   end
 end

@@ -3,19 +3,19 @@ defmodule Tidewave.BrowserSessions do
 
   # Registry of connected browser control pages ("clients").
   #
-  # This is the (deliberately thin) server side of Tidewave's control plane.
+  # This is the (deliberately thin) server side of Tidewave's control page.
   # Each browser tab that opens `/tidewave` connects over a plain WebSocket
   # (`Tidewave.ControlSocket`) and registers its connection process under a
   # self-chosen, human-friendly name (e.g. `nice-cactus`) in a `:unique`
   # `Registry` (started under this module's name). The registry maps the name to
   # the connection process and prunes it automatically when that process dies;
-  # everything about individual sessions (the iframes, their `@N` numbering,
+  # everything about individual sessions (the iframes, their `#N` numbering,
   # primary vs. secondary) lives in the page's JavaScript. A `sid` has the shape
-  # `name@N`; we route by splitting on `@` and treating the suffix as opaque.
+  # `name#N`; we route by splitting on `#` and treating the suffix as opaque.
   #
   # The MCP `browser_eval` tool callback runs in the request process and uses
-  # `eval/3` (a `sid` was given) or `broadcast_eval/2` (none given, so we ask
-  # every connected page and take the first to answer). Both block until a reply
+  # `run/4` (a `sid` was given) or `broadcast_run/3` (none given, so we ask every
+  # connected page and take the first to answer). Both block until a reply
   # arrives or the timeout elapses. The waiting is done in a throwaway task so a
   # late reply can never leak into the long-lived request process.
 
@@ -55,17 +55,17 @@ defmodule Tidewave.BrowserSessions do
   end
 
   @doc """
-  Runs `browser_eval` against the client owning `sid` and waits for the reply.
+  Runs the given tool against the client owning `sid` and waits for the reply.
 
   Returns `{:ok, result}` (the browser's response map) or `{:error, reason}`
   where reason is `:invalid_sid`, `:unknown_client`, `:timeout`, or
   `:disconnected`.
   """
-  def eval(sid, input, timeout) when is_binary(sid) do
+  def run(sid, name, input, timeout) when is_binary(sid) do
     case parse_sid(sid) do
-      {:ok, name} ->
-        case lookup_client(name) do
-          {:ok, pid} -> collect(fn -> await_eval(pid, sid, input) end, timeout)
+      {:ok, client} ->
+        case lookup_client(client) do
+          {:ok, pid} -> collect(fn -> await_eval(pid, sid, name, input) end, timeout)
           :error -> {:error, :unknown_client}
         end
 
@@ -75,16 +75,16 @@ defmodule Tidewave.BrowserSessions do
   end
 
   @doc """
-  Broadcasts `browser_eval` to every connected client and returns the first reply.
+  Broadcasts the given tool to every connected client and returns the first reply.
 
   Used for the handshake (a `browser_eval` call with no `sid`). Returns
   `{:ok, result}`, `{:error, :no_clients}` when nobody is connected, or
   `{:error, :timeout}` when no client answered in time.
   """
-  def broadcast_eval(input, timeout) do
+  def broadcast_run(name, input, timeout) do
     case client_pids() do
       [] -> {:error, :no_clients}
-      pids -> collect(fn -> await_broadcast(pids, input) end, timeout)
+      pids -> collect(fn -> await_broadcast(pids, name, input) end, timeout)
     end
   end
 
@@ -93,7 +93,7 @@ defmodule Tidewave.BrowserSessions do
   end
 
   defp parse_sid(sid) do
-    case String.split(sid, "@", parts: 2) do
+    case String.split(sid, "#", parts: 2) do
       [name, suffix] when name != "" and suffix != "" -> {:ok, name}
       _ -> :error
     end
@@ -112,23 +112,25 @@ defmodule Tidewave.BrowserSessions do
     end
   end
 
-  defp await_eval(pid, sid, input) do
-    ref = make_ref()
-    mon = Process.monitor(pid)
-    send(pid, {:browser_eval, ref, self(), sid, input})
+  defp await_eval(pid, sid, name, input) do
+    alias = Process.monitor(pid, alias: :reply_demonitor)
+    send(pid, {:run_tool, alias, sid, name, input})
 
     receive do
-      {:browser_reply, ^ref, value} -> {:ok, value}
-      {:DOWN, ^mon, :process, ^pid, _reason} -> {:error, :disconnected}
+      {:browser_reply, ^alias, value} -> {:ok, value}
+      {:DOWN, ^alias, :process, ^pid, _reason} -> {:error, :disconnected}
     end
   end
 
-  defp await_broadcast(pids, input) do
-    ref = make_ref()
-    Enum.each(pids, fn pid -> send(pid, {:browser_eval, ref, self(), nil, input}) end)
+  defp await_broadcast(pids, name, input) do
+    # we are only interested in the first response, so we use
+    # an alias with :reply to ignore any late responses
+    alias = :erlang.alias([:reply])
+    Enum.each(pids, fn pid -> send(pid, {:run_tool, alias, nil, name, input}) end)
 
     receive do
-      {:browser_reply, ^ref, value} -> {:ok, value}
+      {:browser_reply, ^alias, value} ->
+        {:ok, value}
     end
   end
 end

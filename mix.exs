@@ -53,7 +53,7 @@ defmodule Tidewave.MixProject do
       {:circular_buffer, "~> 0.4 or ~> 1.0"},
       {:igniter, "~> 0.6", optional: true},
 
-      # Required for the browser control plane to upgrade /tidewave/ws to a
+      # Required for the browser control page to upgrade /tidewave/ws to a
       # plain WebSocket. Works with both Bandit and Plug.Cowboy.
       {:websock_adapter, "~> 0.5"},
 

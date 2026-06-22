@@ -7,8 +7,8 @@ defmodule Tidewave.ControlSocket do
   #
   # On connect, the page sends a `hello` with its self-chosen name, which we
   # register with `Tidewave.BrowserSessions`. From then on the MCP request
-  # process forwards `{:browser_eval, ...}` messages here; we push them to the
-  # page as JSON frames and route the page's eventual `eval_reply` back to the
+  # process forwards `{:run_tool, ...}` messages here; we push them to the page
+  # as JSON frames and route the page's eventual `tool_reply` back to the
   # waiting request process, correlated by an integer `ref`.
 
   @behaviour WebSock
@@ -49,16 +49,20 @@ defmodule Tidewave.ControlSocket do
     {:ok, reply_pending(state, ref, message["result"])}
   end
 
+  defp handle_message(%{"type" => "tool_reply", "ref" => ref} = message, state) do
+    {:ok, reply_pending(state, ref, message["result"])}
+  end
+
   defp handle_message(_other, state), do: {:ok, state}
 
   @impl true
-  # An agent (via the MCP server) asked to run code. Push it to the page and
-  # remember who is waiting for the reply.
-  def handle_info({:browser_eval, request_ref, reply_to, sid, input}, state) do
+  # An agent (via the MCP server) asked to run a browser tool. Push it to the
+  # page and remember who is waiting for the reply.
+  def handle_info({:run_tool, reply_to, sid, name, input}, state) when is_binary(name) do
     ref = System.unique_integer([:positive])
     Process.send_after(self(), {:drop_pending, ref}, @drop_after)
-    state = put_in(state.pending[ref], {reply_to, request_ref})
-    {:push, text_frame(%{type: "eval", ref: ref, sid: sid, input: input}), state}
+    state = put_in(state.pending[ref], reply_to)
+    {:push, text_frame(%{type: "run_tool", ref: ref, name: name, sid: sid, input: input}), state}
   end
 
   def handle_info({:drop_pending, ref}, state) do
@@ -74,7 +78,7 @@ defmodule Tidewave.ControlSocket do
     {pending, rest} = Map.pop(state.pending, ref)
 
     case pending do
-      {reply_to, request_ref} -> send(reply_to, {:browser_reply, request_ref, value})
+      reply_to when not is_nil(reply_to) -> send(reply_to, {:browser_reply, reply_to, value})
       nil -> :ok
     end
 

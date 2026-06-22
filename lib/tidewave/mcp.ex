@@ -19,7 +19,6 @@ defmodule Tidewave.MCP do
     MCP.Server.init_tools()
 
     children = [
-      {Registry, name: MCP.Registry, keys: :unique},
       {Registry, name: Tidewave.BrowserSessions, keys: :unique},
       Tidewave.MCP.Logger,
       Tidewave.MCP.StandardError

@@ -8,44 +8,44 @@ defmodule Tidewave.ControlSocketTest do
     assert pending == %{}
   end
 
-  test "forwards a browser_eval as an eval frame and tracks who is waiting" do
+  test "forwards a run_tool frame and tracks who is waiting" do
     {:ok, state} = ControlSocket.init(%{})
-    request_ref = make_ref()
+    reply_to = self()
 
     assert {:push, {:text, json}, state} =
              ControlSocket.handle_info(
-               {:browser_eval, request_ref, self(), "nice-cactus@1", %{code: "x"}},
+               {:run_tool, reply_to, "nice-cactus#1", "browser_eval", %{code: "x"}},
                state
              )
 
     message = Jason.decode!(json)
-    assert message["type"] == "eval"
-    assert message["sid"] == "nice-cactus@1"
+    assert message["type"] == "run_tool"
+    assert message["name"] == "browser_eval"
+    assert message["sid"] == "nice-cactus#1"
     assert message["input"] == %{"code" => "x"}
 
-    assert [{ref, {reply_to, ^request_ref}}] = Map.to_list(state.pending)
-    assert reply_to == self()
+    assert [{ref, ^reply_to}] = Map.to_list(state.pending)
     assert message["ref"] == ref
   end
 
-  test "routes an eval_reply back to the waiting process" do
+  test "routes a tool_reply back to the waiting process" do
     {:ok, state} = ControlSocket.init(%{})
-    request_ref = make_ref()
+    reply_to = :erlang.alias([:reply])
 
     {:push, {:text, json}, state} =
-      ControlSocket.handle_info({:browser_eval, request_ref, self(), "a@1", %{code: "x"}}, state)
+      ControlSocket.handle_info({:run_tool, reply_to, "a#1", "browser_eval", %{code: "x"}}, state)
 
     ref = Jason.decode!(json)["ref"]
-    reply = ~s({"type":"eval_reply","ref":#{ref},"result":{"text":"hi","isError":false}})
+    reply = ~s({"type":"tool_reply","ref":#{ref},"result":{"text":"hi","isError":false}})
 
     assert {:ok, state} = ControlSocket.handle_in({reply, [opcode: :text]}, state)
     assert state.pending == %{}
-    assert_receive {:browser_reply, ^request_ref, %{"text" => "hi", "isError" => false}}
+    assert_receive {:browser_reply, ^reply_to, %{"text" => "hi", "isError" => false}}
   end
 
-  test "ignores eval_reply for an unknown ref" do
+  test "ignores tool_reply for an unknown ref" do
     {:ok, state} = ControlSocket.init(%{})
-    reply = ~s({"type":"eval_reply","ref":999,"result":{}})
+    reply = ~s({"type":"tool_reply","ref":999,"result":{}})
 
     assert {:ok, ^state} = ControlSocket.handle_in({reply, [opcode: :text]}, state)
   end

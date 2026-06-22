@@ -26,15 +26,11 @@ defmodule Tidewave do
     Tidewave.MCP.Logger.clear_logs()
   end
 
-  @doc false
-  def control_plane_enabled? do
-    Application.get_env(:tidewave, :enable_control_plane, false)
-  end
-
   @impl true
   def init(opts) do
     %{
       allow_remote_access: Keyword.get(opts, :allow_remote_access, false),
+      allowed_origins: opts |> Keyword.get(:allowed_origins, []) |> List.wrap(),
       phoenix_endpoint: nil,
       team: Keyword.get(opts, :team, []),
       inspect_opts:
