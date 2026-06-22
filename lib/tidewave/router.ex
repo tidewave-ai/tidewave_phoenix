@@ -21,7 +21,8 @@ defmodule Tidewave.Router do
   get "/config" do
     conn
     |> put_resp_content_type("application/json")
-    |> send_resp(200, Jason.encode_to_iodata!(config(conn.private.tidewave_config)))
+    |> put_resp_header("access-control-allow-origin", "*")
+    |> send_resp(200, Jason.encode_to_iodata!(config(conn)))
     |> halt()
   end
 
@@ -89,11 +90,15 @@ defmodule Tidewave.Router do
       {[], _} ->
         conn
 
+      # /config contains metadata for discovery and it is safe to allow any origin
+      {["config"], _} ->
+        conn
+
       # No origin header is always allowed
       {_, []} ->
         conn
 
-      # /config and /mcp refuse if origin header is set
+      # /mcp refuses if origin header is set
       {_, _} ->
         log_and_send_403(conn, """
         For security reasons, Tidewave does not accept requests with an origin header for this endpoint.
@@ -135,12 +140,15 @@ defmodule Tidewave.Router do
     end
   end
 
-  defp config(plug_config) do
+  defp config(conn) do
+    plug_config = conn.private.tidewave_config
+
     %{
       project_name: MCP.project_name(),
       framework_type: "phoenix",
       tidewave_version: package_version(:tidewave),
-      team: Map.new(plug_config.team)
+      team: Map.new(plug_config.team),
+      local_port: get_sock_data(conn).port
     }
   end
 end

@@ -10,7 +10,7 @@ defmodule TidewaveTest do
     def struct_url, do: URI.parse("http://localhost:4000")
   end
 
-  test "/mcp and /config refuse requests with origin header" do
+  test "/mcp refuses requests with origin header" do
     # /mcp should refuse any request with origin header
     conn =
       conn(:post, "/tidewave/mcp")
@@ -19,15 +19,18 @@ defmodule TidewaveTest do
       |> Tidewave.call(Tidewave.init([]))
 
     assert conn.status == 403
+  end
 
-    # /config should refuse any request with origin header
+  test "/config allows requests with origin header + CORS" do
+    # /config should allow any request with origin header
     conn =
       conn(:get, "/tidewave/config")
-      |> put_req_header("origin", "http://localhost:4000")
+      |> put_req_header("origin", "http://localhost:4001")
       |> put_private(:phoenix_endpoint, Endpoint)
       |> Tidewave.call(Tidewave.init([]))
 
-    assert conn.status == 403
+    assert conn.status == 200
+    assert get_resp_header(conn, "access-control-allow-origin") == ["*"]
   end
 
   test "/ (root) allows any origin" do
