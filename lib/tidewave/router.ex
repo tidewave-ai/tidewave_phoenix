@@ -12,9 +12,12 @@ defmodule Tidewave.Router do
   plug(:dispatch)
 
   get "/" do
+    conn = fetch_query_params(conn)
+    entrypoint = Map.get(conn.query_params, "entrypoint", "control")
+
     conn
     |> put_resp_content_type("text/html")
-    |> send_resp(200, tidewave_html())
+    |> send_resp(200, tidewave_html(entrypoint))
     |> halt()
   end
 
@@ -121,7 +124,7 @@ defmodule Tidewave.Router do
   defp check_ws_origin(conn, []), do: conn
 
   defp check_ws_origin(conn, [origin | _]) do
-    if origin_allowed?(origin, conn.private.tidewave_config) do
+    if origin_host(origin) in allowed_origin_hosts(conn.private.tidewave_config) do
       conn
     else
       log_and_send_403(conn, """
@@ -130,91 +133,38 @@ defmodule Tidewave.Router do
     end
   end
 
-  defp origin_allowed?(origin, config) do
-    with {:ok, origin} <- normalize_origin(origin) do
-      Enum.any?(allowed_ws_origins(config), &origin_matches?(origin, &1))
-    else
-      :error -> false
-    end
+  defp origin_host(origin) do
+    URI.parse(origin).host
   end
 
-  defp origin_matches?(origin, {:origin, allowed_origin}) do
-    origin == allowed_origin
+  defp allowed_origin_hosts(%{allowed_origins: [_ | _] = allowed_origins}) do
+    Enum.map(allowed_origins, &origin_or_host_to_host/1)
   end
 
-  defp origin_matches?(origin, {:host, allowed_host}) do
-    origin.host == allowed_host
-  end
-
-  defp allowed_ws_origins(%{allowed_origins: [_ | _] = allowed_origins}) do
-    Enum.map(allowed_origins, &allowed_origin_or_host/1)
-  end
-
-  defp allowed_ws_origins(%{phoenix_endpoint: endpoint}) when not is_nil(endpoint) do
-    url_config = endpoint.config(:url)
-
-    if host = url_config[:host] do
-      [{:origin, endpoint_origin(url_config, host)}]
+  defp allowed_origin_hosts(%{phoenix_endpoint: endpoint}) when not is_nil(endpoint) do
+    if host = endpoint.config(:url)[:host] do
+      [host]
     else
       raise_missing_allowed_origins!()
     end
   end
 
-  defp allowed_ws_origins(_config) do
+  defp allowed_origin_hosts(_config) do
     raise_missing_allowed_origins!()
   end
 
-  defp allowed_origin_or_host(origin_or_host) do
-    case normalize_origin(origin_or_host) do
-      {:ok, origin} -> {:origin, origin}
-      :error -> {:host, normalize_host(origin_or_host)}
+  defp origin_or_host_to_host(origin_or_host) do
+    case URI.parse(origin_or_host) do
+      %URI{host: host} when is_binary(host) -> host
+      _ -> origin_or_host
     end
   end
-
-  defp endpoint_origin(url_config, host) do
-    scheme = url_config |> Keyword.get(:scheme, "http") |> to_string() |> String.downcase()
-    port = url_config |> Keyword.get(:port, default_port(scheme)) |> normalize_port()
-
-    %{scheme: scheme, host: normalize_host(host), port: port}
-  end
-
-  defp normalize_origin(origin) when is_binary(origin) do
-    case URI.parse(origin) do
-      %URI{scheme: scheme, host: host, port: port} when is_binary(scheme) and is_binary(host) ->
-        scheme = String.downcase(scheme)
-
-        {:ok,
-         %{
-           scheme: scheme,
-           host: normalize_host(host),
-           port: normalize_port(port || default_port(scheme))
-         }}
-
-      _ ->
-        :error
-    end
-  end
-
-  defp normalize_origin(_origin), do: :error
-
-  defp normalize_host(host) when is_binary(host), do: String.downcase(host)
-  defp normalize_host(host), do: host |> to_string() |> String.downcase()
-
-  defp normalize_port(port) when is_integer(port), do: port
-
-  defp normalize_port(port) when is_binary(port) do
-    String.to_integer(port)
-  end
-
-  defp default_port("http"), do: 80
-  defp default_port("https"), do: 443
-  defp default_port(_scheme), do: nil
 
   defp raise_missing_allowed_origins! do
     raise """
-    Tidewave cannot verify the WebSocket origin because no allowed origins are configured and no Phoenix endpoint URL origin is available.
+    Tidewave cannot verify the WebSocket origin because no allowed origins are configured and no Phoenix endpoint URL host is available.
 
-    Configure the Tidewave plug with `allowed_origins: [...]` to list the origins or hosts that may open the control page.
+    Configure the Tidewave plug with `allowed_origins: [...]` to list the hosts that may open the control page.
     """
   end
 
@@ -227,7 +177,7 @@ defmodule Tidewave.Router do
     |> halt()
   end
 
-  defp tidewave_html() do
+  defp tidewave_html(entrypoint) do
     client_url = Application.get_env(:tidewave, :client_url, "https://tidewave.ai")
 
     # We return a basic page that is used by Tidewave Web.
@@ -239,7 +189,7 @@ defmodule Tidewave.Router do
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <script type="module" src="#{client_url}/tc/tc.js?entrypoint=control"></script>
+        <script type="module" src="#{client_url}/tc/tc.js?entrypoint=#{entrypoint}"></script>
       </head>
       <body></body>
     </html>
