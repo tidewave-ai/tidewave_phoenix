@@ -65,7 +65,7 @@ defmodule Tidewave.BrowserSessions do
     case parse_sid(sid) do
       {:ok, client} ->
         case lookup_client(client) do
-          {:ok, pid} -> collect(fn -> await_eval(pid, sid, name, input) end, timeout)
+          {:ok, pid} -> await_eval(pid, sid, name, input, timeout)
           :error -> {:error, :unknown_client}
         end
 
@@ -82,14 +82,10 @@ defmodule Tidewave.BrowserSessions do
   `{:error, :timeout}` when no client answered in time.
   """
   def broadcast_run(name, input, timeout) do
-    case client_pids() do
+    case list_clients() do
       [] -> {:error, :no_clients}
-      pids -> collect(fn -> await_broadcast(pids, name, input) end, timeout)
+      clients -> await_broadcast(clients, name, input, timeout)
     end
-  end
-
-  defp client_pids do
-    for {_name, pid} <- list_clients(), do: pid
   end
 
   defp parse_sid(sid) do
@@ -99,38 +95,32 @@ defmodule Tidewave.BrowserSessions do
     end
   end
 
-  # Runs the blocking receive in a throwaway task so that, on timeout, the task
-  # (and any stray late `:browser_reply` messages in its mailbox) is discarded
-  # instead of polluting the caller, which on HTTP/1 keep-alive is reused across
-  # requests.
-  defp collect(fun, timeout) do
-    task = Task.async(fun)
-
-    case Task.yield(task, timeout) || Task.shutdown(task, :brutal_kill) do
-      {:ok, result} -> result
-      _ -> {:error, :timeout}
-    end
-  end
-
-  defp await_eval(pid, sid, name, input) do
+  defp await_eval(pid, sid, name, input, timeout) do
     alias = Process.monitor(pid, alias: :reply_demonitor)
     send(pid, {:run_tool, alias, sid, name, input})
 
     receive do
       {:browser_reply, ^alias, value} -> {:ok, value}
       {:DOWN, ^alias, :process, ^pid, _reason} -> {:error, :disconnected}
+    after
+      timeout ->
+        Process.demonitor(alias, [:flush])
+        {:error, :timeout}
     end
   end
 
-  defp await_broadcast(pids, name, input) do
+  defp await_broadcast(clients, name, input, timeout) do
     # we are only interested in the first response, so we use
     # an alias with :reply to ignore any late responses
     alias = :erlang.alias([:reply])
-    Enum.each(pids, fn pid -> send(pid, {:run_tool, alias, nil, name, input}) end)
+    Enum.each(clients, fn {_name, pid} -> send(pid, {:run_tool, alias, nil, name, input}) end)
 
     receive do
       {:browser_reply, ^alias, value} ->
         {:ok, value}
+    after
+      timeout ->
+        {:error, :timeout}
     end
   end
 end

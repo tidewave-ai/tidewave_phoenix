@@ -366,16 +366,26 @@ defmodule Tidewave.MCP.Server do
     |> send_resp(200, Jason.encode!(response))
   end
 
+  defp control_url(conn) do
+    scheme = conn.scheme |> to_string() |> String.downcase()
+    "#{scheme}://#{conn.host}#{port_suffix(scheme, conn.port)}"
+  end
+
+  defp port_suffix(_scheme, nil), do: ""
+  defp port_suffix("http", 80), do: ""
+  defp port_suffix("https", 443), do: ""
+  defp port_suffix(_scheme, port), do: ":#{port}"
+
   def handle_http_message(conn) do
     Logger.info("Received #{conn.method} message")
     params = conn.body_params
     conn = fetch_query_params(conn)
-    include_browser_tools? = conn.query_params["include_browser_tools"] == "true"
+    include_browser_tools? = conn.query_params["include_browser_tools"] != "false"
     Logger.debug("Raw params: #{inspect(params, pretty: true)}")
 
     case validate_jsonrpc_message(params) do
       {:ok, message} ->
-        assigns = conn.private.tidewave_config
+        assigns = Map.put(conn.private.tidewave_config, :url, control_url(conn))
 
         case handle_message(message, assigns, include_browser_tools?) do
           {:ok, nil} ->

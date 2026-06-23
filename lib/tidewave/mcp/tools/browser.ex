@@ -29,36 +29,43 @@ defmodule Tidewave.MCP.Tools.Browser do
             }
           }
         },
-        callback: &browser_eval/1
+        callback: &browser_eval/2
       }
     ]
   end
 
-  def browser_eval(args) when is_map(args) do
-    input = %{code: to_code(args["code"])}
-    timeout = eval_timeout(args)
+  def browser_eval(args, assigns) when is_map(args) do
+    url = assigns.url
 
     case args["sid"] do
       sid when is_binary(sid) and sid != "" ->
-        BrowserSessions.run(sid, "browser_eval", input, timeout) |> direct_result(sid)
+        BrowserSessions.run(sid, "browser_eval", args, eval_timeout(args))
+        |> direct_result(sid, url)
 
       _ ->
-        broadcast_with_retry("browser_eval", input, timeout) |> broadcast_result()
+        # the broadcast case is not expected to run with any long running code
+        # so we hardcode a 10 second timeout
+        broadcast("browser_eval", args, 10_000) |> broadcast_result(url)
     end
   end
 
-  def browser_eval(_args) do
+  def browser_eval(_args, _assigns) do
     {:error, :invalid_arguments}
   end
 
-  defp to_code(code) when is_binary(code), do: code
-  defp to_code(_), do: ""
-
   # A pure handshake (no code) has no side effects, so a missed first broadcast
   # is worth retrying once. We never retry code, which could run twice.
+  defp broadcast(name, input, timeout) do
+    if Map.get(input, "code", "") == "" do
+      broadcast_with_retry(name, input, timeout)
+    else
+      BrowserSessions.broadcast_run(name, input, timeout)
+    end
+  end
+
   defp broadcast_with_retry(name, input, timeout) do
     case BrowserSessions.broadcast_run(name, input, timeout) do
-      {:error, :timeout} when input.code == "" ->
+      {:error, :timeout} ->
         BrowserSessions.broadcast_run(name, input, timeout)
 
       other ->
@@ -66,42 +73,34 @@ defmodule Tidewave.MCP.Tools.Browser do
     end
   end
 
-  defp direct_result({:ok, result}, _sid), do: {:ok, relay(result)}
+  defp direct_result({:ok, result}, _sid, _url), do: {:ok, result}
 
-  defp direct_result({:error, :invalid_sid}, sid) do
+  defp direct_result({:error, :invalid_sid}, sid, _url) do
     {:error, "Invalid sid \"#{sid}\". A sid looks like \"nice-cactus#1\"."}
   end
 
-  defp direct_result({:error, :unknown_client}, sid) do
+  defp direct_result({:error, :unknown_client}, sid, _url) do
     {:error,
      "No connected browser owns sid \"#{sid}\". It may have disconnected — " <>
        "call browser_eval with no arguments to discover a live session."}
   end
 
-  defp direct_result({:error, :timeout}, _sid) do
+  defp direct_result({:error, :timeout}, _sid, _url) do
     {:error, "browser_eval timed out waiting for the browser to respond."}
   end
 
-  defp direct_result({:error, :disconnected}, _sid) do
-    {:error, "The browser disconnected before responding."}
+  defp direct_result({:error, :disconnected}, _sid, url) do
+    {:error,
+     "The browser disconnected before responding. Open #{url}/tidewave in your browser to open a new session."}
   end
 
-  defp broadcast_result({:ok, result}), do: {:ok, relay(result)}
-  defp broadcast_result({:error, :no_clients}), do: {:error, no_browser_message()}
-  defp broadcast_result({:error, :timeout}), do: {:error, no_browser_message()}
+  defp broadcast_result({:ok, result}, _url), do: {:ok, result}
+  defp broadcast_result({:error, :no_clients}, url), do: {:error, no_browser_message(url)}
+  defp broadcast_result({:error, :timeout}, url), do: {:error, no_browser_message(url)}
 
-  defp no_browser_message do
+  defp no_browser_message(url) do
     "No browser is connected to the Tidewave control page. " <>
-      "Open #{@control_path} in your browser and try again."
-  end
-
-  # The browser composes the full response text (session hints, the new-session
-  # notice, the handshake docs); we simply relay it.
-  defp relay(result) do
-    %{
-      content: [%{type: "text", text: result["text"] || ""}],
-      isError: result["isError"] == true
-    }
+      "Open #{url}/tidewave in your browser and try again."
   end
 
   # Server-side wait: a little longer than the browser's own timeout so the
