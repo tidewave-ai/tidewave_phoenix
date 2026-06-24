@@ -3,8 +3,6 @@ defmodule Tidewave.MCP.Tools.Browser do
 
   alias Tidewave.BrowserSessions
 
-  @control_path "/tidewave"
-
   def tools do
     [
       %{
@@ -58,17 +56,9 @@ defmodule Tidewave.MCP.Tools.Browser do
     {:error, :invalid_arguments}
   end
 
-  # A pure handshake (no code) has no side effects, so a missed first broadcast
-  # is worth retrying once. We never retry code, which could run twice.
+  # Broadcast is only used for the first handshake. We can safely retry
+  # once if the first attempt times out.
   defp broadcast(name, input, timeout) do
-    if Map.get(input, "code", "") == "" do
-      broadcast_with_retry(name, input, timeout)
-    else
-      BrowserSessions.broadcast_run(name, input, timeout)
-    end
-  end
-
-  defp broadcast_with_retry(name, input, timeout) do
     case BrowserSessions.broadcast_run(name, input, timeout) do
       {:error, :timeout} ->
         BrowserSessions.broadcast_run(name, input, timeout)
@@ -126,8 +116,8 @@ defmodule Tidewave.MCP.Tools.Browser do
     its `sid` along with the full `browser` API documentation. Then call again with `code` \
     (and the `sid` you were given) to interact with the page.
 
-    Requires a browser tab open at #{@control_path}. Use it to verify visibility, text, \
-    state, and interactions — DO NOT use it to validate design, styles, or general CSS.
+    Use it to verify visibility, text, state, and interactions - DO NOT use it to validate
+    design, styles, or general CSS.
     """
   end
 end
