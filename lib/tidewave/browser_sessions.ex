@@ -1,24 +1,6 @@
 defmodule Tidewave.BrowserSessions do
   @moduledoc false
 
-  # Registry of connected browser control pages ("clients").
-  #
-  # This is the (deliberately thin) server side of Tidewave's control page.
-  # Each browser tab that opens `/tidewave` connects over a plain WebSocket
-  # (`Tidewave.ControlSocket`) and registers its connection process under a
-  # self-chosen, human-friendly name (e.g. `nice-cactus`) in a `:unique`
-  # `Registry` (started under this module's name). The registry maps the name to
-  # the connection process and prunes it automatically when that process dies;
-  # everything about individual sessions (the iframes, their `#N` numbering,
-  # primary vs. secondary) lives in the page's JavaScript. A `sid` has the shape
-  # `name#N`; we route by splitting on `#` and treating the suffix as opaque.
-  #
-  # The MCP `browser_eval` tool callback runs in the request process and uses
-  # `run/4` (a `sid` was given) or `broadcast_run/3` (none given, so we ask every
-  # connected page and take the first to answer). Both block until a reply
-  # arrives or the timeout elapses. The waiting is done in a throwaway task so a
-  # late reply can never leak into the long-lived request process.
-
   @registry __MODULE__
 
   @doc """

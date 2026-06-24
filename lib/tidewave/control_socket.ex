@@ -1,16 +1,6 @@
 defmodule Tidewave.ControlSocket do
   @moduledoc false
 
-  # The `WebSock` handler behind `/tidewave/ws`. One process per connected
-  # control page. The router upgrades the request to this handler via
-  # `WebSockAdapter.upgrade/4`.
-  #
-  # On connect, the page sends a `hello` with its self-chosen name, which we
-  # register with `Tidewave.BrowserSessions`. From then on the MCP request
-  # process forwards `{:run_tool, ...}` messages here; we push them to the page
-  # as JSON frames and route the page's eventual `tool_reply` back to the
-  # waiting request process, correlated by an integer `ref`.
-
   @behaviour WebSock
 
   alias Tidewave.BrowserSessions
