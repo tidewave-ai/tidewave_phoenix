@@ -13,7 +13,7 @@ defmodule Tidewave.BrowserSessionsTest do
     end
 
     def run(args) do
-      [_sup | [test | _]] = Process.get(:"$callers", [])
+      test = Keyword.fetch!(args, :test)
       name = Keyword.fetch!(args, :name)
 
       behavior =
@@ -50,7 +50,7 @@ defmodule Tidewave.BrowserSessionsTest do
 
   describe "register_client/2" do
     test "registers and is discoverable" do
-      pid = start_supervised!({TestClient, name: "nice-cactus"})
+      pid = start_supervised!({TestClient, test: self(), name: "nice-cactus"})
 
       receive do
         {:ready, ^pid} -> :ok
@@ -61,7 +61,7 @@ defmodule Tidewave.BrowserSessionsTest do
     end
 
     test "rejects a duplicate name from another process" do
-      pid = start_supervised!({TestClient, name: "nice-cactus"})
+      pid = start_supervised!({TestClient, test: self(), name: "nice-cactus"})
 
       receive do
         {:ready, ^pid} -> :ok
@@ -76,7 +76,7 @@ defmodule Tidewave.BrowserSessionsTest do
     end
 
     test "forgets a client when it dies" do
-      pid = start_supervised!({TestClient, name: "nice-cactus"})
+      pid = start_supervised!({TestClient, test: self(), name: "nice-cactus"})
 
       receive do
         {:ready, ^pid} -> :ok
@@ -96,6 +96,7 @@ defmodule Tidewave.BrowserSessionsTest do
       pid =
         start_supervised!(
           {TestClient,
+           test: self(),
            name: "nice-cactus",
            behavior: fn sid, name, input ->
              %{"text" => "ran #{name} with #{input.code} in #{sid}", "isError" => false}
@@ -121,7 +122,7 @@ defmodule Tidewave.BrowserSessionsTest do
     end
 
     test "times out when the client never replies" do
-      pid = start_supervised!({TestClient, name: "slow-otter", behavior: :silent})
+      pid = start_supervised!({TestClient, test: self(), name: "slow-otter", behavior: :silent})
 
       receive do
         {:ready, ^pid} -> :ok
@@ -132,7 +133,7 @@ defmodule Tidewave.BrowserSessionsTest do
     end
 
     test "reports a disconnect when the client dies mid-request" do
-      pid = start_supervised!({TestClient, name: "dying-comet", behavior: :die})
+      pid = start_supervised!({TestClient, test: self(), name: "dying-comet", behavior: :die})
 
       receive do
         {:ready, ^pid} -> :ok
@@ -152,6 +153,7 @@ defmodule Tidewave.BrowserSessionsTest do
     test "returns the first reply and passes a nil sid" do
       start_supervised!(
         {TestClient,
+         test: self(),
          name: "first-robin",
          behavior: fn sid, _name, _input ->
            %{"text" => "from #{sid || "handshake"}", "isError" => false, "sid" => "first-robin#1"}
@@ -163,7 +165,7 @@ defmodule Tidewave.BrowserSessionsTest do
     end
 
     test "times out when clients are silent" do
-      pid = start_supervised!({TestClient, name: "quiet-fjord", behavior: :silent})
+      pid = start_supervised!({TestClient, test: self(), name: "quiet-fjord", behavior: :silent})
 
       receive do
         {:ready, ^pid} -> :ok
