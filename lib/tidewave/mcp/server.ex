@@ -48,7 +48,7 @@ defmodule Tidewave.MCP.Server do
   end
 
   @doc false
-  def tools_and_dispatch(include_browser_tools? \\ false) do
+  def tools_and_dispatch(include_browser_tools?) do
     # TODO: switch back to persistent_term when we don't support OTP 27 any more
     # :persistent_term.get({__MODULE__, :tools_and_dispatch})
     [{:tools, {tools, dispatch_map, browser_tools, browser_dispatch_map}}] =
