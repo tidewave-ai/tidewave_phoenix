@@ -37,15 +37,20 @@ defmodule Tidewave.MCP.Tools.Browser do
   def browser_eval(args, assigns) when is_map(args) do
     url = assigns.url
 
-    case args["sid"] do
-      sid when is_binary(sid) and sid != "" ->
+    case args do
+      %{"sid" => sid} when is_binary(sid) and sid != "" ->
         BrowserSessions.run(sid, "browser_eval", args, eval_timeout(args))
         |> direct_result(sid, url)
 
+      %{"code" => ""} ->
+        # the broadcast case is only expected to run for initial discovery
+        broadcast("browser_eval", args, 5_000) |> broadcast_result(url)
+
+      args when not is_map_key(args, "code") ->
+        broadcast("browser_eval", args, 5_000) |> broadcast_result(url)
+
       _ ->
-        # the broadcast case is not expected to run with any long running code
-        # so we hardcode a 10 second timeout
-        broadcast("browser_eval", args, 10_000) |> broadcast_result(url)
+        {:error, "browser_eval requires a `sid` when `code` is not empty."}
     end
   end
 
