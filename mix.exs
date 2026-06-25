@@ -56,6 +56,9 @@ defmodule Tidewave.MixProject do
       # We require v1.6.1 to detect if phoenix live reload is running too early or late
       {:phoenix_live_reload, ">= 1.6.1", optional: true},
 
+      # We require 2.9 for get_sock_data
+      {:plug_cowboy, "~> 2.9", optional: true},
+
       # Dev deps
       {:bandit, "~> 1.10", only: [:dev, :test]},
       {:ex_doc, ">= 0.0.0", only: :dev},
