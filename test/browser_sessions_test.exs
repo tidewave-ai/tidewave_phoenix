@@ -86,7 +86,10 @@ defmodule Tidewave.BrowserSessionsTest do
 
       Process.exit(pid, :kill)
 
-      wait_until(fn -> BrowserSessions.lookup_client("nice-cactus") == :error end)
+      wait_until(fn ->
+        BrowserSessions.lookup_client("nice-cactus") == {:error, :unknown_client}
+      end)
+
       assert BrowserSessions.list_clients() == []
     end
   end

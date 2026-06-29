@@ -32,7 +32,7 @@ defmodule Tidewave.BrowserSessions do
   def lookup_client(name) when is_binary(name) do
     case Registry.lookup(@registry, name) do
       [{pid, _value}] -> {:ok, pid}
-      [] -> :error
+      [] -> {:error, :unknown_client}
     end
   end
 
@@ -44,15 +44,9 @@ defmodule Tidewave.BrowserSessions do
   `:disconnected`.
   """
   def run(sid, name, input, timeout) when is_binary(sid) do
-    case parse_sid(sid) do
-      {:ok, client} ->
-        case lookup_client(client) do
-          {:ok, pid} -> await_eval(pid, sid, name, input, timeout)
-          :error -> {:error, :unknown_client}
-        end
-
-      :error ->
-        {:error, :invalid_sid}
+    with {:ok, client} <- parse_sid(sid),
+         {:ok, pid} <- lookup_client(client) do
+      await_eval(pid, sid, name, input, timeout)
     end
   end
 
@@ -73,7 +67,7 @@ defmodule Tidewave.BrowserSessions do
   defp parse_sid(sid) do
     case String.split(sid, "#", parts: 2) do
       [name, suffix] when name != "" and suffix != "" -> {:ok, name}
-      _ -> :error
+      _ -> {:error, :invalid_sid}
     end
   end
 

@@ -63,9 +63,8 @@ defmodule Tidewave.ControlSocket do
   defp reply_pending(state, ref, value) do
     {pending, rest} = Map.pop(state.pending, ref)
 
-    case pending do
-      reply_to when not is_nil(reply_to) -> send(reply_to, {:browser_reply, reply_to, value})
-      nil -> :ok
+    if pending do
+      send(pending, {:browser_reply, pending, value})
     end
 
     %{state | pending: rest}

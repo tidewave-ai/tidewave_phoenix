@@ -102,7 +102,7 @@ defmodule Tidewave.MCP.Tools.Browser do
   # browser's result (or its own timeout) comes back before we give up.
   defp eval_timeout(args) do
     case args["timeout"] do
-      ms when is_integer(ms) and ms > 0 -> min(ms + 5_000, 120_000)
+      ms when is_integer(ms) and ms > 0 -> min(ms + 5_000, 60_000)
       _ -> 15_000
     end
   end

@@ -20,7 +20,15 @@ defmodule Tidewave.ControlPlaneTest do
 
       assert conn.status == 200
       assert get_resp_header_value(conn, "content-type") =~ "text/html"
-      assert conn.resp_body =~ "/tc/tc.js?entrypoint=control"
+      assert conn.resp_body =~ "/tc/control.js"
+    end
+
+    test "uses the tc entrypoint if entrypoint is set" do
+      conn = conn(:get, "/tidewave?entrypoint=inner") |> Tidewave.call(Tidewave.init([]))
+
+      assert conn.status == 200
+      assert get_resp_header_value(conn, "content-type") =~ "text/html"
+      assert conn.resp_body =~ "/tc/tc.js"
     end
   end
 

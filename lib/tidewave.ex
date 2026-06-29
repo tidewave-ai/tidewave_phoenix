@@ -32,6 +32,7 @@ defmodule Tidewave do
       allow_remote_access: Keyword.get(opts, :allow_remote_access, false),
       allowed_origins: opts |> Keyword.get(:allowed_origins, []) |> List.wrap(),
       phoenix_endpoint: nil,
+      url: nil,
       team: Keyword.get(opts, :team, []),
       inspect_opts:
         Keyword.get(opts, :inspect_opts, charlists: :as_lists, limit: 50, pretty: true)
@@ -40,7 +41,7 @@ defmodule Tidewave do
 
   @impl true
   def call(%Plug.Conn{path_info: ["tidewave" | rest]} = conn, config) do
-    config = %{config | phoenix_endpoint: conn.private[:phoenix_endpoint]}
+    config = %{config | phoenix_endpoint: conn.private[:phoenix_endpoint], url: control_url(conn)}
 
     conn
     |> validate!()
@@ -109,4 +110,14 @@ defmodule Tidewave do
     end
     |> Enum.join("; ")
   end
+
+  defp control_url(conn) do
+    scheme = conn.scheme |> to_string() |> String.downcase()
+    "#{scheme}://#{conn.host}#{port_suffix(scheme, conn.port)}"
+  end
+
+  defp port_suffix(_scheme, nil), do: ""
+  defp port_suffix("http", 80), do: ""
+  defp port_suffix("https", 443), do: ""
+  defp port_suffix(_scheme, port), do: ":#{port}"
 end

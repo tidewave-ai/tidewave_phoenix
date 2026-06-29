@@ -366,16 +366,6 @@ defmodule Tidewave.MCP.Server do
     |> send_resp(200, Jason.encode!(response))
   end
 
-  defp control_url(conn) do
-    scheme = conn.scheme |> to_string() |> String.downcase()
-    "#{scheme}://#{conn.host}#{port_suffix(scheme, conn.port)}"
-  end
-
-  defp port_suffix(_scheme, nil), do: ""
-  defp port_suffix("http", 80), do: ""
-  defp port_suffix("https", 443), do: ""
-  defp port_suffix(_scheme, port), do: ":#{port}"
-
   def handle_http_message(conn) do
     Logger.info("Received #{conn.method} message")
     params = conn.body_params
@@ -385,9 +375,7 @@ defmodule Tidewave.MCP.Server do
 
     case validate_jsonrpc_message(params) do
       {:ok, message} ->
-        assigns = Map.put(conn.private.tidewave_config, :url, control_url(conn))
-
-        case handle_message(message, assigns, include_browser_tools?) do
+        case handle_message(message, conn.private.tidewave_config, include_browser_tools?) do
           {:ok, nil} ->
             # Notifications that don't return a response
             conn |> put_status(202) |> send_json(%{status: "ok"})
