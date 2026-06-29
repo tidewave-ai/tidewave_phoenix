@@ -13,11 +13,10 @@ defmodule Tidewave.Router do
 
   get "/" do
     conn = fetch_query_params(conn)
-    entrypoint = Map.get(conn.query_params, "entrypoint", "control")
 
     conn
     |> put_resp_content_type("text/html")
-    |> send_resp(200, tidewave_html(entrypoint))
+    |> send_resp(200, tidewave_html(conn.query_params))
     |> halt()
   end
 
@@ -177,8 +176,14 @@ defmodule Tidewave.Router do
     |> halt()
   end
 
-  defp tidewave_html(entrypoint) do
+  defp tidewave_html(params) do
     client_url = Application.get_env(:tidewave, :client_url, "https://tidewave.ai")
+
+    script =
+      case params do
+        %{"entrypoint" => _} -> "tc.js"
+        _ -> "control.js"
+      end
 
     # We return a basic page that is used by Tidewave Web.
     # Note that, by itself, this page is harmless and it
@@ -189,7 +194,7 @@ defmodule Tidewave.Router do
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <script type="module" src="#{client_url}/tc/tc.js?entrypoint=#{entrypoint}"></script>
+        <script type="module" src="#{client_url}/tc/#{script}"></script>
       </head>
       <body></body>
     </html>
