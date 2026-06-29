@@ -53,6 +53,10 @@ defmodule Tidewave.MixProject do
       {:circular_buffer, "~> 0.4 or ~> 1.0"},
       {:igniter, "~> 0.6", optional: true},
 
+      # Required for the browser control page to upgrade /tidewave/ws to a
+      # plain WebSocket. Works with both Bandit and Plug.Cowboy.
+      {:websock_adapter, "~> 0.5"},
+
       # We require v1.6.1 to detect if phoenix live reload is running too early or late
       {:phoenix_live_reload, ">= 1.6.1", optional: true},
 
