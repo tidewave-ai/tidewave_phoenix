@@ -52,6 +52,22 @@ defmodule Tidewave.Router do
     |> halt()
   end
 
+  post "/upload" do
+    Logger.metadata(tidewave_mcp: true)
+
+    opts =
+      Plug.Parsers.init(
+        parsers: [:multipart],
+        pass: [],
+        length: 10_000_000
+      )
+
+    conn
+    |> Plug.Parsers.call(opts)
+    |> handle_upload()
+    |> halt()
+  end
+
   match "/*_ignored" do
     # Return 404 for /.well-known resources lookup and similar
     Logger.metadata(tidewave_mcp: true)
@@ -98,12 +114,63 @@ defmodule Tidewave.Router do
       {_, []} ->
         conn
 
+      # Uploads are allowed from the same origin.
+      {["upload"], origin} ->
+        require_same_origin(conn, origin)
+
       # /mcp refuses if origin header is set
       {_, _} ->
         log_and_send_403(conn, """
         For security reasons, Tidewave does not accept requests with an origin header for this endpoint.
         """)
     end
+  end
+
+  defp require_same_origin(conn, []), do: conn
+
+  defp require_same_origin(conn, [origin | _]) do
+    if origin_host(origin) in allowed_origin_hosts(conn.private.tidewave_config) do
+      conn
+    else
+      log_and_send_403(conn, """
+      For security reasons, this page only allows connections from the application's own origin.
+      """)
+    end
+  end
+
+  defp origin_host(origin) do
+    URI.parse(origin).host
+  end
+
+  defp allowed_origin_hosts(%{allowed_origins: [_ | _] = allowed_origins}) do
+    Enum.map(allowed_origins, &origin_or_host_to_host/1)
+  end
+
+  defp allowed_origin_hosts(%{phoenix_endpoint: endpoint}) when not is_nil(endpoint) do
+    if host = endpoint.config(:url)[:host] do
+      [host]
+    else
+      raise_missing_allowed_origins!()
+    end
+  end
+
+  defp allowed_origin_hosts(_config) do
+    raise_missing_allowed_origins!()
+  end
+
+  defp origin_or_host_to_host(origin_or_host) do
+    case URI.parse(origin_or_host) do
+      %URI{host: host} when is_binary(host) -> host
+      _ -> origin_or_host
+    end
+  end
+
+  defp raise_missing_allowed_origins! do
+    raise """
+    Tidewave cannot verify the WebSocket origin because no allowed origins are configured and no Phoenix endpoint URL host is available.
+
+    Configure the Tidewave plug with `allowed_origins: [...]` to list the hosts that may open the control page.
+    """
   end
 
   defp log_and_send_403(conn, message) do
@@ -148,7 +215,46 @@ defmodule Tidewave.Router do
       framework_type: "phoenix",
       tidewave_version: package_version(:tidewave),
       team: Map.new(plug_config.team),
-      local_port: get_sock_data(conn).port
+      local_port: get_sock_data(conn).port,
+      has_uploads_dir: upload_dir() != nil
     }
+  end
+
+  defp handle_upload(conn) do
+    case conn.body_params do
+      %{"file" => %Plug.Upload{content_type: "image/" <> _} = upload} ->
+        create_upload_dir!()
+        dest = upload_path(upload.filename)
+        File.cp!(upload.path, dest)
+
+        conn
+        |> put_resp_content_type("application/json")
+        |> send_resp(200, Jason.encode_to_iodata!(%{status: "ok", path: dest}))
+
+      _ ->
+        conn
+        |> send_resp(400, "Bad Request: missing file parameter")
+    end
+  end
+
+  defp create_upload_dir! do
+    File.mkdir_p!(upload_dir())
+  end
+
+  defp upload_dir do
+    case Application.get_env(:tidewave, :upload_dir) do
+      nil ->
+        # TODO: should we look at XDG_* dirs?
+        System.user_home!()
+        |> Path.join(".tidewave")
+        |> Path.join("uploads")
+
+      upload_dir ->
+        upload_dir
+    end
+  end
+
+  defp upload_path(filename) do
+    Path.join(upload_dir(), filename)
   end
 end
