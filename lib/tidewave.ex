@@ -52,9 +52,14 @@ defmodule Tidewave do
     conn
     |> validate!()
     |> Plug.Conn.register_before_send(fn conn ->
-      conn
-      |> maybe_rewrite_csp()
-      |> Plug.Conn.delete_resp_header("x-frame-options")
+      try do
+        conn
+        |> maybe_rewrite_csp()
+        |> Plug.Conn.delete_resp_header("x-frame-options")
+      rescue
+        Plug.Conn.AlreadySentError ->
+          conn
+      end
     end)
   end
 
