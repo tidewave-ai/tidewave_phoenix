@@ -54,6 +54,22 @@ defmodule Tidewave.Router do
     |> halt()
   end
 
+  post "/upload" do
+    Logger.metadata(tidewave_mcp: true)
+
+    opts =
+      Plug.Parsers.init(
+        parsers: [:multipart],
+        pass: [],
+        length: 10_000_000
+      )
+
+    conn
+    |> Plug.Parsers.call(opts)
+    |> handle_upload()
+    |> halt()
+  end
+
   get "/ws" do
     conn
     |> WebSockAdapter.upgrade(Tidewave.ControlSocket, %{}, timeout: 60_000)
@@ -106,11 +122,15 @@ defmodule Tidewave.Router do
       # receives an Origin header (browsers always send it on WebSocket
       # upgrades), so it gets a same-origin check instead.
       {["ws"], origin} ->
-        check_ws_origin(conn, origin)
+        require_same_origin(conn, origin)
 
       # No origin header is always allowed
       {_, []} ->
         conn
+
+      # Uploads are allowed from the same origin.
+      {["upload"], origin} ->
+        require_same_origin(conn, origin)
 
       # /mcp refuses if origin header is set
       {_, _} ->
@@ -120,14 +140,14 @@ defmodule Tidewave.Router do
     end
   end
 
-  defp check_ws_origin(conn, []), do: conn
+  defp require_same_origin(conn, []), do: conn
 
-  defp check_ws_origin(conn, [origin | _]) do
+  defp require_same_origin(conn, [origin | _]) do
     if origin_host(origin) in allowed_origin_hosts(conn.private.tidewave_config) do
       conn
     else
       log_and_send_403(conn, """
-      For security reasons, the Tidewave control page only accepts WebSocket connections from the application's own origin.
+      For security reasons, this page only allows connections from the application's own origin.
       """)
     end
   end
@@ -215,7 +235,46 @@ defmodule Tidewave.Router do
       framework_type: "phoenix",
       tidewave_version: package_version(:tidewave),
       team: Map.new(plug_config.team),
-      local_port: get_sock_data(conn).port
+      local_port: get_sock_data(conn).port,
+      has_uploads_dir: upload_dir() != nil
     }
+  end
+
+  defp handle_upload(conn) do
+    case conn.body_params do
+      %{"file" => %Plug.Upload{content_type: "image/" <> _} = upload} ->
+        create_upload_dir!()
+        dest = upload_path(upload.filename)
+        File.cp!(upload.path, dest)
+
+        conn
+        |> put_resp_content_type("application/json")
+        |> send_resp(200, Jason.encode_to_iodata!(%{status: "ok", path: dest}))
+
+      _ ->
+        conn
+        |> send_resp(400, "Bad Request: missing file parameter")
+    end
+  end
+
+  defp create_upload_dir! do
+    File.mkdir_p!(upload_dir())
+  end
+
+  defp upload_dir do
+    case Application.get_env(:tidewave, :upload_dir) do
+      nil ->
+        # TODO: should we look at XDG_* dirs?
+        System.user_home!()
+        |> Path.join(".tidewave")
+        |> Path.join("uploads")
+
+      upload_dir ->
+        upload_dir
+    end
+  end
+
+  defp upload_path(filename) do
+    Path.join(upload_dir(), filename)
   end
 end
