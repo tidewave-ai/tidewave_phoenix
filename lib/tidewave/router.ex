@@ -11,6 +11,9 @@ defmodule Tidewave.Router do
   plug(:check_origin)
   plug(:dispatch)
 
+  @allowed_upload_content_types ["image/png", "image/jpeg", "video/webm"]
+  @allowed_upload_types ["image", "recording"]
+
   get "/" do
     conn
     |> put_resp_content_type("text/html")
@@ -216,45 +219,59 @@ defmodule Tidewave.Router do
       tidewave_version: package_version(:tidewave),
       team: Map.new(plug_config.team),
       local_port: get_sock_data(conn).port,
-      has_uploads_dir: upload_dir() != nil
+      has_uploads_dir: true
     }
   end
 
   defp handle_upload(conn) do
-    case conn.body_params do
-      %{"file" => %Plug.Upload{content_type: "image/" <> _} = upload} ->
-        create_upload_dir!()
-        dest = upload_path(upload.filename)
-        File.cp!(upload.path, dest)
+    with %{"type" => type, "file" => %Plug.Upload{content_type: content_type} = upload}
+         when type in @allowed_upload_types <- conn.body_params,
+         true <- is_allowed_content_type?(content_type) do
+      create_upload_dir!(type)
+      dest = upload_path(type, upload.filename)
+      File.cp!(upload.path, dest)
 
-        conn
-        |> put_resp_content_type("application/json")
-        |> send_resp(200, Jason.encode_to_iodata!(%{status: "ok", path: dest}))
-
+      conn
+      |> put_resp_content_type("application/json")
+      |> send_resp(200, Jason.encode_to_iodata!(%{status: "ok", path: dest}))
+    else
       _ ->
         conn
-        |> send_resp(400, "Bad Request: missing file parameter")
+        |> send_resp(400, "Bad Request: missing or invalid file parameter")
     end
   end
 
-  defp create_upload_dir! do
-    File.mkdir_p!(upload_dir())
+  defp create_upload_dir!(type) do
+    File.mkdir_p!(upload_dir(type))
   end
 
-  defp upload_dir do
+  defp upload_dir(type) do
     case Application.get_env(:tidewave, :upload_dir) do
       nil ->
         "tmp"
         |> Path.expand()
         |> Path.join("tidewave")
-        |> Path.join("uploads")
+        |> Path.join(folder_for_type(type))
 
       upload_dir ->
         upload_dir
     end
   end
 
-  defp upload_path(filename) do
-    Path.join(upload_dir(), filename)
+  defp upload_path(type, filename) do
+    if String.contains?(filename, "..") do
+      raise "invalid filename: #{filename}"
+    end
+
+    Path.join(upload_dir(type), filename)
+  end
+
+  defp folder_for_type("screenshot"), do: "screenshots"
+  defp folder_for_type("recording"), do: "recordings"
+
+  defp is_allowed_content_type?(content_type) do
+    # video/webm;codecs=vp9 -> we are only interested in video/webm
+    [ct | _] = String.split(content_type, ";")
+    ct in @allowed_upload_content_types
   end
 end
