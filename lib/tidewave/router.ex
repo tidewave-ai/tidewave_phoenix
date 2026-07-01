@@ -244,9 +244,9 @@ defmodule Tidewave.Router do
   defp upload_dir do
     case Application.get_env(:tidewave, :upload_dir) do
       nil ->
-        # TODO: should we look at XDG_* dirs?
-        System.user_home!()
-        |> Path.join(".tidewave")
+        "tmp"
+        |> Path.expand()
+        |> Path.join("tidewave")
         |> Path.join("uploads")
 
       upload_dir ->
