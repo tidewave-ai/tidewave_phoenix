@@ -12,7 +12,7 @@ defmodule Tidewave.Router do
   plug(:dispatch)
 
   @allowed_upload_content_types ["image/png", "image/jpeg", "video/webm"]
-  @allowed_upload_types ["image", "recording"]
+  @allowed_upload_types ["screenshot", "recording"]
 
   get "/" do
     conn
