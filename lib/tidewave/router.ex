@@ -239,7 +239,7 @@ defmodule Tidewave.Router do
       tidewave_version: package_version(:tidewave),
       team: Map.new(plug_config.team),
       local_port: get_sock_data(conn).port,
-      has_uploads_dir: true
+      tmp_dir: tmp_dir()
     }
   end
 
@@ -265,17 +265,21 @@ defmodule Tidewave.Router do
     File.mkdir_p!(upload_dir(type))
   end
 
-  defp upload_dir(type) do
-    case Application.get_env(:tidewave, :upload_dir) do
+  defp tmp_dir do
+    case Application.get_env(:tidewave, :tmp_dir) do
       nil ->
         "tmp"
-        |> Path.expand()
-        |> Path.join("tidewave")
-        |> Path.join(folder_for_type(type))
 
-      upload_dir ->
-        upload_dir
+      tmp_dir ->
+        tmp_dir
     end
+  end
+
+  defp upload_dir(type) do
+    tmp_dir()
+    |> Path.expand()
+    |> Path.join("tidewave")
+    |> Path.join(folder_for_type(type))
   end
 
   defp upload_path(type, filename) do
