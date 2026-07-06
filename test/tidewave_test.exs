@@ -164,6 +164,41 @@ defmodule TidewaveTest do
     end
   end
 
+  describe "/upload" do
+    test "validates filenames" do
+      upload_dir = Path.expand("tmp/tidewave/screenshots")
+      valid_filename = "screenshot-123_abc.jpg"
+
+      on_exit(fn ->
+        File.rm_rf(Path.expand("tmp/tidewave"))
+      end)
+
+      conn = router_upload_conn(valid_filename)
+
+      assert conn.status == 200
+      assert Jason.decode!(conn.resp_body) == %{"status" => "ok"}
+      assert File.read!(Path.join(upload_dir, valid_filename)) == "image"
+
+      assert_raise Plug.Conn.WrapperError,
+                   ~r/filename must only contain numbers, letters, hyphens, and underscores: \.\.\/screenshot\.png/,
+                   fn ->
+                     router_upload_conn("../screenshot.png")
+                   end
+
+      assert_raise Plug.Conn.WrapperError,
+                   ~r/filename must only contain numbers, letters, hyphens, and underscores: screenshot png\.jpg/,
+                   fn ->
+                     router_upload_conn("screenshot png.jpg")
+                   end
+
+      assert_raise Plug.Conn.WrapperError,
+                   ~r/filename must have a valid extension \(\.png, \.jpg, \.jpeg, \.webm\): screenshot\.gif/,
+                   fn ->
+                     router_upload_conn("screenshot.gif")
+                   end
+    end
+  end
+
   describe "clear_logs/0" do
     test "clears all captured logs" do
       require Logger
@@ -190,5 +225,21 @@ defmodule TidewaveTest do
       refute Enum.any?(logs, &String.contains?(&1, "old log"))
       assert Enum.any?(logs, &String.contains?(&1, "new log"))
     end
+  end
+
+  defp router_upload_conn(filename) do
+    upload_source = Path.join(System.tmp_dir!(), "tidewave-upload-source")
+    File.write!(upload_source, "image")
+
+    conn(:post, "/upload", %{
+      "type" => "screenshot",
+      "file" => %Plug.Upload{
+        path: upload_source,
+        filename: filename,
+        content_type: "image/jpeg"
+      }
+    })
+    |> put_private(:tidewave_config, Tidewave.init([]))
+    |> Tidewave.Router.call([])
   end
 end

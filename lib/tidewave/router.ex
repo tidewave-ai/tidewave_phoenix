@@ -253,7 +253,7 @@ defmodule Tidewave.Router do
 
       conn
       |> put_resp_content_type("application/json")
-      |> send_resp(200, Jason.encode_to_iodata!(%{status: "ok", path: dest}))
+      |> send_resp(200, Jason.encode_to_iodata!(%{status: "ok"}))
     else
       _ ->
         conn
@@ -277,11 +277,18 @@ defmodule Tidewave.Router do
   end
 
   defp upload_path(type, filename) do
-    if String.contains?(filename, "..") do
-      raise "invalid filename: #{filename}"
-    end
+    ext = filename |> Path.extname() |> String.downcase()
 
-    Path.join(upload_dir(type), filename)
+    cond do
+      not String.match?(filename, ~r/^[A-Za-z0-9_.-]+$/) ->
+        raise "filename must only contain numbers, letters, hyphens, and underscores: #{filename}"
+
+      ext not in [".png", ".jpg", ".jpeg", ".webm"] ->
+        raise "filename must have a valid extension (.png, .jpg, .jpeg, .webm): #{filename}"
+
+      true ->
+        Path.join(upload_dir(type), filename)
+    end
   end
 
   defp folder_for_type("screenshot"), do: "screenshots"
