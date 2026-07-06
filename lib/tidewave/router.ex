@@ -266,13 +266,7 @@ defmodule Tidewave.Router do
   end
 
   defp tmp_dir do
-    case Application.get_env(:tidewave, :tmp_dir) do
-      nil ->
-        "tmp"
-
-      tmp_dir ->
-        tmp_dir
-    end
+    Application.get_env(:tidewave, :tmp_dir, "tmp")
   end
 
   defp upload_dir(type) do
