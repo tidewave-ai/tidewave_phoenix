@@ -297,7 +297,6 @@ defmodule Tidewave.Router do
   defp is_allowed_content_type?(%Plug.Upload{content_type: content_type, path: path}) do
     # video/webm;codecs=vp9 -> we are only interested in video/webm
     [ct | _] = String.split(content_type, ";")
-    # TODO: only read the first few bytes
     file = File.open!(path, [:binary, :raw])
     magic_bytes = IO.binread(file, 128)
     File.close(file)
