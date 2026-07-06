@@ -253,7 +253,10 @@ defmodule Tidewave.Router do
 
       conn
       |> put_resp_content_type("application/json")
-      |> send_resp(200, Jason.encode_to_iodata!(%{status: "ok"}))
+      |> send_resp(
+        200,
+        Jason.encode_to_iodata!(%{status: "ok", path: dest})
+      )
     else
       _ ->
         conn
@@ -271,7 +274,6 @@ defmodule Tidewave.Router do
 
   defp upload_dir(type) do
     tmp_dir()
-    |> Path.expand()
     |> Path.join("tidewave")
     |> Path.join(folder_for_type(type))
   end

@@ -176,7 +176,12 @@ defmodule TidewaveTest do
       conn = router_upload_conn(valid_filename)
 
       assert conn.status == 200
-      assert Jason.decode!(conn.resp_body) == %{"status" => "ok"}
+
+      assert Jason.decode!(conn.resp_body) == %{
+               "status" => "ok",
+               "path" => "tmp/tidewave/screenshots/#{valid_filename}"
+             }
+
       assert File.read!(Path.join(upload_dir, valid_filename)) == "image"
 
       assert_raise Plug.Conn.WrapperError,
