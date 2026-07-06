@@ -64,7 +64,7 @@ defmodule Tidewave.Router do
       Plug.Parsers.init(
         parsers: [:multipart],
         pass: [],
-        length: 10_000_000
+        length: 200_000_000
       )
 
     conn
