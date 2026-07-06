@@ -33,7 +33,7 @@ defmodule Tidewave.MCP.ServerTest do
       assert response_body["id"] == "1"
       assert response_body["result"]["protocolVersion"] == "2025-03-26"
       assert is_list(response_body["result"]["tools"])
-      assert "browser_eval" in Enum.map(response_body["result"]["tools"], & &1["name"])
+      refute "browser_eval" in Enum.map(response_body["result"]["tools"], & &1["name"])
     end
 
     test "handles initialized notification", %{conn: conn} do
@@ -91,22 +91,22 @@ defmodule Tidewave.MCP.ServerTest do
       assert response_body["jsonrpc"] == "2.0"
       assert response_body["id"] == "2"
       assert is_list(response_body["result"]["tools"])
-      assert "browser_eval" in Enum.map(response_body["result"]["tools"], & &1["name"])
+      refute "browser_eval" in Enum.map(response_body["result"]["tools"], & &1["name"])
     end
 
-    test "does not include browser tools when disabled" do
+    test "includes browser tools when enabled" do
       message = %{
         "jsonrpc" => "2.0",
         "method" => "tools/list",
         "id" => "2"
       }
 
-      conn = %{mcp_conn("/tidewave/mcp?include_browser_tools=false") | body_params: message}
+      conn = %{mcp_conn("/tidewave/mcp?include_browser_tools=true") | body_params: message}
       response = Tidewave.MCP.Server.handle_http_message(conn)
 
       assert response.status == 200
       response_body = Jason.decode!(response.resp_body)
-      refute "browser_eval" in Enum.map(response_body["result"]["tools"], & &1["name"])
+      assert "browser_eval" in Enum.map(response_body["result"]["tools"], & &1["name"])
     end
 
     test "does not dispatch browser tools when disabled" do
@@ -133,7 +133,7 @@ defmodule Tidewave.MCP.ServerTest do
         "params" => %{"name" => "browser_eval", "arguments" => "invalid"}
       }
 
-      conn = %{mcp_conn("/tidewave/mcp") | body_params: message}
+      conn = %{mcp_conn("/tidewave/mcp?include_browser_tools=true") | body_params: message}
       response = Tidewave.MCP.Server.handle_http_message(conn)
 
       assert response.status == 400

@@ -370,7 +370,7 @@ defmodule Tidewave.MCP.Server do
     Logger.info("Received #{conn.method} message")
     params = conn.body_params
     conn = fetch_query_params(conn)
-    include_browser_tools? = conn.query_params["include_browser_tools"] != "false"
+    include_browser_tools? = conn.query_params["include_browser_tools"] == "true"
     Logger.debug("Raw params: #{inspect(params, pretty: true)}")
 
     case validate_jsonrpc_message(params) do
