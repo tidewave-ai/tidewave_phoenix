@@ -12,9 +12,11 @@ defmodule Tidewave.Router do
   plug(:dispatch)
 
   get "/" do
+    conn = fetch_query_params(conn)
+
     conn
     |> put_resp_content_type("text/html")
-    |> send_resp(200, tidewave_html())
+    |> send_resp(200, tidewave_html(conn.query_params))
     |> halt()
   end
 
@@ -49,6 +51,12 @@ defmodule Tidewave.Router do
     conn
     |> Plug.Parsers.call(opts)
     |> MCP.Server.handle_http_message()
+    |> halt()
+  end
+
+  get "/ws" do
+    conn
+    |> WebSockAdapter.upgrade(Tidewave.ControlSocket, %{}, timeout: 60_000)
     |> halt()
   end
 
@@ -94,6 +102,12 @@ defmodule Tidewave.Router do
       {["config"], _} ->
         conn
 
+      # The control page WebSocket is the one endpoint that legitimately
+      # receives an Origin header (browsers always send it on WebSocket
+      # upgrades), so it gets a same-origin check instead.
+      {["ws"], origin} ->
+        check_ws_origin(conn, origin)
+
       # No origin header is always allowed
       {_, []} ->
         conn
@@ -106,6 +120,53 @@ defmodule Tidewave.Router do
     end
   end
 
+  defp check_ws_origin(conn, []), do: conn
+
+  defp check_ws_origin(conn, [origin | _]) do
+    if origin_host(origin) in allowed_origin_hosts(conn.private.tidewave_config) do
+      conn
+    else
+      log_and_send_403(conn, """
+      For security reasons, the Tidewave control page only accepts WebSocket connections from the application's own origin.
+      """)
+    end
+  end
+
+  defp origin_host(origin) do
+    URI.parse(origin).host
+  end
+
+  defp allowed_origin_hosts(%{allowed_origins: [_ | _] = allowed_origins}) do
+    Enum.map(allowed_origins, &origin_or_host_to_host/1)
+  end
+
+  defp allowed_origin_hosts(%{phoenix_endpoint: endpoint}) when not is_nil(endpoint) do
+    if host = endpoint.config(:url)[:host] do
+      [host]
+    else
+      raise_missing_allowed_origins!()
+    end
+  end
+
+  defp allowed_origin_hosts(_config) do
+    raise_missing_allowed_origins!()
+  end
+
+  defp origin_or_host_to_host(origin_or_host) do
+    case URI.parse(origin_or_host) do
+      %URI{host: host} when is_binary(host) -> host
+      _ -> origin_or_host
+    end
+  end
+
+  defp raise_missing_allowed_origins! do
+    raise """
+    Tidewave cannot verify the WebSocket origin because no allowed origins are configured and no Phoenix endpoint URL host is available.
+
+    Configure the Tidewave plug with `allowed_origins: [...]` to list the hosts that may open the control page.
+    """
+  end
+
   defp log_and_send_403(conn, message) do
     require Logger
     Logger.warning(message)
@@ -115,8 +176,14 @@ defmodule Tidewave.Router do
     |> halt()
   end
 
-  defp tidewave_html() do
+  defp tidewave_html(params) do
     client_url = Application.get_env(:tidewave, :client_url, "https://tidewave.ai")
+
+    script =
+      case params do
+        %{"entrypoint" => _} -> "tc.js"
+        _ -> "control.js"
+      end
 
     # We return a basic page that is used by Tidewave Web.
     # Note that, by itself, this page is harmless and it
@@ -127,7 +194,7 @@ defmodule Tidewave.Router do
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <script type="module" src="#{client_url}/tc/tc.js"></script>
+        <script type="module" src="#{client_url}/tc/#{script}"></script>
       </head>
       <body></body>
     </html>
