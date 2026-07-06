@@ -182,7 +182,7 @@ defmodule TidewaveTest do
                "path" => "tmp/tidewave/screenshots/#{valid_filename}"
              }
 
-      assert File.read!(Path.join(upload_dir, valid_filename)) == "image"
+      assert File.read!(Path.join(upload_dir, valid_filename)) == valid_jpg()
 
       assert_raise Plug.Conn.WrapperError,
                    ~r/filename must only contain numbers, letters, hyphens, and underscores: \.\.\/screenshot\.png/,
@@ -201,6 +201,13 @@ defmodule TidewaveTest do
                    fn ->
                      router_upload_conn("screenshot.gif")
                    end
+    end
+
+    test "validates file magic bytes" do
+      conn = router_upload_conn("screenshot.jpg", "not an image")
+
+      assert conn.status == 400
+      assert conn.resp_body == "Bad Request: missing or invalid file parameter"
     end
   end
 
@@ -232,9 +239,9 @@ defmodule TidewaveTest do
     end
   end
 
-  defp router_upload_conn(filename) do
+  defp router_upload_conn(filename, file_contents \\ valid_jpg()) do
     upload_source = Path.join(System.tmp_dir!(), "tidewave-upload-source")
-    File.write!(upload_source, "image")
+    File.write!(upload_source, file_contents)
 
     conn(:post, "/upload", %{
       "type" => "screenshot",
@@ -246,5 +253,9 @@ defmodule TidewaveTest do
     })
     |> put_private(:tidewave_config, Tidewave.init([]))
     |> Tidewave.Router.call([])
+  end
+
+  defp valid_jpg do
+    <<0xFF, 0xD8, 0xFF, 0xE0, "JFIF", 0xFF, 0xD9>>
   end
 end

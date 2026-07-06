@@ -143,8 +143,6 @@ defmodule Tidewave.Router do
     end
   end
 
-  defp require_same_origin(conn, []), do: conn
-
   defp require_same_origin(conn, [origin | _]) do
     if origin_host(origin) in allowed_origin_hosts(conn.private.tidewave_config) do
       conn
@@ -244,9 +242,9 @@ defmodule Tidewave.Router do
   end
 
   defp handle_upload(conn) do
-    with %{"type" => type, "file" => %Plug.Upload{content_type: content_type} = upload}
+    with %{"type" => type, "file" => %Plug.Upload{} = upload}
          when type in @allowed_upload_types <- conn.body_params,
-         true <- is_allowed_content_type?(content_type) do
+         true <- is_allowed_content_type?(upload) do
       create_upload_dir!(type)
       dest = upload_path(type, upload.filename)
       File.cp!(upload.path, dest)
@@ -296,9 +294,14 @@ defmodule Tidewave.Router do
   defp folder_for_type("screenshot"), do: "screenshots"
   defp folder_for_type("recording"), do: "recordings"
 
-  defp is_allowed_content_type?(content_type) do
+  defp is_allowed_content_type?(%Plug.Upload{content_type: content_type, path: path}) do
     # video/webm;codecs=vp9 -> we are only interested in video/webm
     [ct | _] = String.split(content_type, ";")
-    ct in @allowed_upload_content_types
+    # TODO: only read the first few bytes
+    file = File.open!(path, [:binary, :raw])
+    magic_bytes = IO.binread(file, 128)
+    File.close(file)
+
+    ct in @allowed_upload_content_types and Tidewave.MagicBytes.type(magic_bytes) != :unknown
   end
 end
