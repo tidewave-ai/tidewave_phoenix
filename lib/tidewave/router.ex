@@ -184,9 +184,9 @@ defmodule Tidewave.Router do
 
   defp raise_missing_allowed_origins! do
     raise """
-    Tidewave cannot verify the WebSocket origin because no allowed origins are configured and no Phoenix endpoint URL host is available.
+    Tidewave cannot verify the origin because no allowed origins are configured and no Phoenix endpoint URL host is available.
 
-    Configure the Tidewave plug with `allowed_origins: [...]` to list the hosts that may open the control page.
+    Configure the Tidewave plug with `allowed_origins: [...]` to list allowed origins manually.
     """
   end
 
