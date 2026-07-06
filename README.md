@@ -114,9 +114,11 @@ The following options are available:
 
   * `:allow_remote_access` - Tidewave only allows requests from localhost by default, even if your server listens on other interfaces, for security purposes. Read [our security guidelines for more information and when to allow remote access](https://hexdocs.pm/tidewave/security.html) (if you know what you are doing)
 
-  * `:inspect_opts` - Custom options passed to `Kernel.inspect/2` when formatting some tool results. Defaults to: `[charlists: :as_lists, limit: 50, pretty: true]`
+  * `:inspect_opts` - custom options passed to `Kernel.inspect/2` when formatting some tool results. Defaults to: `[charlists: :as_lists, limit: 50, pretty: true]`
 
   * `:team` - set your Tidewave Team configuration, such as `team: [id: "my-company"]`
+
+  * `:toolbar` - controls whether the Tidewave toolbar is injected into your HTML pages. Defaults to `true`
 
 ## Available tools
 
