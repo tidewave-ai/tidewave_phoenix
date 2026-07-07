@@ -27,7 +27,7 @@ defmodule Tidewave.Router do
     conn
     |> put_resp_content_type("application/json")
     |> put_resp_header("access-control-allow-origin", "*")
-    |> send_resp(200, Jason.encode_to_iodata!(config(conn)))
+    |> send_resp(200, Jason.encode_to_iodata!(Tidewave.tidewave_config(conn)))
     |> halt()
   end
 
@@ -220,25 +220,6 @@ defmodule Tidewave.Router do
       <body></body>
     </html>
     """
-  end
-
-  defp package_version(app) do
-    if vsn = Application.spec(app)[:vsn] do
-      List.to_string(vsn)
-    end
-  end
-
-  defp config(conn) do
-    plug_config = conn.private.tidewave_config
-
-    %{
-      project_name: MCP.project_name(),
-      framework_type: "phoenix",
-      tidewave_version: package_version(:tidewave),
-      team: Map.new(plug_config.team),
-      local_port: get_sock_data(conn).port,
-      tmp_dir: tmp_dir()
-    }
   end
 
   defp handle_upload(conn) do
