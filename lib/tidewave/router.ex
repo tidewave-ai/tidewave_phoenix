@@ -11,6 +11,9 @@ defmodule Tidewave.Router do
   plug(:check_origin)
   plug(:dispatch)
 
+  @allowed_upload_content_types ["image/png", "image/jpeg", "video/webm"]
+  @allowed_upload_types ["screenshot", "recording"]
+
   get "/" do
     conn = fetch_query_params(conn)
 
@@ -51,6 +54,22 @@ defmodule Tidewave.Router do
     conn
     |> Plug.Parsers.call(opts)
     |> MCP.Server.handle_http_message()
+    |> halt()
+  end
+
+  post "/upload" do
+    Logger.metadata(tidewave_mcp: true)
+
+    opts =
+      Plug.Parsers.init(
+        parsers: [:multipart],
+        pass: [],
+        length: 200_000_000
+      )
+
+    conn
+    |> Plug.Parsers.call(opts)
+    |> handle_upload()
     |> halt()
   end
 
@@ -106,11 +125,15 @@ defmodule Tidewave.Router do
       # receives an Origin header (browsers always send it on WebSocket
       # upgrades), so it gets a same-origin check instead.
       {["ws"], origin} ->
-        check_ws_origin(conn, origin)
+        require_same_origin(conn, origin)
 
       # No origin header is always allowed
       {_, []} ->
         conn
+
+      # Uploads are allowed from the same origin.
+      {["upload"], origin} ->
+        require_same_origin(conn, origin)
 
       # /mcp refuses if origin header is set
       {_, _} ->
@@ -120,14 +143,12 @@ defmodule Tidewave.Router do
     end
   end
 
-  defp check_ws_origin(conn, []), do: conn
-
-  defp check_ws_origin(conn, [origin | _]) do
+  defp require_same_origin(conn, [origin | _]) do
     if origin_host(origin) in allowed_origin_hosts(conn.private.tidewave_config) do
       conn
     else
       log_and_send_403(conn, """
-      For security reasons, the Tidewave control page only accepts WebSocket connections from the application's own origin.
+      For security reasons, this page only allows connections from the application's own origin.
       """)
     end
   end
@@ -161,9 +182,9 @@ defmodule Tidewave.Router do
 
   defp raise_missing_allowed_origins! do
     raise """
-    Tidewave cannot verify the WebSocket origin because no allowed origins are configured and no Phoenix endpoint URL host is available.
+    Tidewave cannot verify the origin because no allowed origins are configured and no Phoenix endpoint URL host is available.
 
-    Configure the Tidewave plug with `allowed_origins: [...]` to list the hosts that may open the control page.
+    Configure the Tidewave plug with `allowed_origins: [...]` to list allowed origins manually.
     """
   end
 
@@ -215,7 +236,71 @@ defmodule Tidewave.Router do
       framework_type: "phoenix",
       tidewave_version: package_version(:tidewave),
       team: Map.new(plug_config.team),
-      local_port: get_sock_data(conn).port
+      local_port: get_sock_data(conn).port,
+      tmp_dir: tmp_dir()
     }
+  end
+
+  defp handle_upload(conn) do
+    with %{"type" => type, "file" => %Plug.Upload{} = upload}
+         when type in @allowed_upload_types <- conn.body_params,
+         true <- is_allowed_content_type?(upload) do
+      create_upload_dir!(type)
+      dest = upload_path(type, upload.filename)
+      File.cp!(upload.path, dest)
+
+      conn
+      |> put_resp_content_type("application/json")
+      |> send_resp(
+        200,
+        Jason.encode_to_iodata!(%{status: "ok", path: dest})
+      )
+    else
+      _ ->
+        conn
+        |> send_resp(400, "Bad Request: missing or invalid file parameter")
+    end
+  end
+
+  defp create_upload_dir!(type) do
+    File.mkdir_p!(upload_dir(type))
+  end
+
+  defp tmp_dir do
+    Application.get_env(:tidewave, :tmp_dir, "tmp")
+  end
+
+  defp upload_dir(type) do
+    tmp_dir()
+    |> Path.join("tidewave")
+    |> Path.join(folder_for_type(type))
+  end
+
+  defp upload_path(type, filename) do
+    ext = filename |> Path.extname() |> String.downcase()
+
+    cond do
+      not String.match?(filename, ~r/^[A-Za-z0-9_.-]+$/) ->
+        raise "filename must only contain numbers, letters, hyphens, and underscores: #{filename}"
+
+      ext not in [".png", ".jpg", ".jpeg", ".webm"] ->
+        raise "filename must have a valid extension (.png, .jpg, .jpeg, .webm): #{filename}"
+
+      true ->
+        Path.join(upload_dir(type), filename)
+    end
+  end
+
+  defp folder_for_type("screenshot"), do: "screenshots"
+  defp folder_for_type("recording"), do: "recordings"
+
+  defp is_allowed_content_type?(%Plug.Upload{content_type: content_type, path: path}) do
+    # video/webm;codecs=vp9 -> we are only interested in video/webm
+    [ct | _] = String.split(content_type, ";")
+    file = File.open!(path, [:binary, :raw])
+    magic_bytes = IO.binread(file, 128)
+    File.close(file)
+
+    ct in @allowed_upload_content_types and Tidewave.MagicBytes.type(magic_bytes) != :unknown
   end
 end
