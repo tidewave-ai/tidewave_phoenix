@@ -23,7 +23,7 @@ defmodule Tidewave.MCP.Tools.Browser do
             },
             timeout: %{
               type: "number",
-              description: "Timeout in milliseconds. Defaults to 10000."
+              description: "Timeout in milliseconds. Defaults to 45000."
             }
           }
         },
