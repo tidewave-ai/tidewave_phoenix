@@ -114,7 +114,7 @@ The following options are available:
 
   * `:allow_remote_access` - Tidewave only allows requests from localhost by default, even if your server listens on other interfaces, for security purposes. Read [our security guidelines for more information and when to allow remote access](https://hexdocs.pm/tidewave/security.html) (if you know what you are doing)
 
-  * `allowed_origins` - hosts or origins allowed to upload screenshots and recordings from the browser. By default, Tidewave uses the Phoenix Endpoint's configured default URL host. Ports are ignored, so `http://localhost:3000` and `http://localhost:4000` both allow `localhost`
+  * `:allowed_origins` - a list of values matched against the `Origin` header to prevent cross origin and DNS rebinding attacks. Each value must be a string of shape `[scheme:]//host[:port]`, where both scheme and port are optional. The host may also start with "*". Example: `["//localhost:8000", "//*.test"]`
 
   * `:inspect_opts` - custom options passed to `Kernel.inspect/2` when formatting some tool results. Defaults to: `[charlists: :as_lists, limit: 50, pretty: true]`
 
