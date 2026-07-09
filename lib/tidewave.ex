@@ -36,7 +36,8 @@ defmodule Tidewave do
       team: Keyword.get(opts, :team, []),
       toolbar: Keyword.get(opts, :toolbar, true),
       inspect_opts:
-        Keyword.get(opts, :inspect_opts, charlists: :as_lists, limit: 50, pretty: true)
+        Keyword.get(opts, :inspect_opts, charlists: :as_lists, limit: 50, pretty: true),
+      tmp_dir: Keyword.get(opts, :tmp_dir, "tmp")
     }
   end
 
@@ -184,7 +185,8 @@ defmodule Tidewave do
       framework_type: "phoenix",
       tidewave_version: package_version(:tidewave),
       team: Map.new(plug_config.team),
-      local_port: Plug.Conn.get_sock_data(conn).port
+      local_port: Plug.Conn.get_sock_data(conn).port,
+      tmp_dir: plug_config.tmp_dir
     }
   end
 

@@ -226,8 +226,9 @@ defmodule Tidewave.Router do
     with %{"type" => type, "file" => %Plug.Upload{} = upload}
          when type in @allowed_upload_types <- conn.body_params,
          true <- is_allowed_content_type?(upload) do
-      create_upload_dir!(type)
-      dest = upload_path(type, upload.filename)
+      tmp_dir = conn.private.tidewave_config.tmp_dir
+      create_upload_dir!(tmp_dir, type)
+      dest = upload_path(tmp_dir, type, upload.filename)
       File.cp!(upload.path, dest)
 
       conn
@@ -243,21 +244,17 @@ defmodule Tidewave.Router do
     end
   end
 
-  defp create_upload_dir!(type) do
-    File.mkdir_p!(upload_dir(type))
+  defp create_upload_dir!(tmp_dir, type) do
+    File.mkdir_p!(upload_dir(tmp_dir, type))
   end
 
-  defp tmp_dir do
-    Application.get_env(:tidewave, :tmp_dir, "tmp")
-  end
-
-  defp upload_dir(type) do
-    tmp_dir()
+  defp upload_dir(tmp_dir, type) do
+    tmp_dir
     |> Path.join("tidewave")
     |> Path.join(folder_for_type(type))
   end
 
-  defp upload_path(type, filename) do
+  defp upload_path(tmp_dir, type, filename) do
     ext = filename |> Path.extname() |> String.downcase()
 
     cond do
@@ -268,7 +265,7 @@ defmodule Tidewave.Router do
         raise "filename must have a valid extension (.png, .jpg, .jpeg, .webm): #{filename}"
 
       true ->
-        Path.join(upload_dir(type), filename)
+        Path.join(upload_dir(tmp_dir, type), filename)
     end
   end
 

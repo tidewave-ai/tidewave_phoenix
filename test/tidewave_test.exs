@@ -159,6 +159,7 @@ defmodule TidewaveTest do
                "framework_type" => "phoenix",
                "project_name" => "tidewave",
                "team" => %{},
+               "tmp_dir" => "tmp",
                "tidewave_version" => _
              } = Jason.decode!(conn.resp_body)
     end
