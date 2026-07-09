@@ -121,8 +121,8 @@ The following options are available:
   * `:team` - set your Tidewave Team configuration, such as `team: [id: "my-company"]`
 
   * `:toolbar` - controls whether the Tidewave toolbar is injected into your HTML pages. Defaults to `true`
-  
-  * `tmp_dir` - temporary directory Tidewave uses for screenshots and recordings. Defaults to `tmp`, storing files under `tmp/tidewave/screenshots` and `tmp/tidewave/recordings`
+
+  * `tmp_dir` - temporary directory Tidewave uses for screenshots and recordings. It must be a relative directory to the current application root. Defaults to `tmp`, storing files under `tmp/tidewave/screenshots` and `tmp/tidewave/recordings`
 
 ## Available tools
 
