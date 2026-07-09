@@ -37,7 +37,7 @@ defmodule Tidewave.ControlPlaneTest do
       conn =
         ws_conn()
         |> Plug.Conn.put_req_header("origin", "http://control.example.com")
-        |> Tidewave.call(Tidewave.init(allowed_origins: ["control.example.com"]))
+        |> Tidewave.call(Tidewave.init(allowed_origins: ["//control.example.com"]))
 
       assert conn.status == nil
     end
@@ -51,11 +51,20 @@ defmodule Tidewave.ControlPlaneTest do
       assert conn.status == nil
     end
 
-    test "allows a websocket upgrade from the same host as an allowed full origin" do
+    test "allows a websocket upgrade from the same host as an allowed port-less origin" do
       conn =
         ws_conn()
         |> Plug.Conn.put_req_header("origin", "http://control.example.com:5173")
-        |> Tidewave.call(Tidewave.init(allowed_origins: ["http://control.example.com:4000"]))
+        |> Tidewave.call(Tidewave.init(allowed_origins: ["//control.example.com"]))
+
+      assert conn.status == nil
+    end
+
+    test "allows a websocket upgrade from a wildcard origin" do
+      conn =
+        ws_conn()
+        |> Plug.Conn.put_req_header("origin", "http://control.example.com")
+        |> Tidewave.call(Tidewave.init(allowed_origins: ["//*.example.com"]))
 
       assert conn.status == nil
     end
@@ -96,6 +105,16 @@ defmodule Tidewave.ControlPlaneTest do
         |> Plug.Conn.put_req_header("origin", "http://app.example.com")
         |> Tidewave.call(Tidewave.init([]))
       end
+    end
+
+    test "raises on invalid allowed origin configuration" do
+      assert_raise ArgumentError,
+                   ~r/invalid :allowed_origins value.*Expected an origin with a host/,
+                   fn ->
+                     ws_conn()
+                     |> Plug.Conn.put_req_header("origin", "http://app.example.com")
+                     |> Tidewave.call(Tidewave.init(allowed_origins: ["invalid-origin"]))
+                   end
     end
   end
 

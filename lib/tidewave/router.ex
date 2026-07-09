@@ -113,29 +113,31 @@ defmodule Tidewave.Router do
 
   defp check_origin(conn, _opts) do
     case {conn.path_info, get_req_header(conn, "origin")} do
+      # No origin header is always allowed
+      {_, []} ->
+        conn
+
       # GET / allows any origin
       {[], _} ->
         conn
 
       # /config contains metadata for discovery and it is safe to allow any origin
-      {["config"], _} ->
+      {[no_check_origin], _} when no_check_origin in ["config"] ->
         conn
 
-      # The control page WebSocket is the one endpoint that legitimately
-      # receives an Origin header (browsers always send it on WebSocket
-      # upgrades), so it gets a same-origin check instead.
-      {["ws"], origin} ->
-        require_same_origin(conn, origin)
+      # /ws and /upload are acessed from the web app and must have origins
+      {[check_origin], [origin]} when check_origin in ["ws", "upload"] ->
+        if valid_allowed_origin?(conn, URI.parse(origin)) do
+          conn
+        else
+          log_and_send_403(conn, """
+          For security reasons, Tidewave only accepts requests from the same origin your web app is running on.
 
-      # No origin header is always allowed
-      {_, []} ->
-        conn
+          If you really want to allow remote connections, configure the Tidewave with the `allowed_origins: [#{inspect(origin)}]` option.
+          """)
+        end
 
-      # Uploads are allowed from the same origin.
-      {["upload"], origin} ->
-        require_same_origin(conn, origin)
-
-      # /mcp refuses if origin header is set
+      # /mcp and everything else fails if origin header is set
       {_, _} ->
         log_and_send_403(conn, """
         For security reasons, Tidewave does not accept requests with an origin header for this endpoint.
@@ -143,42 +145,73 @@ defmodule Tidewave.Router do
     end
   end
 
-  defp require_same_origin(conn, [origin | _]) do
-    if origin_host(origin) in allowed_origin_hosts(conn.private.tidewave_config) do
-      conn
-    else
-      log_and_send_403(conn, """
-      For security reasons, this page only allows connections from the application's own origin.
-      """)
+  defp valid_allowed_origin?(conn, origin) do
+    allowed_origins =
+      case conn.private.tidewave_config.allowed_origins do
+        [_ | _] = allowed_origins -> allowed_origins
+        _ -> [host_from_endpoint!(conn)]
+      end
+
+    Enum.any?(allowed_origins, &allowed_origin?(origin, parse_allowed_origin!(&1)))
+  end
+
+  defp host_from_endpoint!(conn) do
+    case conn.private do
+      %{tidewave_config: %{phoenix_endpoint: endpoint}} when not is_nil(endpoint) ->
+        "//#{host_from_endpoint(endpoint)}"
+
+      _ ->
+        raise """
+        no Phoenix endpoint found! You must manually configure the \
+        allowed origins for Tidewave by setting the `:allowed_origins` \
+        option on the Tidewave plug:
+
+            plug Tidewave, allowed_origins: ["//localhost"]
+        """
     end
   end
 
-  defp origin_host(origin) do
-    URI.parse(origin).host
+  defp host_from_endpoint(endpoint) do
+    cond do
+      function_exported?(endpoint, :struct_url, 0) ->
+        endpoint.struct_url().host
+
+      function_exported?(endpoint, :config, 1) ->
+        endpoint.config(:url)[:host]
+
+      true ->
+        nil
+    end || raise_missing_allowed_origins!()
   end
 
-  defp allowed_origin_hosts(%{allowed_origins: [_ | _] = allowed_origins}) do
-    Enum.map(allowed_origins, &origin_or_host_to_host/1)
-  end
+  defp parse_allowed_origin!(origin) do
+    case URI.parse(origin) do
+      %URI{host: nil} ->
+        raise ArgumentError,
+              "invalid :allowed_origins value: #{inspect(origin)}. " <>
+                "Expected an origin with a host that is parsable by URI.parse/1. For example: " <>
+                "[\"https://example.com\", \"//another.com:888\", \"//other.com\"]"
 
-  defp allowed_origin_hosts(%{phoenix_endpoint: endpoint}) when not is_nil(endpoint) do
-    if host = endpoint.config(:url)[:host] do
-      [host]
-    else
-      raise_missing_allowed_origins!()
+      %URI{} = uri ->
+        uri
     end
   end
 
-  defp allowed_origin_hosts(_config) do
-    raise_missing_allowed_origins!()
+  defp allowed_origin?(origin, allowed) do
+    compare?(origin.scheme, allowed.scheme) and
+      compare?(origin.port, allowed.port) and
+      compare_host?(origin.host, allowed.host)
   end
 
-  defp origin_or_host_to_host(origin_or_host) do
-    case URI.parse(origin_or_host) do
-      %URI{host: host} when is_binary(host) -> host
-      _ -> origin_or_host
-    end
+  defp compare?(request_val, allowed_val) do
+    is_nil(allowed_val) or request_val == allowed_val
   end
+
+  defp compare_host?(request_host, "*." <> allowed_host),
+    do: request_host == allowed_host or String.ends_with?(request_host, "." <> allowed_host)
+
+  defp compare_host?(request_host, allowed_host),
+    do: request_host == allowed_host
 
   defp raise_missing_allowed_origins! do
     raise """
