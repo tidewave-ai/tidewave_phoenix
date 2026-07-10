@@ -198,11 +198,15 @@ The following options are available:
 
   * `:allow_remote_access` - Tidewave only allows requests from localhost by default, even if your server listens on other interfaces, for security purposes. Read [our security guidelines for more information and when to allow remote access](https://hexdocs.pm/tidewave/security.html) (if you know what you are doing)
 
+  * `:allowed_origins` - a list of values matched against the `Origin` header to prevent cross origin and DNS rebinding attacks. Each value must be a string of shape `[scheme:]//host[:port]`, where both scheme and port are optional. The host may also start with "*". Example: `["//localhost:8000", "//*.test"]`
+
   * `:inspect_opts` - custom options passed to `Kernel.inspect/2` when formatting some tool results. Defaults to: `[charlists: :as_lists, limit: 50, pretty: true]`
 
   * `:team` - set your Tidewave Team configuration, such as `team: [id: "my-company"]`
 
   * `:toolbar` - controls whether the Tidewave toolbar is injected into your HTML pages. Defaults to `true`
+
+  * `tmp_dir` - temporary directory Tidewave uses for screenshots and recordings. It must be a relative directory to the current application root. Defaults to `tmp`, storing files under `tmp/tidewave/screenshots` and `tmp/tidewave/recordings`
 
 ## License
 
