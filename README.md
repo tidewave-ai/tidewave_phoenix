@@ -1,19 +1,33 @@
-# Tidewave
+# Tidewave Phoenix
 
-Tidewave is the coding agent for full-stack web app development, deeply integrated with Phoenix, from the database to the UI. [See our website](https://tidewave.ai) for more information.
+Tidewave Phoenix is an MCP server that provides runtime-level tools for developing Phoenix apps using coding agents.
 
-This project can also be used as [a standalone Model Context Protocol server](https://hexdocs.pm/tidewave/mcp.html).
+Your agent will be able to use this MCP server to talk to your running Phoenix app in development to:
+
+- execute code in the context of the running app (like an IEx session for agents)
+- read the app's live logs
+- query your development database
+- get source locations of modules and functions
+- read documentation pinned to the exact hex package versions your project depends on
+
+This MCP server is an open-source component of [Tidewave](https://tidewave.ai), the agentic development environment for Phoenix and Rails.
+
+You can use this project as a standalone MCP server or integrated with the [Tidewave product](https://tidewave.ai).
+
+To use it as a standalone MCP server, follow the installation instructions below.
 
 ## Installation
 
-### Manually
+### 1. Add the Tidewave hex package to your app
+
+#### Option 1: Manually
 
 Add the `tidewave` package to your `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:tidewave, "~> 0.5", only: :dev},
+    {:tidewave, "~> 0.6", only: :dev},
     {:phoenix, ...},
   ]
 end
@@ -29,9 +43,8 @@ Then, for Phoenix applications, go to your `lib/my_app_web/endpoint.ex` and righ
    if code_reloading? do
 ```
 
-Now make sure [Tidewave is installed](https://hexdocs.pm/tidewave/installation.html) and you are ready to connect Tidewave to your app.
-
-> Tidewave Web works best with Phoenix LiveView v1.1 or later. Once you update it,
+> [!TIP]
+> Tidewave works best with Phoenix LiveView v1.1 or later. Once you update it,
 > make sure to enable the following options in your `config/dev.exs`:
 >
 > ```elixir
@@ -42,9 +55,9 @@ Now make sure [Tidewave is installed](https://hexdocs.pm/tidewave/installation.h
 >
 > Those are enabled by default for Phoenix v1.8+ apps.
 
-### Using Igniter
+#### Option 2: Using Igniter
 
-Alternatively, you can use `igniter` to automatically install it into an existing Phoenix application:
+Alternatively, you can use `igniter` to automatically install Tidewave MCP into an existing Phoenix application:
 
 ```sh
 # install igniter_new if you haven't already
@@ -54,18 +67,16 @@ mix archive.install hex igniter_new
 mix igniter.install tidewave
 ```
 
-Now make sure [Tidewave is installed](https://hexdocs.pm/tidewave/installation.html) and you are ready to connect Tidewave to your app.
-
-### Umbrella projects
+#### Umbrella projects
 
 For umbrella projects, you can follow the manual steps above in the application that defines your Phoenix endpoint (typically `apps/your_app_web`).
 
-### Usage in non-Phoenix applications
+#### In non-Phoenix applications
 
 Tidewave can be used as a MCP in any Elixir project. For example, you can use `bandit` (and `tidewave`) in dev mode in your `mix.exs`:
 
 ```elixir
-{:tidewave, "~> 0.4", only: :dev},
+{:tidewave, "~> 0.6", only: :dev},
 {:bandit, "~> 1.0", only: :dev},
 ```
 
@@ -78,7 +89,80 @@ aliases: [
 ]
 ```
 
-Now run `mix tidewave` and [configure Tidewave as a MCP](https://hexdocs.pm/tidewave/mcp.html).
+Now run `mix tidewave`
+
+### 2. Add the Tidewave MCP to your agent/editor
+
+Add the Tidewave MCP server to your editor or MCP client configuration as the type "http" (streamable), pointing to the `/tidewave/mcp` path and port your web application is running at. For example, `http://localhost:4000/tidewave/mcp`.
+
+We also have specific instructions for:
+
+- [Claude Code](https://tidewave.hexdocs.pm/mcp_claude_code.html)
+- [Codex](https://tidewave.hexdocs.pm/mcp_codex.html)
+- [Cursor](https://tidewave.hexdocs.pm/mcp_cursor.html)
+- [Neovim](https://tidewave.hexdocs.pm/mcp_neovim.html)
+- [OpenCode](https://tidewave.hexdocs.pm/mcp_opencode.html)
+- [VS Code](https://tidewave.hexdocs.pm/mcp_vscode.html)
+- [Zed](https://tidewave.hexdocs.pm/mcp_zed.html)
+- [Others](https://tidewave.hexdocs.pm/mcp.html)
+
+## Usage
+
+As with any other MCP server, your agent will call the tools exposed by the Tidewave MCP whenever it sees fit. But you can also prompt it to call them explicitly.
+
+## Available MCP tools
+
+### `project_eval`
+
+Evaluates Elixir code within your running application, giving the agent access to your runtime, dependencies, and in-memory data. It's like an IEx for the agent.
+
+[![project_eval demo](docs/assets/project_eval-poster.png)](https://asciinema.org/a/1260494)
+
+Your agent can use it when it would rather run code than assume behavior, grounding its next step in what the running app actually does. For example, calling a function to see what comes back or reproducing a failing code path against live app state to debug it.
+
+### `execute_sql_query`
+
+Executes a SQL query within your app's development database.
+
+[![execute_sql_query demo](docs/assets/execute_sql_query-poster.png)](https://asciinema.org/a/1260504)
+
+Your agent can use it to run any SQL against your development database. Useful for the agent to verify the result of an action.
+
+### `get_docs`
+
+Get the documentation for a given module/function. It consults the exact versions locked in your project's mix.lock, ensuring you get correct information.
+
+[![get_docs demo](docs/assets/get_docs-poster.png)](https://asciinema.org/a/1260511)
+
+### `get_logs`
+
+Reads logs written by the server.
+
+[![get_logs demo](docs/assets/get_logs-poster.png)](https://asciinema.org/a/1260515)
+
+Your agent can use it to see what happened after a request. For example, reading the request log and backtrace when something misbehaves.
+
+### `get_source_location`
+
+Get the source location for a given module/function, across both your app and its dependencies.
+
+[![get_source_location demo](docs/assets/get_source_location-poster.png)](https://asciinema.org/a/1260518)
+
+Your agent can use it to jump straight to where a module/function is defined, by file and line, instead of grepping for it, including when the definition lives in a hex dependency.
+
+### `get_ecto_schemas`
+
+Lists all Ecto schema modules and their file paths.
+
+[![get_ecto_schemas demo](docs/assets/get_ecto_schemas-poster.png)](https://asciinema.org/a/1260519)
+
+### `get_ash_resources`
+
+Returns all Ash domains and their resources for the current project.
+
+[![get_ash_resources demo](docs/assets/get_ash_resources-poster.png)](https://asciinema.org/a/1260520)
+
+Only available if you are using Ash.
 
 ## Troubleshooting
 
@@ -123,28 +207,6 @@ The following options are available:
   * `:toolbar` - controls whether the Tidewave toolbar is injected into your HTML pages. Defaults to `true`
 
   * `tmp_dir` - temporary directory Tidewave uses for screenshots and recordings. It must be a relative directory to the current application root. Defaults to `tmp`, storing files under `tmp/tidewave/screenshots` and `tmp/tidewave/recordings`
-
-## Available tools
-
-- `execute_sql_query` - executes a SQL query within your application
-  database, useful for the agent to verify the result of an action
-
-- `get_docs` - get the documentation for a given module/function.
-  It consults the exact versions used by the project, ensuring you always
-  get correct information
-
-- `get_logs` - reads logs written by the server
-
-- `get_models` - lists all modules in the application and their location
-  for quick discovery
-
-- `get_source_location` - get the source location for a given module/function,
-  so an agent can directly read the source skipping search
-
-- `project_eval` - evaluates code within the your application itself, giving the agent
-  access to your runtime, dependencies, and in-memory data
-
-`get_ecto_schemas` and `get_ash_resources` is also available if you are using Ecto and Ash respectively.
 
 ## License
 
