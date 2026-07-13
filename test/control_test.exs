@@ -14,21 +14,13 @@ defmodule Tidewave.ControlPlaneTest do
     def config(:http), do: [ip: {127, 0, 0, 1}, port: 9000]
   end
 
-  describe "/tidewave" do
+  describe "/tidewave/app" do
     test "uses the control entrypoint" do
-      conn = conn(:get, "/tidewave") |> Tidewave.call(Tidewave.init([]))
+      conn = conn(:get, "/tidewave/app") |> Tidewave.call(Tidewave.init([]))
 
       assert conn.status == 200
       assert get_resp_header_value(conn, "content-type") =~ "text/html"
       assert conn.resp_body =~ "/tc/control.js"
-    end
-
-    test "uses the tc entrypoint if entrypoint is set" do
-      conn = conn(:get, "/tidewave?entrypoint=inner") |> Tidewave.call(Tidewave.init([]))
-
-      assert conn.status == 200
-      assert get_resp_header_value(conn, "content-type") =~ "text/html"
-      assert conn.resp_body =~ "/tc/tc.js"
     end
   end
 

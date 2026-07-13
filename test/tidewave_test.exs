@@ -33,6 +33,16 @@ defmodule TidewaveTest do
     assert get_resp_header(conn, "access-control-allow-origin") == ["*"]
   end
 
+  test "/ services entrypoint if given" do
+    conn =
+      conn(:get, "/tidewave?entrypoint=foo")
+      |> put_private(:phoenix_endpoint, Endpoint)
+      |> Tidewave.call(Tidewave.init([]))
+
+    assert conn.status == 200
+    assert conn.resp_body =~ "tc.js"
+  end
+
   test "/ (root) allows any origin" do
     # / should allow any origin
     conn =
@@ -40,14 +50,14 @@ defmodule TidewaveTest do
       |> put_req_header("origin", "http://example.com")
       |> Tidewave.call(Tidewave.init([]))
 
-    assert conn.status == 200
+    assert conn.status == 302
 
     conn =
       conn(:get, "/tidewave")
       |> put_req_header("origin", "http://localhost:4000")
       |> Tidewave.call(Tidewave.init([]))
 
-    assert conn.status == 200
+    assert conn.status == 302
   end
 
   test "allows requests with no origin header" do
@@ -84,14 +94,14 @@ defmodule TidewaveTest do
       |> Map.put(:remote_ip, {127, 0, 0, 1})
       |> Tidewave.call(Tidewave.init([]))
 
-    assert conn.status == 200
+    assert conn.status == 302
 
     conn =
       conn(:get, "/tidewave")
       |> Map.put(:remote_ip, {192, 168, 1, 1})
       |> Tidewave.call(Tidewave.init(allow_remote_access: true))
 
-    assert conn.status == 200
+    assert conn.status == 302
   end
 
   test "removes X-Frame-Options headers if set" do
