@@ -50,14 +50,14 @@ defmodule TidewaveTest do
       |> put_req_header("origin", "http://example.com")
       |> Tidewave.call(Tidewave.init([]))
 
-    assert conn.status == 302
+    assert conn.status == 200
 
     conn =
       conn(:get, "/tidewave")
       |> put_req_header("origin", "http://localhost:4000")
       |> Tidewave.call(Tidewave.init([]))
 
-    assert conn.status == 302
+    assert conn.status == 200
   end
 
   test "allows requests with no origin header" do
@@ -94,14 +94,14 @@ defmodule TidewaveTest do
       |> Map.put(:remote_ip, {127, 0, 0, 1})
       |> Tidewave.call(Tidewave.init([]))
 
-    assert conn.status == 302
+    assert conn.status == 200
 
     conn =
       conn(:get, "/tidewave")
       |> Map.put(:remote_ip, {192, 168, 1, 1})
       |> Tidewave.call(Tidewave.init(allow_remote_access: true))
 
-    assert conn.status == 302
+    assert conn.status == 200
   end
 
   test "removes X-Frame-Options headers if set" do

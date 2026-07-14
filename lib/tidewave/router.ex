@@ -15,21 +15,10 @@ defmodule Tidewave.Router do
   @allowed_upload_types ["screenshot", "recording"]
 
   get "/" do
-    conn = fetch_query_params(conn)
-
-    case conn.query_params do
-      %{"entrypoint" => _} ->
-        conn
-        |> put_resp_content_type("text/html")
-        |> send_resp(200, entrypoint_html())
-        |> halt()
-
-      _ ->
-        conn
-        |> put_resp_header("location", "/#{Enum.join(conn.script_name, "/")}/app")
-        |> send_resp(302, "")
-        |> halt()
-    end
+    conn
+    |> put_resp_content_type("text/html")
+    |> send_resp(200, entrypoint_html())
+    |> halt()
   end
 
   get "/app" do
