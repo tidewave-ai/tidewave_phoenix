@@ -33,6 +33,16 @@ defmodule TidewaveTest do
     assert get_resp_header(conn, "access-control-allow-origin") == ["*"]
   end
 
+  test "/ services entrypoint if given" do
+    conn =
+      conn(:get, "/tidewave?entrypoint=foo")
+      |> put_private(:phoenix_endpoint, Endpoint)
+      |> Tidewave.call(Tidewave.init([]))
+
+    assert conn.status == 200
+    assert conn.resp_body =~ "tc.js"
+  end
+
   test "/ (root) allows any origin" do
     # / should allow any origin
     conn =
