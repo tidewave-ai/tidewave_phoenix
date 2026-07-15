@@ -20,6 +20,10 @@ defmodule Tidewave.ControlTest do
 
       assert conn.status == 200
       assert get_resp_header_value(conn, "content-type") =~ "text/html"
+
+      assert get_resp_header_value(conn, "content-security-policy") ==
+               "base-uri 'self'; frame-ancestors 'self';"
+
       assert conn.resp_body =~ "/tc/control.js"
     end
   end
