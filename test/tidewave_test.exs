@@ -114,18 +114,33 @@ defmodule TidewaveTest do
     assert Plug.Conn.get_resp_header(conn, "x-frame-options") == []
   end
 
-  test "updates CSP header if set" do
+  test "updates CSP header if set (no toolbar)" do
     conn =
       conn(:get, "/foo")
       |> Plug.Conn.put_resp_header(
         "content-security-policy",
         "default-src 'self' http://example.com; connect-src 'none'; script-src 'self'; frame-ancestors 'none'"
       )
-      |> Tidewave.call(Tidewave.init([]))
+      |> Tidewave.call(Tidewave.init(toolbar: false))
       |> Plug.Conn.send_resp(200, "foo")
 
     assert Plug.Conn.get_resp_header(conn, "content-security-policy") == [
              "default-src 'self' http://example.com; connect-src 'none'; script-src 'unsafe-eval' 'self'"
+           ]
+  end
+
+  test "updates CSP header if set (toolbar)" do
+    conn =
+      conn(:get, "/foo")
+      |> Plug.Conn.put_resp_header(
+        "content-security-policy",
+        "default-src 'self' http://example.com; connect-src 'none'; script-src 'self'; frame-ancestors 'none'"
+      )
+      |> Tidewave.call(Tidewave.init(toolbar: true))
+      |> Plug.Conn.send_resp(200, "foo")
+
+    assert Plug.Conn.get_resp_header(conn, "content-security-policy") == [
+             "default-src 'self' http://example.com; connect-src 'none'; script-src https://tidewave.ai 'unsafe-eval' 'self'"
            ]
   end
 
@@ -140,7 +155,7 @@ defmodule TidewaveTest do
       |> Plug.Conn.send_resp(200, "foo")
 
     assert Plug.Conn.get_resp_header(conn, "content-security-policy") ==
-             ["upgrade-insecure-requests; script-src 'unsafe-eval' 'self'; "]
+             ["upgrade-insecure-requests; script-src https://tidewave.ai 'unsafe-eval' 'self'; "]
   end
 
   describe "/mcp" do
