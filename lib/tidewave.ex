@@ -87,7 +87,7 @@ defmodule Tidewave do
   defp maybe_rewrite_csp(conn) do
     case Plug.Conn.get_resp_header(conn, "content-security-policy") do
       [csp | _] ->
-        csp = rewrite_csp(csp)
+        csp = rewrite_csp(conn, csp)
         Plug.Conn.put_resp_header(conn, "content-security-policy", csp)
 
       _ ->
@@ -95,8 +95,17 @@ defmodule Tidewave do
     end
   end
 
-  defp rewrite_csp(csp) do
+  defp rewrite_csp(conn, csp) do
     policy_directives = String.split(csp, ";", trim: true)
+
+    toolbar_host =
+      case conn.private.tidewave_config do
+        %{toolbar: true} ->
+          Application.get_env(:tidewave, :client_url, "https://tidewave.ai") <> " "
+
+        _ ->
+          ""
+      end
 
     for policy_directive <- policy_directives,
         policy_directive = String.trim(policy_directive),
@@ -104,8 +113,8 @@ defmodule Tidewave do
       case String.split(policy_directive, " ", parts: 2) do
         ["script-src", directives] ->
           case :binary.match(directives, "'unsafe-eval'") do
-            :nomatch -> "script-src 'unsafe-eval' #{directives}"
-            _ -> "script-src #{directives}"
+            :nomatch -> "script-src #{toolbar_host}'unsafe-eval' #{directives}"
+            _ -> "script-src #{toolbar_host}#{directives}"
           end
 
         [policy, directives] ->
