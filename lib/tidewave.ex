@@ -181,7 +181,7 @@ defmodule Tidewave do
 
     """
     <meta name="tidewave:config" content="#{config |> Jason.encode!() |> Plug.HTML.html_escape()}" />
-    <script type="module" src="#{client_url}/tc/toolbar.js"></script>
+    <script async type="module" src="#{client_url}/tc/toolbar.js"></script>
     """
   end
 
