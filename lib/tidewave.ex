@@ -174,6 +174,7 @@ defmodule Tidewave do
     config = %{
       tidewave: tidewave_config(conn),
       root: Tidewave.MCP.root(),
+      wsl_distro: System.get_env("WSL_DISTRO_NAME"),
       framework: %{
         app_paths: app_paths
       }
@@ -195,8 +196,25 @@ defmodule Tidewave do
       tidewave_version: package_version(:tidewave),
       team: Map.new(plug_config.team),
       local_port: Plug.Conn.get_sock_data(conn).port,
+      local_scheme: local_scheme(conn),
       tmp_dir: plug_config.tmp_dir
     }
+  end
+
+  defp local_scheme(conn) do
+    # We want the scheme of the local server, so we check the socket
+    # itself, otherwise plugs such as Plug.RewriteOn may have changed
+    # conn.scheme to reflect the proxy in front. get_ssl_data/1 is an
+    # optional adapter callback (Cowboy does not implement it), so we
+    # fall back to conn.scheme.
+
+    {adapter, _payload} = conn.adapter
+
+    if function_exported?(adapter, :get_ssl_data, 1) do
+      if Plug.Conn.get_ssl_data(conn), do: :https, else: :http
+    else
+      conn.scheme
+    end
   end
 
   defp package_version(app) do
