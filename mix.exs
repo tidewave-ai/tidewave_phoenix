@@ -48,7 +48,7 @@ defmodule Tidewave.MixProject do
 
   defp deps do
     [
-      {:plug, "~> 1.17"},
+      {:plug, "~> 1.18"},
       {:jason, "~> 1.4"},
       {:circular_buffer, "~> 0.4 or ~> 1.0"},
       {:igniter, "~> 0.6", optional: true},
