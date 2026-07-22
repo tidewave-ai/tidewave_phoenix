@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.8.0 (2026-07-22)
+
+* Add the Tidewave Toolbar
+* Align minor version across Tidewave packages
+
 ## v0.6.1 (2026-06-22)
 
 * Enhancements
