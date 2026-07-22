@@ -12,9 +12,7 @@ Your agent will be able to use this MCP server to talk to your running Phoenix a
 
 This MCP server is an open-source component of [Tidewave](https://tidewave.ai), the agentic development environment for Phoenix and Rails.
 
-You can use this project as a standalone MCP server or integrated with the [Tidewave product](https://tidewave.ai).
-
-To use it as a standalone MCP server, follow the installation instructions below.
+You can use this project as a standalone MCP server or integrated with the [Tidewave product](https://tidewave.ai) by following the installation instructions below.
 
 ## Installation
 
@@ -184,7 +182,7 @@ The above will allow your application to run embedded within Tidewave across mul
 
 ### Content security policy
 
-If you have enabled Content-Security-Policy, Tidewave will automatically enable "unsafe-eval" under `script-src` in order for contextual browser testing to work correctly. It also disables the `frame-ancestors` directive.
+If you have enabled Content-Security-Policy, Tidewave will automatically enable "unsafe-eval" under `script-src` in order for contextual browser testing to work correctly. It also disables the `frame-ancestors` directive. This is done only in the environments that Tidewave is loadead (development by default).
 
 ## Configuration
 
