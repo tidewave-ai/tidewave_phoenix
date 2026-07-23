@@ -35,7 +35,7 @@ defmodule Tidewave.ControlTest do
         |> Plug.Conn.put_req_header("origin", "http://control.example.com")
         |> Tidewave.call(Tidewave.init(allowed_origins: ["//control.example.com"]))
 
-      assert conn.status == nil
+      assert conn.status == 101
     end
 
     test "allows a websocket upgrade from an allowed full origin" do
@@ -44,7 +44,7 @@ defmodule Tidewave.ControlTest do
         |> Plug.Conn.put_req_header("origin", "http://control.example.com:4000")
         |> Tidewave.call(Tidewave.init(allowed_origins: ["http://control.example.com:4000"]))
 
-      assert conn.status == nil
+      assert conn.status == 101
     end
 
     test "allows a websocket upgrade from the same host as an allowed port-less origin" do
@@ -53,7 +53,7 @@ defmodule Tidewave.ControlTest do
         |> Plug.Conn.put_req_header("origin", "http://control.example.com:5173")
         |> Tidewave.call(Tidewave.init(allowed_origins: ["//control.example.com"]))
 
-      assert conn.status == nil
+      assert conn.status == 101
     end
 
     test "allows a websocket upgrade from a wildcard origin" do
@@ -62,7 +62,7 @@ defmodule Tidewave.ControlTest do
         |> Plug.Conn.put_req_header("origin", "http://control.example.com")
         |> Tidewave.call(Tidewave.init(allowed_origins: ["//*.example.com"]))
 
-      assert conn.status == nil
+      assert conn.status == 101
     end
 
     test "falls back to the phoenix endpoint url host" do
@@ -72,7 +72,7 @@ defmodule Tidewave.ControlTest do
         |> Plug.Conn.put_private(:phoenix_endpoint, Endpoint)
         |> Tidewave.call(Tidewave.init([]))
 
-      assert conn.status == nil
+      assert conn.status == 101
     end
 
     test "falls back to the phoenix endpoint url host when the port is configured on http" do
@@ -82,7 +82,7 @@ defmodule Tidewave.ControlTest do
         |> Plug.Conn.put_private(:phoenix_endpoint, EndpointWithHttpPort)
         |> Tidewave.call(Tidewave.init([]))
 
-      assert conn.status == nil
+      assert conn.status == 101
     end
 
     test "rejects a websocket upgrade from a foreign origin" do
