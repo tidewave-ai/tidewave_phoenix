@@ -10,7 +10,7 @@ defmodule TidewaveTest do
     def struct_url, do: URI.parse("http://localhost:4000")
   end
 
-  test "/mcp and /config refuse requests with origin header" do
+  test "/mcp refuses requests with origin header" do
     # /mcp should refuse any request with origin header
     conn =
       conn(:post, "/tidewave/mcp")
@@ -19,15 +19,28 @@ defmodule TidewaveTest do
       |> Tidewave.call(Tidewave.init([]))
 
     assert conn.status == 403
+  end
 
-    # /config should refuse any request with origin header
+  test "/config allows requests with origin header + CORS" do
+    # /config should allow any request with origin header
     conn =
       conn(:get, "/tidewave/config")
-      |> put_req_header("origin", "http://localhost:4000")
+      |> put_req_header("origin", "http://localhost:4001")
       |> put_private(:phoenix_endpoint, Endpoint)
       |> Tidewave.call(Tidewave.init([]))
 
-    assert conn.status == 403
+    assert conn.status == 200
+    assert get_resp_header(conn, "access-control-allow-origin") == ["*"]
+  end
+
+  test "/ services entrypoint if given" do
+    conn =
+      conn(:get, "/tidewave?entrypoint=foo")
+      |> put_private(:phoenix_endpoint, Endpoint)
+      |> Tidewave.call(Tidewave.init([]))
+
+    assert conn.status == 200
+    assert conn.resp_body =~ "tc.js"
   end
 
   test "/ (root) allows any origin" do
@@ -101,18 +114,33 @@ defmodule TidewaveTest do
     assert Plug.Conn.get_resp_header(conn, "x-frame-options") == []
   end
 
-  test "updates CSP header if set" do
+  test "updates CSP header if set (no toolbar)" do
     conn =
       conn(:get, "/foo")
       |> Plug.Conn.put_resp_header(
         "content-security-policy",
         "default-src 'self' http://example.com; connect-src 'none'; script-src 'self'; frame-ancestors 'none'"
       )
-      |> Tidewave.call(Tidewave.init([]))
+      |> Tidewave.call(Tidewave.init(toolbar: false))
       |> Plug.Conn.send_resp(200, "foo")
 
     assert Plug.Conn.get_resp_header(conn, "content-security-policy") == [
              "default-src 'self' http://example.com; connect-src 'none'; script-src 'unsafe-eval' 'self'"
+           ]
+  end
+
+  test "updates CSP header if set (toolbar)" do
+    conn =
+      conn(:get, "/foo")
+      |> Plug.Conn.put_resp_header(
+        "content-security-policy",
+        "default-src 'self' http://example.com; connect-src 'none'; script-src 'self'; frame-ancestors 'none'"
+      )
+      |> Tidewave.call(Tidewave.init(toolbar: true))
+      |> Plug.Conn.send_resp(200, "foo")
+
+    assert Plug.Conn.get_resp_header(conn, "content-security-policy") == [
+             "default-src 'self' http://example.com; connect-src 'none'; script-src https://tidewave.ai 'unsafe-eval' 'self'"
            ]
   end
 
@@ -127,7 +155,7 @@ defmodule TidewaveTest do
       |> Plug.Conn.send_resp(200, "foo")
 
     assert Plug.Conn.get_resp_header(conn, "content-security-policy") ==
-             ["upgrade-insecure-requests; script-src 'unsafe-eval' 'self'; "]
+             ["upgrade-insecure-requests; script-src https://tidewave.ai 'unsafe-eval' 'self'; "]
   end
 
   describe "/mcp" do
@@ -156,8 +184,56 @@ defmodule TidewaveTest do
                "framework_type" => "phoenix",
                "project_name" => "tidewave",
                "team" => %{},
+               "tmp_dir" => "tmp",
                "tidewave_version" => _
              } = Jason.decode!(conn.resp_body)
+    end
+  end
+
+  describe "/upload" do
+    test "validates filenames" do
+      upload_dir = Path.expand("tmp/tidewave/screenshots")
+      valid_filename = "screenshot-123_abc.jpg"
+
+      on_exit(fn ->
+        File.rm_rf(Path.expand("tmp/tidewave"))
+      end)
+
+      conn = router_upload_conn(valid_filename)
+
+      assert conn.status == 200
+
+      assert Jason.decode!(conn.resp_body) == %{
+               "status" => "ok",
+               "path" => "tmp/tidewave/screenshots/#{valid_filename}"
+             }
+
+      assert File.read!(Path.join(upload_dir, valid_filename)) == valid_jpg()
+
+      assert_raise Plug.Conn.WrapperError,
+                   ~r/filename must only contain numbers, letters, hyphens, and underscores: \.\.\/screenshot\.png/,
+                   fn ->
+                     router_upload_conn("../screenshot.png")
+                   end
+
+      assert_raise Plug.Conn.WrapperError,
+                   ~r/filename must only contain numbers, letters, hyphens, and underscores: screenshot png\.jpg/,
+                   fn ->
+                     router_upload_conn("screenshot png.jpg")
+                   end
+
+      assert_raise Plug.Conn.WrapperError,
+                   ~r/filename must have a valid extension \(\.png, \.jpg, \.jpeg, \.webm\): screenshot\.gif/,
+                   fn ->
+                     router_upload_conn("screenshot.gif")
+                   end
+    end
+
+    test "validates file magic bytes" do
+      conn = router_upload_conn("screenshot.jpg", "not an image")
+
+      assert conn.status == 400
+      assert conn.resp_body == "Bad Request: missing or invalid file parameter"
     end
   end
 
@@ -187,5 +263,25 @@ defmodule TidewaveTest do
       refute Enum.any?(logs, &String.contains?(&1, "old log"))
       assert Enum.any?(logs, &String.contains?(&1, "new log"))
     end
+  end
+
+  defp router_upload_conn(filename, file_contents \\ valid_jpg()) do
+    upload_source = Path.join(System.tmp_dir!(), "tidewave-upload-source")
+    File.write!(upload_source, file_contents)
+
+    conn(:post, "/upload", %{
+      "type" => "screenshot",
+      "file" => %Plug.Upload{
+        path: upload_source,
+        filename: filename,
+        content_type: "image/jpeg"
+      }
+    })
+    |> put_private(:tidewave_config, Tidewave.init([]))
+    |> Tidewave.Router.call([])
+  end
+
+  defp valid_jpg do
+    <<0xFF, 0xD8, 0xFF, 0xE0, "JFIF", 0xFF, 0xD9>>
   end
 end

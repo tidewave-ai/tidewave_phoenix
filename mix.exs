@@ -3,7 +3,7 @@ defmodule Tidewave.MixProject do
 
   @source_url "https://github.com/tidewave-ai/tidewave_phoenix"
   @homepage_url "https://tidewave.ai/"
-  @version "0.6.0"
+  @version "0.8.0"
 
   def project do
     [
@@ -48,13 +48,20 @@ defmodule Tidewave.MixProject do
 
   defp deps do
     [
-      {:plug, "~> 1.17"},
+      {:plug, "~> 1.18"},
       {:jason, "~> 1.4"},
       {:circular_buffer, "~> 0.4 or ~> 1.0"},
       {:igniter, "~> 0.6", optional: true},
 
+      # Required for the browser control page to upgrade /tidewave/ws to a
+      # plain WebSocket. Works with both Bandit and Plug.Cowboy.
+      {:websock_adapter, "~> 0.5"},
+
       # We require v1.6.1 to detect if phoenix live reload is running too early or late
       {:phoenix_live_reload, ">= 1.6.1", optional: true},
+
+      # We require 2.9 for get_sock_data
+      {:plug_cowboy, "~> 2.9", optional: true},
 
       # Dev deps
       {:bandit, "~> 1.10", only: [:dev, :test]},

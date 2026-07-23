@@ -30,31 +30,40 @@ defmodule Tidewave do
   def init(opts) do
     %{
       allow_remote_access: Keyword.get(opts, :allow_remote_access, false),
+      allowed_origins: opts |> Keyword.get(:allowed_origins, []) |> List.wrap(),
       phoenix_endpoint: nil,
+      url: nil,
       team: Keyword.get(opts, :team, []),
+      toolbar: Keyword.get(opts, :toolbar, true),
       inspect_opts:
-        Keyword.get(opts, :inspect_opts, charlists: :as_lists, limit: 50, pretty: true)
+        Keyword.get(opts, :inspect_opts, charlists: :as_lists, limit: 50, pretty: true),
+      tmp_dir: Keyword.get(opts, :tmp_dir, "tmp")
     }
   end
 
   @impl true
-  def call(%Plug.Conn{path_info: ["tidewave" | rest]} = conn, config) do
-    config = %{config | phoenix_endpoint: conn.private[:phoenix_endpoint]}
+  def call(conn, config) do
+    config = %{config | phoenix_endpoint: conn.private[:phoenix_endpoint], url: control_url(conn)}
 
     conn
     |> validate!()
     |> Plug.Conn.put_private(:tidewave_config, config)
+    |> call()
+  end
+
+  defp call(%Plug.Conn{path_info: ["tidewave" | rest]} = conn) do
+    conn
     |> Plug.forward(rest, Tidewave.Router, [])
     |> Plug.Conn.halt()
   end
 
-  def call(conn, _opts) do
+  defp call(conn) do
     conn
-    |> validate!()
     |> Plug.Conn.register_before_send(fn conn ->
       conn
       |> maybe_rewrite_csp()
       |> Plug.Conn.delete_resp_header("x-frame-options")
+      |> maybe_inject_toolbar()
     end)
   end
 
@@ -78,7 +87,7 @@ defmodule Tidewave do
   defp maybe_rewrite_csp(conn) do
     case Plug.Conn.get_resp_header(conn, "content-security-policy") do
       [csp | _] ->
-        csp = rewrite_csp(csp)
+        csp = rewrite_csp(conn, csp)
         Plug.Conn.put_resp_header(conn, "content-security-policy", csp)
 
       _ ->
@@ -86,8 +95,17 @@ defmodule Tidewave do
     end
   end
 
-  defp rewrite_csp(csp) do
+  defp rewrite_csp(conn, csp) do
     policy_directives = String.split(csp, ";", trim: true)
+
+    toolbar_host =
+      case conn.private.tidewave_config do
+        %{toolbar: true} ->
+          Application.get_env(:tidewave, :client_url, "https://tidewave.ai") <> " "
+
+        _ ->
+          ""
+      end
 
     for policy_directive <- policy_directives,
         policy_directive = String.trim(policy_directive),
@@ -95,8 +113,8 @@ defmodule Tidewave do
       case String.split(policy_directive, " ", parts: 2) do
         ["script-src", directives] ->
           case :binary.match(directives, "'unsafe-eval'") do
-            :nomatch -> "script-src 'unsafe-eval' #{directives}"
-            _ -> "script-src #{directives}"
+            :nomatch -> "script-src #{toolbar_host}'unsafe-eval' #{directives}"
+            _ -> "script-src #{toolbar_host}#{directives}"
           end
 
         [policy, directives] ->
@@ -107,5 +125,101 @@ defmodule Tidewave do
       end
     end
     |> Enum.join("; ")
+  end
+
+  defp control_url(conn) do
+    scheme = conn.scheme |> to_string() |> String.downcase()
+    "#{scheme}://#{conn.host}#{port_suffix(scheme, conn.port)}"
+  end
+
+  defp port_suffix(_scheme, nil), do: ""
+  defp port_suffix("http", 80), do: ""
+  defp port_suffix("https", 443), do: ""
+  defp port_suffix(_scheme, port), do: ":#{port}"
+
+  defp maybe_inject_toolbar(conn) do
+    if conn.private.tidewave_config.toolbar and conn.resp_body != nil and html?(conn) do
+      resp_body = IO.iodata_to_binary(conn.resp_body)
+
+      if String.contains?(resp_body, "</head>") do
+        {head, [last]} = Enum.split(String.split(resp_body, "</head>"), -1)
+        head = Enum.intersperse(head, "</head>")
+        body = [head, tidewave_html(conn), "</head>" | last]
+        put_in(conn.resp_body, body)
+      else
+        conn
+      end
+    else
+      conn
+    end
+  end
+
+  defp html?(conn) do
+    case Plug.Conn.get_resp_header(conn, "content-type") do
+      [] -> false
+      [type | _] -> String.starts_with?(type, "text/html")
+    end
+  end
+
+  defp tidewave_html(conn) do
+    client_url = Application.get_env(:tidewave, :client_url, "https://tidewave.ai")
+
+    app_paths =
+      if Code.loaded?(Mix.Project) do
+        for {app, path} <- Mix.Project.deps_paths(), into: %{}, do: {to_string(app), path}
+      else
+        %{}
+      end
+
+    config = %{
+      tidewave: tidewave_config(conn),
+      root: Tidewave.MCP.root(),
+      wsl_distro: System.get_env("WSL_DISTRO_NAME"),
+      framework: %{
+        app_paths: app_paths
+      }
+    }
+
+    """
+    <meta name="tidewave:config" content="#{config |> Jason.encode!() |> Plug.HTML.html_escape()}" />
+    <script async type="module" src="#{client_url}/tc/toolbar.js"></script>
+    """
+  end
+
+  @doc false
+  def tidewave_config(conn) do
+    plug_config = conn.private.tidewave_config
+
+    %{
+      project_name: Tidewave.MCP.project_name(),
+      framework_type: "phoenix",
+      tidewave_version: package_version(:tidewave),
+      team: Map.new(plug_config.team),
+      local_port: Plug.Conn.get_sock_data(conn).port,
+      local_scheme: local_scheme(conn),
+      tmp_dir: plug_config.tmp_dir
+    }
+  end
+
+  defp local_scheme(conn) do
+    # We want the scheme of the local server, so we check the socket
+    # itself, otherwise plugs such as Plug.RewriteOn may have changed
+    # conn.scheme to reflect the proxy in front. get_ssl_data/1 is an
+    # optional adapter callback (Cowboy does not implement it), so we
+    # fall back to conn.scheme.
+
+    {adapter, _payload} = conn.adapter
+
+    if function_exported?(adapter, :get_ssl_data, 1) do
+      if Plug.Conn.get_ssl_data(conn), do: :https, else: :http
+    else
+      conn.scheme
+    end
+  end
+
+  defp package_version(app) do
+    if vsn = Application.spec(app)[:vsn] do
+      List.to_string(vsn)
+    end
   end
 end

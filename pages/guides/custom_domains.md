@@ -20,76 +20,6 @@ To configure your cookies to use `SameSite=None; Secure` across different framew
 
 <!-- tabs-open -->
 
-### Django
-
-Add the following to your `settings.py` (typically in your development settings):
-
-```python
-if DEBUG:
-    SESSION_COOKIE_SAMESITE = 'None'
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SAMESITE = 'None'
-    CSRF_COOKIE_SECURE = True
-```
-
-### FastAPI
-
-Configure it directly whenever you set the cookie (remember to apply `SameSite=None` only in development):
-
-```python
-response.set_cookie(
-    key="your_session",
-    value="your_value",
-    samesite="none",
-    secure=True,
-    httponly=True,
-)
-```
-
-For the session middleware, you might set this:
-
-```python
-from starlette.middleware.sessions import SessionMiddleware
-
-app.add_middleware(
-    SessionMiddleware,
-    secret_key="your-secret-key",
-    session_cookie="your_app_session",
-    same_site="none",
-    https_only=True,
-)
-```
-
-### Flask
-
-Add the following to your Flask app configuration:
-
-```python
-app = Flask(__name__)
-
-if app.debug:
-    # Session configuration
-    app.config['SESSION_COOKIE_SAMESITE'] = 'None'
-    app.config['SESSION_COOKIE_SECURE'] = True
-    
-    # If using Flask-Login or other extensions, also set:
-    app.config['REMEMBER_COOKIE_SAMESITE'] = 'None'
-    app.config['REMEMBER_COOKIE_SECURE'] = True
-```
-
-### Next.js
-
-Configure it directly whenever you set the cookie (remember to apply `SameSite=None` only in development):
-
-```typescript
-response.cookies.set({
-  name: 'your-cookie-name',
-  value: 'your-value',
-  sameSite: (process.env.NODE_ENV === 'development' ? 'none' : 'lax'),
-  secure: true,
-})
-```
-
 ### Ruby on Rails
 
 Add the following to `config/initializers/development.rb`:
@@ -114,5 +44,9 @@ if code_reloading? do
   # here goes the remaining of the code reloading configuration
 end
 ```
+
+### Vite
+
+The session configuration depends on the library or framework you are using with Vite for session management. Please check their documentation accordingly.
 
 <!-- tabs-close -->

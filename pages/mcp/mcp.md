@@ -24,14 +24,14 @@ We also have specific instructions for:
 
 Here is a baseline comparison of the tools supported by different frameworks/languages.
 
-| Features                     | Django | FastAPI | Flask | Next.js | Phoenix | Rails | TanStack Start |
-| :--------------------------- | :----: | :-----: | :---: | :-----: | :-----: | :---: | :------------: |
-| `project_eval`               | ✅     | ✅      | ✅    | ✅      | ✅      | ✅    | ✅             |
-| `get_docs`                   | ✅     | ✅      | ✅    | ✅      | ✅      | ✅    | ✅             |
-| `get_source_location`        | ✅     | ✅      | ✅    | ✅      | ✅      | ✅    | ✅             |
-| `get_logs`                   | ✅     | ✅      | ✅    | ✅      | ✅      | ✅    | ✅             |
-| `get_models` / `get_schemas` | ✅     | ✅      | ✅    |         | ✅      | ✅    |                |
-| `execute_sql_query`          | ✅     | ✅      | ✅    |         | ✅      | ✅    |                |
+| Features                     | Phoenix | Rails | Vite / TanStack Start |
+| :--------------------------- | :-----: | :---: | :-------------------: |
+| `project_eval`               | ✅      | ✅    | ✅                    |
+| `get_docs`                   | ✅      | ✅    | ✅                    |
+| `get_source_location`        | ✅      | ✅    | ✅                    |
+| `get_logs`                   | ✅      | ✅    | ✅                    |
+| `get_models` / `get_schemas` | ✅      | ✅    |                       |
+| `execute_sql_query`          | ✅      | ✅    |                       |
 
 You may want to nudge your coding agent into using Tidewave MCP's capabilities more frequently by using rules, so you don't need to ask explicitly each time. Each editor places those rules at different locations, so make sure to consult their documentation.
 
@@ -144,5 +144,4 @@ In case it still does not work, here are places you can get help to diagnose it:
 * Our issues trackers - in case we messed something up, please let us know. Here are the specific repositories:
   * [Tidewave for JavaScript](https://github.com/tidewave-ai/tidewave_js/issues)
   * [Tidewave for Phoenix](https://github.com/tidewave-ai/tidewave_phoenix/issues)
-  * [Tidewave for Python](https://github.com/tidewave-ai/tidewave_python/issues)
   * [Tidewave for Rails](https://github.com/tidewave-ai/tidewave_rails/issues)

@@ -26,8 +26,23 @@ idea://open?file=__FILE__&line=__LINE__
 pycharm://open?file=__FILE__&line=__LINE__
 ```
 
-Some editors, such as Sublime Text, require extensions or
-additional packages that enable custom URLs.
+The variables available are `__FILE__`, `__LINE__`, and `__COLUMN__`.
+
+Note that some editors, such as Sublime Text, require extensions or
+additional packages to enable custom URLs.
+
+## WSL
+
+If you are using Windows System for Linux (WSL), two additional
+variables are available:
+
+* `__WSLDISTRO__` - the WSL distribution
+* `__WSLFILE__` - the Linux path
+
+For example, in order to configure VS Code with WSL, you may want to set
+it to a custom URL such as:
+
+    vscode://vscode-remote/wsl+__WSLDISTRO__/__WSLFILE__:__LINE__:__COLUMN__
 
 ## Container configuration
 

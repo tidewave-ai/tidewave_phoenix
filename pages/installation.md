@@ -22,10 +22,6 @@ After installation, you can run the Tidewave application. By default, it will ru
 
 Then you can put the address of your web application and Tidewave will connect to it. If your web application was not yet configured with Tidewave, you will be prompted to do so, using the links below:
 
-* [Tidewave for Django](https://github.com/tidewave-ai/tidewave_python#django)
-* [Tidewave for FastAPI](https://github.com/tidewave-ai/tidewave_python#fastapi)
-* [Tidewave for Flask](https://github.com/tidewave-ai/tidewave_python#flask)
-* [Tidewave for Next.js](https://github.com/tidewave-ai/tidewave_js#nextjs)
 * [Tidewave for Phoenix](https://github.com/tidewave-ai/tidewave_phoenix)
 * [Tidewave for Ruby on Rails](https://github.com/tidewave-ai/tidewave_rails)
 * [Tidewave for TanStack Start](https://github.com/tidewave-ai/tidewave_js#tanstack-start)
