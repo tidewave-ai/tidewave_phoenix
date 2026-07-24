@@ -25,7 +25,7 @@ defmodule Tidewave.Router do
     conn
     |> put_resp_content_type("text/html")
     |> put_resp_header("content-security-policy", "base-uri 'self'; frame-ancestors 'self';")
-    |> send_resp(200, control_html())
+    |> send_resp(200, control_html(conn))
     |> halt()
   end
 
@@ -255,7 +255,7 @@ defmodule Tidewave.Router do
     """
   end
 
-  defp control_html do
+  defp control_html(conn) do
     client_url = Application.get_env(:tidewave, :client_url, "https://tidewave.ai")
 
     """
@@ -263,6 +263,7 @@ defmodule Tidewave.Router do
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="tidewave:config" content="#{Tidewave.tidewave_config_meta(conn) |> Jason.encode!() |> Plug.HTML.html_escape()}" />
         <script type="module" src="#{client_url}/tc/control.js"></script>
       </head>
       <body></body>
