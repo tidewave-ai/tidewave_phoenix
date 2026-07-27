@@ -1,11 +1,6 @@
 # Containers
 
-To isolate the agent environment from your local machine, you can use containers.
-Because Tidewave runs within your web application, running your app in a container
-automatically isolates Tidewave as well, this makes Tidewave simpler to containerize.
-
-Furthermore, when using Tidewave Web with containers, you must not use the desktop app,
-instead you must use the [Tidewave CLI](https://github.com/tidewave-ai/tidewave_app).
+You can run Tidewave IDE inside a container by using the [Tidewave IDE CLI](https://github.com/tidewave-ai/tidewave_app) and exposing it through the container. Then users can access the Tidewave IDE and use it to develop, test, and review new features.
 
 > #### Matching hosts and ports {: .warning}
 >
@@ -13,7 +8,7 @@ instead you must use the [Tidewave CLI](https://github.com/tidewave-ai/tidewave_
 
 ## Devcontainers
 
-One popular solution for this is [Visual Studio Code's dev containers](https://code.visualstudio.com/docs/devcontainers/containers). To use Tidewave Web with
+One popular solution for this is [Visual Studio Code's dev containers](https://code.visualstudio.com/docs/devcontainers/containers). To use Tidewave IDE with
 devcontainers, download the latest `tidewave` CLI binary with `curl` or `wget`
 in a Terminal inside your container:
 
@@ -24,10 +19,10 @@ $ ./tidewave --port 9000
 2025-11-03T16:27:00.232551Z  INFO tidewave_core::server: HTTP server bound to 127.0.0.1:9001
 ```
 
-In the example above, we run Tidewave on port 9000, in case you are also using the Tidewave App
+In the example above, we run Tidewave IDE on port 9000, in case you are also using the Tidewave IDE App
 for other applications.
 
-If instead you want Tidewave up and running by default in your containers, you can update
+If instead you want Tidewave IDE up and running by default in your containers, you can update
 your `.devcontainer/devcontainer.json` with the following:
 
 ```json
@@ -39,7 +34,7 @@ your `.devcontainer/devcontainer.json` with the following:
 }
 ```
 
-You may need to change the Tidewave URL above to match your architecture. Consult our [Installation page](../installation.md#cli) for a complete listing of CLI versions per Operating System.
+You may need to change the Tidewave IDE URL above to match your architecture. Consult our [Installation page](../installation.md#cli) for a complete listing of CLI versions per Operating System.
 
 ## Build your own dev container
 
@@ -54,7 +49,7 @@ In this section, we'll build a minimal devcontainer-like setup.
 > This guide assumes some familiarity with using Docker.
 
 When you use another editor than VSCode, you can build a similar experience to
-devcontainer, with your web app and Tidewave running inside Docker, but your
+devcontainer, with your web app and Tidewave IDE running inside Docker, but your
 editor on your local machine.
 
 First, because you usally have some external systems you depend on, for example
@@ -172,15 +167,15 @@ Also pay close attention to the `-p` parameter above:
 * We used ports 3000:3001 but you need to adapt them to your web framework
   (such as 4000:4001 for Phoenix).
 
-* We forward the ports for the Tidewave CLI as well, such that you can access it
+* We forward the ports for the Tidewave IDE CLI as well, such that you can access it
   at `http://localhost:9000`. We gave it a custom port so it doesn't conflict with
-  the Tidewave App, if you have it installed.
+  the Tidewave IDE App, if you have it installed.
 
 * We only bind to `127.0.0.1` for security purposes. Don't use `-p 3000:3001`,
-  otherwise anyone on your local network can access your web app and Tidewave.
+  otherwise anyone on your local network can access your web app and Tidewave IDE.
 
 Compared to VSCode's devcontainers, this setup still runs your editor outside
-of the container. So while Tidewave will be constrained to the container,
+of the container. So while Tidewave IDE will be constrained to the container,
 any tools your editor might bring to edit files and run terminal commands are
 still potentially dangerous if you let the agent use those without supervision.
 
@@ -189,9 +184,9 @@ steps for each framework on GitHub to learn how to customize them.
 
 ## Editor configuration
 
-Tidewave Web allows you to open files inside your favorite editor. However,
+Tidewave IDE allows you to open files inside your favorite editor. However,
 when running inside containers, the file paths in the container won't align
-with the paths on the host machine. For this purpose, Tidewave allows setting
+with the paths on the host machine. For this purpose, Tidewave IDE allows setting
 the `TIDEWAVE_HOST_PATH` environment variable in your container, which should
 point to the path the project is located on your machine. When launching the
 container from the project's root directory, you can set it to the output of

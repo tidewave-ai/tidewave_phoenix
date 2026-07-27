@@ -1,6 +1,6 @@
 # Inspector
 
-Tidewave Web includes a default inspector integrated with our coding agent. The Inspector understands both server-side templates and client-side components.
+Tidewave includes a default inspector integrated with our coding agent. The Inspector understands both server-side templates and client-side components.
 
 ## Usage
 

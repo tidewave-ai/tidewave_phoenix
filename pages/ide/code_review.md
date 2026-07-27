@@ -1,8 +1,8 @@
 # Code review
 
-You can review code, in real-time, with Tidewave Web.
+You can review code, in real-time, with Tidewave IDE.
 
-<iframe width="640" height="360" src="https://www.youtube.com/embed/vdMetEO7K4Q?si=xcGqoOIXwtR-7QCy" title="Tidewave Code Review" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe width="640" height="360" src="https://www.youtube.com/embed/vdMetEO7K4Q?si=xcGqoOIXwtR-7QCy" title="Tidewave IDE Code Review" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 Our code review is designed around two main workflows:
 
@@ -10,7 +10,7 @@ Our code review is designed around two main workflows:
 
 * **Real-time reviews** — in this scenario, you review the code as the coding agent is working, immediately giving the agent feedback
 
-Tidewave Web enables both by updating the code review pane in real-time and allowing you to mark which code sections (hunks in `git` terms) have been reviewed:
+Tidewave IDE enables both by updating the code review pane in real-time and allowing you to mark which code sections (hunks in `git` terms) have been reviewed:
 
 <img src="assets/review-review.png" alt="Code review: review / unreviewed" width="600px">
 
@@ -26,13 +26,13 @@ Once you have reviewed your changes, you can click the "Commit reviewed" button 
 * **Commit all** - it will stage all changes and ask the agent to commit them
 * **Stage reviewed** - it will stage all reviewed changes
 
-If you ask the agent to commit and you are in your default branch (typically `main`), Tidewave will ask prompt if you want to create a new branch.
+If you ask the agent to commit and you are in your default branch (typically `main`), Tidewave IDE will ask prompt if you want to create a new branch.
 
-All commits done by Tidewave will append a "Assisted-by: Model Version Tidewave" line to the commit message. You can disable this behaviour or provide custom commit and branch naming instructions in Settings.
+All commits done by Tidewave IDE will append a "Assisted-by: Model Version Tidewave IDE" line to the commit message. You can disable this behaviour or provide custom commit and branch naming instructions in Settings.
 
 > #### Opening up diffs and files in your editor {: .tip}
 >
-> If you `Ctrl+Click` (or `Cmd+Click`) a line number, either within the code review or while viewing a file, Tidewave will automatically open up that file+line in your editor of choice.
+> If you `Ctrl+Click` (or `Cmd+Click`) a line number, either within the code review or while viewing a file, Tidewave IDE will automatically open up that file+line in your editor of choice.
 
 ## Configuration
 

@@ -1,6 +1,6 @@
 # Editors/IDEs
 
-Tidewave Web can open up files and page elements directly in your editor.
+Tidewave can open up files and page elements directly in your editor.
 
 Whenever Tidewave renders a file location, you can directly `Ctrl+Click` (or `Cmd+Click`) the filename to open it in your editor. They will be identified with an upward right facing arrow (↗):
 
@@ -16,7 +16,7 @@ There are a few additional places you can open in editor:
 
 ## Custom URLs
 
-Tidewave Web come with built-in support for a few editors.
+Tidewave come with built-in support for a few editors.
 In case your editor is not supported, you can use a custom URL.
 For example, if you are using one of JetBrains IDEs, you may
 configure a custom URL like this:
@@ -46,7 +46,7 @@ it to a custom URL such as:
 
 ## Container configuration
 
-You can also run Tidewave Web inside containers. However,
+You can also run Tidewave inside containers. However,
 when running inside containers, the file paths in the container won't align
 with the paths on the host machine. For this purpose, Tidewave allows setting
 the `TIDEWAVE_HOST_PATH` environment variable in your container, which should

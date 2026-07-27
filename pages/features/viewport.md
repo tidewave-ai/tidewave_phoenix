@@ -1,6 +1,6 @@
 # Viewport
 
-Tidewave Web offers the ability to customize the viewport, allowing developers to simulate different devices. To use it, click on the display icon on the top right:
+Tidewave offers the ability to customize the viewport, allowing developers to simulate different devices. To use it, click on the display icon on the top right:
 
 <img src="assets/viewport.png" alt="Tidewave Viewport" width="600px">
 

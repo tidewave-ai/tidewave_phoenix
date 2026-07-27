@@ -1,10 +1,12 @@
 # Installation
 
-Tidewave is the coding agent for full-stack web app development. Integrate Claude Code, OpenAI Codex, and other agents with your web app and web framework at every layer, from UI to database. [See our website](https://tidewave.ai) for more information.
+Tidewave IDE is an agentic dev environment for Phoenix and Rails. It is an IDE that runs in the browser, allowing your coding agent to seamlessly interact with your web application. [See our Tidewave IDE page](https://tidewave.ai/ide) for more information.
+
+Tidewave IDE is an additional product which requires installing an additional Tidewave App.
 
 ## Installing the app
 
-To get started with Tidewave, download our desktop app:
+To get started with Tidewave IDE, download our desktop app:
 
 * For macOS: [Apple Silicon](https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-app-aarch64.dmg), [Intel](https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-app-x64.dmg)
 * For Linux: [AppImage (x86_64)](https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-app-amd64.AppImage), [AppImage (ARM64)](https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-app-aarch64.AppImage)
@@ -14,26 +16,26 @@ After installation, an icon should appear in your menu bar (top-right on macOS a
 
 We also offer a [CLI](#cli) if you are running your application remotely, inside containers, or other cases where the desktop application is not an option. If you are using Docker, read [our containers guide](../guides/containers.md).
 
-## Running Tidewave
+## Running Tidewave IDE
 
-After installation, you can run the Tidewave application. By default, it will run a service on [`http://localhost:9832`](http://localhost:9832), which you can acess from your favorite browser. Once you do, you will be greeted with this screen:
+After installation, you can run the Tidewave IDE application. By default, it will run a service on [`http://localhost:9832`](http://localhost:9832), which you can acess from your favorite browser. Once you do, you will be greeted with this screen:
 
-![Welcome to Tidewave Web](assets/tidewave-app.png)
+![Welcome to Tidewave IDE](assets/tidewave-app.png)
 
-Then you can put the address of your web application and Tidewave will connect to it. If your web application was not yet configured with Tidewave, you will be prompted to do so, using the links below:
+Then you can put the address of your web application and Tidewave IDE will connect to it. If your web application was not yet configured with Tidewave IDE, you will be prompted to do so, using the links below:
 
-* [Tidewave for Phoenix](https://github.com/tidewave-ai/tidewave_phoenix)
-* [Tidewave for Ruby on Rails](https://github.com/tidewave-ai/tidewave_rails)
-* [Tidewave for TanStack Start](https://github.com/tidewave-ai/tidewave_js#tanstack-start)
-* [Tidewave for Vite](https://github.com/tidewave-ai/tidewave_js#vite)
+* [Tidewave IDE for Phoenix](https://github.com/tidewave-ai/tidewave_phoenix)
+* [Tidewave IDE for Ruby on Rails](https://github.com/tidewave-ai/tidewave_rails)
+* [Tidewave IDE for TanStack Start](https://github.com/tidewave-ai/tidewave_js#tanstack-start)
+* [Tidewave IDE for Vite](https://github.com/tidewave-ai/tidewave_js#vite)
 
-The Tidewave app will remain running on your menu bar (top right on macOS/Linux, bottom right on Windows), you can click it to open up, configure, and update Tidewave.
+The Tidewave IDE app will remain running on your menu bar (top right on macOS/Linux, bottom right on Windows), you can click it to open up, configure, and update Tidewave IDE.
 
-Remember Tidewave must always run on the same machine as your web server is running. If your web server is running on a separate machine, you will want to use our CLI.
+Remember Tidewave IDE must always run on the same machine as your web server is running. If your web server is running on a separate machine, you will want to use our CLI.
 
 ## CLI
 
-For running Tidewave inside containers and other advanced uses, a CLI is also available:
+For running Tidewave IDE inside containers and other advanced uses, a CLI is also available:
 
 * For macOS: [Apple Silicon](https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-cli-aarch64-apple-darwin), [Intel](https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-cli-x86_64-apple-darwin)
 * For Windows: [Windows](https://github.com/tidewave-ai/tidewave_app/releases/latest/download/tidewave-cli-x86_64-pc-windows-msvc.exe)

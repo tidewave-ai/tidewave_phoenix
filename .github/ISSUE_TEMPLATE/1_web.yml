@@ -1,6 +1,6 @@
 ---
-name: Tidewave Web issue
-description: File a bug report related to Tidewave Web
+name: Tidewave issue
+description: File a bug report related to Tidewave
 
 body:
   - type: markdown

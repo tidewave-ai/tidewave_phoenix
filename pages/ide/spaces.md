@@ -1,6 +1,6 @@
 # Spaces
 
-Spaces allows you to connect a single Tidewave Web tab to multiple web applications and manage multiple coding agents side-by-side. They may be different instances of the same application or even different applications altogether.
+Spaces allows you to connect a single Tidewave IDE tab to multiple web applications and manage multiple coding agents side-by-side. They may be different instances of the same application or even different applications altogether.
 
 <img src="assets/spaces-idle.png" alt="Spaces, all idle" width="300px">
 
@@ -16,13 +16,13 @@ Today, developers who want to run multiple coding agents at once in the same app
 
 Our goal with Spaces is not to prescribe a given workflow, rather integrate with your existing practices. For example:
 
-* You can clone your web app to three different directories, run each of them on a separate port, such as 4000, 4001, and 4002, and connect Tidewave to each. No worktrees or additional tools needed.
+* You can clone your web app to three different directories, run each of them on a separate port, such as 4000, 4001, and 4002, and connect Tidewave IDE to each. No worktrees or additional tools needed.
 
-* You can use `worktrunks` to automatically configure worktrees and spawn a web server on a different port for each of them. Then connect Tidewave to it.
+* You can use `worktrunks` to automatically configure worktrees and spawn a web server on a different port for each of them. Then connect Tidewave IDE to it.
 
-* For containers, either local or remote, you can use [Tidewave's Remote Access](../remote_access.md)
+* For containers, either local or remote, you can use [Tidewave IDE's Remote Access](../remote_access.md)
 
-All Tidewave Web needs is the port your web application is running on and you are good to go. You can also connect to unrelated web applications too and Tidewave will neatly organize them in the sidebar.
+All Tidewave IDE needs is the port your web application is running on and you are good to go. You can also connect to unrelated web applications too and Tidewave IDE will neatly organize them in the sidebar.
 
 ## Status indicators
 

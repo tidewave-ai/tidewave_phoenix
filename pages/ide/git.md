@@ -1,6 +1,6 @@
 # Git and pull requests
 
-Tidewave Web directly integrates with Git, allowing developers to swap branches, push/pull, as well as reference pull request reviews and fix CI with the click of a button.
+Tidewave IDE directly integrates with Git, allowing developers to swap branches, push/pull, as well as reference pull request reviews and fix CI with the click of a button.
 
 ## The Git bar
 

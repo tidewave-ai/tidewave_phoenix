@@ -114,7 +114,7 @@ As with any other MCP server, your agent will call the tools exposed by the Tide
 
 Evaluates Elixir code within your running application, giving the agent access to your runtime, dependencies, and in-memory data. It's like an IEx for the agent.
 
-[![project_eval demo](docs/assets/project_eval-poster.png)](https://asciinema.org/a/1260494)
+[![project_eval demo](readme/project_eval-poster.png)](https://asciinema.org/a/1260494)
 
 Your agent can use it when it would rather run code than assume behavior, grounding its next step in what the running app actually does. For example, calling a function to see what comes back or reproducing a failing code path against live app state to debug it.
 
@@ -122,7 +122,7 @@ Your agent can use it when it would rather run code than assume behavior, ground
 
 Executes a SQL query within your app's development database.
 
-[![execute_sql_query demo](docs/assets/execute_sql_query-poster.png)](https://asciinema.org/a/1260504)
+[![execute_sql_query demo](readme/execute_sql_query-poster.png)](https://asciinema.org/a/1260504)
 
 Your agent can use it to run any SQL against your development database. Useful for the agent to verify the result of an action.
 
@@ -130,13 +130,13 @@ Your agent can use it to run any SQL against your development database. Useful f
 
 Get the documentation for a given module/function. It consults the exact versions locked in your project's mix.lock, ensuring you get correct information.
 
-[![get_docs demo](docs/assets/get_docs-poster.png)](https://asciinema.org/a/1260511)
+[![get_docs demo](readme/get_docs-poster.png)](https://asciinema.org/a/1260511)
 
 ### `get_logs`
 
 Reads logs written by the server.
 
-[![get_logs demo](docs/assets/get_logs-poster.png)](https://asciinema.org/a/1260515)
+[![get_logs demo](readme/get_logs-poster.png)](https://asciinema.org/a/1260515)
 
 Your agent can use it to see what happened after a request. For example, reading the request log and backtrace when something misbehaves.
 
@@ -144,7 +144,7 @@ Your agent can use it to see what happened after a request. For example, reading
 
 Get the source location for a given module/function, across both your app and its dependencies.
 
-[![get_source_location demo](docs/assets/get_source_location-poster.png)](https://asciinema.org/a/1260518)
+[![get_source_location demo](readme/get_source_location-poster.png)](https://asciinema.org/a/1260518)
 
 Your agent can use it to jump straight to where a module/function is defined, by file and line, instead of grepping for it, including when the definition lives in a hex dependency.
 
@@ -152,13 +152,13 @@ Your agent can use it to jump straight to where a module/function is defined, by
 
 Lists all Ecto schema modules and their file paths.
 
-[![get_ecto_schemas demo](docs/assets/get_ecto_schemas-poster.png)](https://asciinema.org/a/1260519)
+[![get_ecto_schemas demo](readme/get_ecto_schemas-poster.png)](https://asciinema.org/a/1260519)
 
 ### `get_ash_resources`
 
 Returns all Ash domains and their resources for the current project.
 
-[![get_ash_resources demo](docs/assets/get_ash_resources-poster.png)](https://asciinema.org/a/1260520)
+[![get_ash_resources demo](readme/get_ash_resources-poster.png)](https://asciinema.org/a/1260520)
 
 Only available if you are using Ash.
 

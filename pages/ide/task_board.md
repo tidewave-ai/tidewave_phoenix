@@ -1,6 +1,6 @@
 # Task board
 
-Tidewave Web includes a task board which can be used to share tasks across sessions:
+Tidewave IDE includes a task board which can be used to share tasks across sessions:
 
 ![Task Board](assets/task-board.png)
 
@@ -18,7 +18,7 @@ To use task boards, you must assign a board to a chat before you send the first 
 
 Within the board, you can create, edit, or drag and drop tasks between columns, but the only way to start a task is by asking the agent to work on it.
 
-You can also ask the agent to create or modify tasks on your behalf. You can click the "quote" icon on the top right of the cards to reference them in the chat. If you want to refine a particular section of a task, select which part you want to change and click "Reference in prompt". Tidewave will send the task and that particular section to the agent:
+You can also ask the agent to create or modify tasks on your behalf. You can click the "quote" icon on the top right of the cards to reference them in the chat. If you want to refine a particular section of a task, select which part you want to change and click "Reference in prompt". Tidewave IDE will send the task and that particular section to the agent:
 
 <img src="assets/task-board-select.png" alt="Reference in prompt" width="400">
 
@@ -30,4 +30,4 @@ Task boards have the following limitations:
 
   * You cannot swap or remove the assigned task board after the session starts
 
-  * Task boards have been modelled after Claude Code tasks. When using Claude Code, Tidewave relies on the built-in Claude Code tools. When using other agents, Tidewave injects its own board management tools. For this reasons and in order to enable cross-agent compability, task boards are stored in your `~/.claude/tasks` folder, regardless of the coding agent you are using
+  * Task boards have been modelled after Claude Code tasks. When using Claude Code, Tidewave IDE relies on the built-in Claude Code tools. When using other agents, Tidewave IDE injects its own board management tools. For this reasons and in order to enable cross-agent compability, task boards are stored in your `~/.claude/tasks` folder, regardless of the coding agent you are using
