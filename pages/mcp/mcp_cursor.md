@@ -1,6 +1,8 @@
 # Cursor
 
-You can use Tidewave MCP with [Cursor](https://cursor.com/).
+You can connect [Cursor](https://cursor.com/) to Tidewave through Cursor's MCP support.
+
+## Install
 
 Cursor allows you to place a file at `.cursor/mcp.json`, for configuration
 which is specific to your project. Given Tidewave is explicitly tied to your
@@ -27,8 +29,9 @@ assistant tab and click on the `⋯` icon on the top right and
 choose "Chat Settings". In the new window that opens, you can
 click "MCP" on the sidebar and follow the steps there.
 
-If your application uses a SQL database, you can verify it all works
-by asking it to run `SELECT 1` as database query.
+## Verify
+
+You can verify it all works by starting a new session and asking
+your agent if it can see Tidewave's tools.
 If it fails, check out [our MCP Troubleshooting section](mcp.md#troubleshooting)
 or [Cursor's official docs](https://docs.cursor.com/context/model-context-protocol).
-

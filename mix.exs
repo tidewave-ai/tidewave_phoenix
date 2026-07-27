@@ -112,8 +112,7 @@ defmodule Tidewave.MixProject do
         "pages/mcp/mcp_neovim.md",
         "pages/mcp/mcp_codex.md",
         "pages/mcp/mcp_opencode.md",
-        "pages/mcp/mcp_vscode.md",
-        "pages/mcp/mcp_zed.md"
+        "pages/mcp/mcp_vscode.md"
       ],
       groups_for_extras: [
         Tidewave: ~r/(pages\/features\/.?)/,

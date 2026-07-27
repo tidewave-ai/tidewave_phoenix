@@ -1,10 +1,6 @@
 # OpenAI Codex
 
-You can use Tidewave MCP with OpenAI's [Codex CLI](https://developers.openai.com/codex/cli/)
-
-> #### Tidewave Web vs Tidewave MCP {: .info}
->
-> The instructions here are about connecting Tidewave MCP and Codex together. To use Tidewave Web (the one running in your browser) and Codex, please [read this guide](../ide/providers.md#openai-codex).
+You can connect OpenAI's [Codex CLI](https://developers.openai.com/codex/cli/) to Tidewave via its MCP support.
 
 ## Install
 
