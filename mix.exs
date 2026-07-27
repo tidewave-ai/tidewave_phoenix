@@ -73,7 +73,7 @@ defmodule Tidewave.MixProject do
   defp docs do
     [
       api_reference: false,
-      main: "installation",
+      main: "welcome",
       logo: "logo.svg",
       footer: false,
       assets: %{"pages/assets" => "assets"},
@@ -81,6 +81,7 @@ defmodule Tidewave.MixProject do
         raise "you forgot to add \"@moduledoc false\" to #{inspect(mod)}"
       end,
       extras: [
+        "pages/welcome.md",
         "pages/ide/installation.md",
         "pages/ide/browser_app.md",
         "pages/ide/code_review.md",
@@ -97,12 +98,12 @@ defmodule Tidewave.MixProject do
         "pages/ide/task_board.md",
         "pages/ide/voice_input.md",
         "pages/features/accessibility.md",
+        "pages/features/connect.md",
         "pages/features/editors.md",
         "pages/features/frontend.md",
         "pages/features/inspector.md",
         "pages/features/teams.md",
         "pages/features/ui_variants.md",
-        "pages/features/viewport.md",
         "pages/features/vision_mode.md",
         "pages/guides/security.md",
         "pages/mcp/mcp.md",

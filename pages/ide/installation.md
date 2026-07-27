@@ -2,7 +2,11 @@
 
 Tidewave IDE is an agentic dev environment for Phoenix and Rails. It is an IDE that runs in the browser, allowing your coding agent to seamlessly interact with your web application. [See our Tidewave IDE page](https://tidewave.ai/ide) for more information.
 
-Tidewave IDE is an additional product which requires installing an additional Tidewave App.
+Tidewave IDE is an additional product which requires installing the Tidewave Desktop app.
+
+> #### Tidewave vs Tidewave IDE {: .info}
+>
+> This page is about installing the Tidewave IDE, which is an agentic IDE that runs in your browser. If you are looking for the Tidewave Toolbar and Tideave Connect, [follow the steps to install the Tidewave package instead](https://tidewave.ai/install).
 
 ## Installing the app
 
