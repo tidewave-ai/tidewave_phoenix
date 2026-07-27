@@ -82,6 +82,7 @@ defmodule Tidewave.MixProject do
       end,
       extras: [
         "pages/ide/installation.md",
+        "pages/ide/browser_app.md",
         "pages/ide/code_review.md",
         "pages/ide/containers.md",
         "pages/ide/custom_domains.md",
@@ -96,7 +97,6 @@ defmodule Tidewave.MixProject do
         "pages/ide/task_board.md",
         "pages/ide/voice_input.md",
         "pages/features/accessibility.md",
-        "pages/features/browser_app.md",
         "pages/features/editors.md",
         "pages/features/frontend.md",
         "pages/features/inspector.md",

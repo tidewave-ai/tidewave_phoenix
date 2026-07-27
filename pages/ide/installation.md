@@ -14,7 +14,7 @@ To get started with Tidewave IDE, download our desktop app:
 
 After installation, an icon should appear in your menu bar (top-right on macOS and Linux, bottom-right on Windows).
 
-We also offer a [CLI](#cli) if you are running your application remotely, inside containers, or other cases where the desktop application is not an option. If you are using Docker, read [our containers guide](../guides/containers.md).
+We also offer a [CLI](#cli) if you are running your application remotely, inside containers, or other cases where the desktop application is not an option. If you are using Docker, read [our containers guide](containers.md).
 
 ## Running Tidewave IDE
 
@@ -43,6 +43,6 @@ For running Tidewave IDE inside containers and other advanced uses, a CLI is als
 
 Once the CLI is installed, run it with `./tidewave`. Run `./tidewave --help` for a list of all options. 
 
-For security reasons, the CLI only allows access from the same machine it is running on by default. Furthermore, it enforces that the CLI is being accessed from `localhost` or `127.0.0.1`. If you want to run the CLI on a custom server, you must pass `--allow-remote-access` and `--allowed-origins=https://HOSTNAME:PORT` respectively to change our defaults. You can also [enable HTTPS certificates](../guides/https.md) both for the App and the CLI.
+For security reasons, the CLI only allows access from the same machine it is running on by default. Furthermore, it enforces that the CLI is being accessed from `localhost` or `127.0.0.1`. If you want to run the CLI on a custom server, you must pass `--allow-remote-access` and `--allowed-origins=https://HOSTNAME:PORT` respectively to change our defaults. You can also [enable HTTPS certificates](https.md) both for the App and the CLI.
 
 Both [our App and CLI are open source](https://github.com/tidewave-ai/tidewave_app).

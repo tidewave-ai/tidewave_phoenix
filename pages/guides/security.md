@@ -46,7 +46,7 @@ may perform any action on your machine and therefore must be assessed with care.
 Because Tidewave runs within your web application, if you run your web app within
 Docker or [devcontainers](https://code.visualstudio.com/docs/devcontainers/containers),
 then all of Tidewave actions will also happen within the container, giving you one
-additional level of security. See our [containers.md](containers.md) guide for more
+additional level of security. See our [containers.md](../ide/containers.md) guide for more
 information.
 
 ## Prompt injection

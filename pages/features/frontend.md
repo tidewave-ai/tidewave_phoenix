@@ -2,13 +2,13 @@
 
 Tidewave directly integrates with [React](https://react.dev) and [Vue](https://vuejs.org/). We can automatically detect React and Vue components on the page, [inspect them](inspector.md), and send their source location to the agent.
 
-This page describes running React and Vue within Django, Flask, FastAPI, Phoenix, and Rails applications. If you are using Vite, with TanStack Start or other frameworks, see the [Tidewave.js](http://github.com/tidewave-ai/tidewave_js) project.
+This page describes running React and Vue within Phoenix and Rails applications. If you are using Vite, with TanStack Start or other frameworks, see the [Tidewave.js](http://github.com/tidewave-ai/tidewave_js) project.
 
 ## Requirements
 
 For Tidewave to be capable of changing both your frontend and backend at once, your frontend application must be located in the same Git repository root as your backend project. If they are separate repositories, you can simply create a symlink inside your backend repository pointing to your frontend source code.
 
-Additionally, if your backend (Django, Phoenix, Rails, etc) is the one serving your frontend, no further changes are necessary. However, if your frontend and backend are effectively two different servers in development running on different ports, you will need to proxy the `/tidewave` route in your frontend to your backend. Please see the steps below.
+Additionally, if your backend (Phoenix, Rails, etc) is the one serving your frontend, no further changes are necessary. However, if your frontend and backend are effectively two different servers in development running on different ports, you will need to proxy the `/tidewave` route in your frontend to your backend. Please see the steps below.
 
 Once set up, to verify it is all working as expected, you can [enable the Inspector on the top right](inspector.md) and then hover page elements defined by React/Vue components. By holding the `Ctrl` key (or `Cmd` key on macOS) while the inspector is enabled, a purple overlay will appear with the name of the container component. You may also click the element while `Ctrl` (or `Cmd`) are held and verify Tidewave will open up the appropriate React/Vue source file. See [the Inspector documentation](inspector.md) to learn more.
 

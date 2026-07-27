@@ -4,6 +4,12 @@ UI variants allows your coding agent to propose multiple versions of a page sect
 
 <iframe width="640" height="360" src="https://www.youtube.com/embed/8px8GdpID74?si=MfHsIGPMS9veQR0H" title="Variants in Tidewave" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
+To enable UI variants in the Tidewave Toolbar, simply click the "UI Variants" icon in the prompt composer, which will then become active, and describe :
+
+<img src="assets/variants.png" alt="UI variants example" width="500px">
+
+When using the Tidewave IDE, the agent already knows the existence of UI variants, you imply need to ask it to build different UI variants.
+
 ## How does it work?
 
 The variant system works by instructing the agent to annotate different HTML elements in a page with the `data-tw-container` and `data-tw-variant` attributes. Tidewave automatically teaches your agent how to use those.

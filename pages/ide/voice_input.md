@@ -30,6 +30,6 @@ And choose "On-device" instead of "Default". Once selected, the relevant languag
 
 Here are some useful tips for making the best of voice input:
 
-* While using the voice input, you can still use the [Inspector](inspector.md) or click on lines during [Code Review](code_review.md), and Tidewave IDE should correctly inject them as part of your speech. However, some browsers require you to briefly pause before clicking.
+* While using the voice input, you can still use the [Inspector](../features/inspector.md) or click on lines during [Code Review](code_review.md), and Tidewave IDE should correctly inject them as part of your speech. However, some browsers require you to briefly pause before clicking.
 
 * Use `Ctrl+Shift+M` (or `Cmd+Shift+M` on macOS) to quickly toggle voice input.

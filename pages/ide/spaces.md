@@ -20,7 +20,7 @@ Our goal with Spaces is not to prescribe a given workflow, rather integrate with
 
 * You can use `worktrunks` to automatically configure worktrees and spawn a web server on a different port for each of them. Then connect Tidewave IDE to it.
 
-* For containers, either local or remote, you can use [Tidewave IDE's Remote Access](../remote_access.md)
+* For containers, either local or remote, you can use [Tidewave IDE's Remote Access](remote_access.md)
 
 All Tidewave IDE needs is the port your web application is running on and you are good to go. You can also connect to unrelated web applications too and Tidewave IDE will neatly organize them in the sidebar.
 

@@ -34,7 +34,7 @@ your `.devcontainer/devcontainer.json` with the following:
 }
 ```
 
-You may need to change the Tidewave IDE URL above to match your architecture. Consult our [Installation page](../installation.md#cli) for a complete listing of CLI versions per Operating System.
+You may need to change the Tidewave IDE URL above to match your architecture. Consult our [Installation page](installation.md#cli) for a complete listing of CLI versions per Operating System.
 
 ## Build your own dev container
 

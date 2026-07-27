@@ -12,7 +12,7 @@ There are a few additional places you can open in editor:
 
 * In the [Inspector](../features/inspector.md), `Ctrl+Click` (or `Cmd+Click`) an element pointed by the inspector to open its source
 
-* Whenever viewing a file or a diff during [Code Review](../features/code_review.md), you can `Ctrl+Click` (or `Cmd+Click`) the line number of open up the file at that location
+* Whenever viewing a file or a diff during [Tidewave IDE's Code Review](../ide/code_review.md), you can `Ctrl+Click` (or `Cmd+Click`) the line number of open up the file at that location
 
 ## Custom URLs
 
