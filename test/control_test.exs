@@ -14,9 +14,9 @@ defmodule Tidewave.ControlTest do
     def config(:http), do: [ip: {127, 0, 0, 1}, port: 9000]
   end
 
-  describe "/tidewave/app" do
+  describe "/tidewave/connect" do
     test "uses the control entrypoint" do
-      conn = conn(:get, "/tidewave/app") |> Tidewave.call(Tidewave.init([]))
+      conn = conn(:get, "/tidewave/connect") |> Tidewave.call(Tidewave.init([]))
 
       assert conn.status == 200
       assert get_resp_header_value(conn, "content-type") =~ "text/html"

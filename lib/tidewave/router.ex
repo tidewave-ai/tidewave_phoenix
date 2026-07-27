@@ -21,7 +21,7 @@ defmodule Tidewave.Router do
     |> halt()
   end
 
-  get "/app" do
+  get "/connect" do
     conn
     |> put_resp_content_type("text/html")
     |> put_resp_header("content-security-policy", "base-uri 'self'; frame-ancestors 'self';")
