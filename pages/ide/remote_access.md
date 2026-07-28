@@ -4,7 +4,7 @@ You can run the Tidewave IDE remotely and allow users to remotely access it. Thi
 
 First of all, Tidewave IDE must always run on the same machine as your web application. After all, Tidewave IDE needs access to your project and its files. This means that, when running Tidewave IDE in a remote node, [you must use the Tidewave IDE CLI](installation.md#cli).
 
-Additionally, for security reasons, the Tidewave IDE CLI only allow access from `localhost` and `*.localhost` addresses and it disallows remote access by default. Therefore, if you want to run Tidewave IDE in a separate address than `localhost` or allow remote access, you must configure it accordingly:
+Additionally, for security reasons, the Tidewave IDE CLI only allows access from `localhost` and `*.localhost` addresses and it disallows remote access by default. Therefore, if you want to run Tidewave IDE in a separate address than `localhost` or allow remote access, you must configure it accordingly:
 
 ```
 $ tidewave --allow-remote-access --allowed-origins https://example.com:9898

@@ -4,11 +4,11 @@ Tidewave includes a default inspector integrated with our coding agent. The Insp
 
 ## Usage
 
-You can find the inspector on your Tidewave toolbar.on the top right of your browser window. Once enabled, you can hover page elements:
+You can find the inspector on your Tidewave toolbar, on the top right of your browser window. Once enabled, you can hover page elements:
 
 ![Inspector example](assets/inspector.png)
 
-Clicking any element adds them to your prompt, which you can them copy and submit to your coding agent.
+Clicking any element adds it to your prompt, which you can then copy and submit to your coding agent.
 
 You can click multiple elements and ask multiple elements to be changed at once. Once you send the prompt, Tidewave will include precise information about that element, such as its location on the page, part of its contents, as well as the server-side templates and client components involved in rendering the particular element.
 
@@ -26,7 +26,7 @@ By holding the `Ctrl` key (or `Cmd` key on macOS) while the Inspector is enabled
 
 <iframe width="640" height="360" src="https://www.youtube.com/embed/7bYxfcgaisc?si=R_V5_RF_Vd-rJpvr" title="Tidewave Framework Overlay" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-Clicking the element while the `Ctrl` key (or `Cmd` key on macOS) are pressed will open up the template/component in your [configured editor](editors.md).
+Clicking the element while the `Ctrl` key (or `Cmd` key on macOS) is pressed will open up the template/component in your [configured editor](editors.md).
 
 ## Shortcuts
 

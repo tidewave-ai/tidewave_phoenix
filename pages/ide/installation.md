@@ -6,7 +6,7 @@ Tidewave IDE is an additional product which requires installing the Tidewave Des
 
 > #### Tidewave vs Tidewave IDE {: .info}
 >
-> This page is about installing the Tidewave IDE, which is an agentic IDE that runs in your browser. If you are looking for the Tidewave Toolbar and Tideave Connect, [follow the steps to install the Tidewave package instead](https://tidewave.ai/install).
+> This page is about installing the Tidewave IDE, which is an agentic IDE that runs in your browser. If you are looking for the Tidewave Toolbar and Tidewave Connect, [follow the steps to install the Tidewave package instead](https://tidewave.ai/install).
 
 ## Installing the app
 
@@ -22,7 +22,7 @@ We also offer a [CLI](#cli) if you are running your application remotely, inside
 
 ## Running Tidewave IDE
 
-After installation, you can run the Tidewave IDE application. By default, it will run a service on [`http://localhost:9832`](http://localhost:9832), which you can acess from your favorite browser. Once you do, you will be greeted with this screen:
+After installation, you can run the Tidewave IDE application. By default, it will run a service on [`http://localhost:9832`](http://localhost:9832), which you can access from your favorite browser. Once you do, you will be greeted with this screen:
 
 ![Welcome to Tidewave IDE](assets/tidewave-app.png)
 

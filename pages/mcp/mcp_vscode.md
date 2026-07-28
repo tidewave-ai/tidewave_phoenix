@@ -14,7 +14,7 @@ configure it.
 
 ![VSCode AI panel](assets/vscode.png)
 
-And then at the center top choose "+ Add MCP Server..." and follow one these steps:
+And then at the center top choose "+ Add MCP Server..." and follow these steps:
 
 1. Choose "HTTP (HTTP or Server-Sent events)"
 

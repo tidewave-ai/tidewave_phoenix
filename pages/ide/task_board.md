@@ -30,4 +30,4 @@ Task boards have the following limitations:
 
   * You cannot swap or remove the assigned task board after the session starts
 
-  * Task boards have been modelled after Claude Code tasks. When using Claude Code, Tidewave IDE relies on the built-in Claude Code tools. When using other agents, Tidewave IDE injects its own board management tools. For this reasons and in order to enable cross-agent compability, task boards are stored in your `~/.claude/tasks` folder, regardless of the coding agent you are using
+  * Task boards have been modelled after Claude Code tasks. When using Claude Code, Tidewave IDE relies on the built-in Claude Code tools. When using other agents, Tidewave IDE injects its own board management tools. For these reasons and in order to enable cross-agent compatibility, task boards are stored in your `~/.claude/tasks` folder, regardless of the coding agent you are using

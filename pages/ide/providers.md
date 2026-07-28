@@ -28,7 +28,7 @@ You can control which Copilot models are available to Tidewave IDE in [your GitH
 >
 > It is possible to use a custom `copilot` executable by setting the `TIDEWAVE_COPILOT_CLI_EXECUTABLE` environment variable when starting your web application. This is rarely needed in practice but it may be required in some operating systems like NixOS.
 
-> #### BYOK not supported {: .warn}
+> #### BYOK not supported {: .warning}
 >
 > While GitHub Copilot does support [bringing your own key (BYOK)](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/use-byok-models), this functionality is not available via ACP (the protocol Tidewave IDE uses to communicate with the `copilot` CLI) at the moment. Consider using OpenCode or Codex instead.
 
@@ -40,7 +40,7 @@ Simply open up Tidewave IDE settings, choose the Providers tab, choose "Codex" a
 
 Once connected, we will automatically configure Codex to also use Tidewave MCP. You may disable this option if (and only if) you have already customized Claude Code to use Tidewave MCP.
 
-> #### Custom `codex-acp` installation
+> #### Custom `codex-acp` installation {: .info}
 >
 > Tidewave IDE talks to Codex using the [Codex ACP](https://github.com/agentclientprotocol/claude-agent-acp) project. It is possible to use a custom `codex-acp` executable by setting the `TIDEWAVE_CODEX_ACP_EXECUTABLE` environment variable when starting your web application. This is rarely needed in practice but it may be required in some operating systems like NixOS.
 
@@ -60,7 +60,7 @@ Once connected, we will automatically configure OpenCode to also use Tidewave MC
 
 ## Third-party providers
 
-There are three mechanisms you can extend Tidewave IDE beyond the providers listed above.
+There are three mechanisms by which you can extend Tidewave IDE beyond the providers listed above.
 
 * [By using OpenCode and adding the models of your choice](#opencode-providers). OpenCode supports 75+ different providers, including local ones
 
@@ -78,7 +78,7 @@ You can add new models directly from Tidewave IDE, by clicking the "Add models" 
 
 ### Codex custom providers
 
-Codex comes with the ablity of running custom providers. This can be used to configure [Ollama](https://docs.ollama.com/integrations/codex), OpenRouter, and other OpenAI compatible endpoints.
+Codex comes with the ability of running custom providers. This can be used to configure [Ollama](https://docs.ollama.com/integrations/codex), OpenRouter, and other OpenAI compatible endpoints.
 
 For example, to use Codex with OpenRouter, add the following to `~/.codex/config.toml`:
 

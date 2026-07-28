@@ -12,11 +12,11 @@ There are a few additional places you can open in editor:
 
 * In the [Inspector](../features/inspector.md), `Ctrl+Click` (or `Cmd+Click`) an element pointed by the inspector to open its source
 
-* Whenever viewing a file or a diff during [Tidewave IDE's Code Review](../ide/code_review.md), you can `Ctrl+Click` (or `Cmd+Click`) the line number of open up the file at that location
+* Whenever viewing a file or a diff during [Tidewave IDE's Code Review](../ide/code_review.md), you can `Ctrl+Click` (or `Cmd+Click`) the line number to open up the file at that location
 
 ## Custom URLs
 
-Tidewave come with built-in support for a few editors.
+Tidewave comes with built-in support for a few editors.
 In case your editor is not supported, you can use a custom URL.
 For example, if you are using one of JetBrains IDEs, you may
 configure a custom URL like this:
@@ -33,7 +33,7 @@ additional packages to enable custom URLs.
 
 ## WSL
 
-If you are using Windows System for Linux (WSL), two additional
+If you are using Windows Subsystem for Linux (WSL), two additional
 variables are available:
 
 * `__WSLDISTRO__` - the WSL distribution

@@ -6,7 +6,7 @@ The installation steps for each framework will guide you towards the best securi
 
 ## Server exposure
 
-The Tidewave package runs within your web application and exposes features such as the Tidewave MCP which allows coding agents to control and learn more about your web application. To allow only your coding agent has access to these tools, we have put the following security in place:
+The Tidewave package runs within your web application and exposes features such as the Tidewave MCP which allows coding agents to control and learn more about your web application. To ensure only your coding agent has access to these tools, we have put the following security measures in place:
 
   * **Localhost binding** - Tidewave allows only localhost access by default.
     Furthermore, most web frameworks restrict your web application in development
@@ -34,14 +34,14 @@ may perform any action on your machine and therefore must be assessed with care
 
 Because Tidewave runs within your web application, if you run your web app within
 Docker or [devcontainers](https://code.visualstudio.com/docs/devcontainers/containers),
-then all of Tidewave actions will also happen within the container, giving you one
+then all of Tidewave's actions will also happen within the container, giving you one
 additional level of security. If you are using the Tidewave IDE, you can also run it
 inside [containers](../ide/containers.md).
 
 ## Data collection
 
-Tidewave logs basic request metadata (timestamps, feature used, etc). Prompts are not logged unless you explicitly opt-in.
+Tidewave logs basic request metadata (timestamps, feature used, etc). Prompts are not logged unless you explicitly opt in.
 
-Tideave IDE logs basic request metadata (timestamps, model used, token counts). Prompts and messages are not logged unless you explicitly opt-in. We don't receive, process, or store tool call results. Note the underlying coding agent may store data separately depending on your user agreement with them, that's outside of Tidewave's control.
+Tidewave IDE logs basic request metadata (timestamps, model used, token counts). Prompts and messages are not logged unless you explicitly opt in. We don't receive, process, or store tool call results. Note the underlying coding agent may store data separately depending on your user agreement with them, that's outside of Tidewave's control.
 
 See our [Terms of Service](https://tidewave.ai/terms) and [Privacy Policy](https://tidewave.ai/privacy).

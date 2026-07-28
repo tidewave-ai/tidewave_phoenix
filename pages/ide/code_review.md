@@ -12,9 +12,9 @@ Our code review is designed around two main workflows:
 
 Tidewave IDE enables both by updating the code review pane in real-time and allowing you to mark which code sections (hunks in `git` terms) have been reviewed:
 
-<img src="assets/review-review.png" alt="Code review: review / unreviewed" width="600px">
+<img src="assets/review-review.png" alt="Code review: reviewed / unreviewed" width="600px">
 
-Future changes show as diffs on top of what you've already reviewed, so you no longer end-up reviewing the same code multiple times, regardless if you are working in tandem with the agent (real-time) or reviewing it once it is done.
+Future changes show as diffs on top of what you've already reviewed, so you no longer end up reviewing the same code multiple times, regardless if you are working in tandem with the agent (real-time) or reviewing it once it is done.
 
 Within the code review pane, you can also comment on any change and send it to your agent as feedback, either immediately or queued up for when it finishes its current turn:
 
@@ -26,9 +26,9 @@ Once you have reviewed your changes, you can click the "Commit reviewed" button 
 * **Commit all** - it will stage all changes and ask the agent to commit them
 * **Stage reviewed** - it will stage all reviewed changes
 
-If you ask the agent to commit and you are in your default branch (typically `main`), Tidewave IDE will ask prompt if you want to create a new branch.
+If you ask the agent to commit and you are in your default branch (typically `main`), Tidewave IDE will prompt you if you want to create a new branch.
 
-All commits done by Tidewave IDE will append a "Assisted-by: Model Version Tidewave IDE" line to the commit message. You can disable this behaviour or provide custom commit and branch naming instructions in Settings.
+All commits done by Tidewave IDE will append an "Assisted-by: Model Version Tidewave IDE" line to the commit message. You can disable this behaviour or provide custom commit and branch naming instructions in Settings.
 
 > #### Opening up diffs and files in your editor {: .tip}
 >

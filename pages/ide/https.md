@@ -1,12 +1,12 @@
 # HTTPS support
 
-If you want to run either the Tidewave IDE or your web application over HTTPS, you will need to make sure their configuration match. There are two main ways to do so, depending on what tools you are using:
+If you want to run either the Tidewave IDE or your web application over HTTPS, you will need to make sure their configurations match. There are two main ways to do so, depending on what tools you are using:
 
 1. Configure Caddy or a proxy: this implies you are using a third party tool to expose your application over HTTPS. You can use the same tool to expose Tidewave IDE too. This is often the simplest approach
 
 2. Configure your application and Tidewave IDE: you are directly configuring your framework or build tool to serve over HTTPS, and you need to match Tidewave IDE accordingly
 
-Once setup, please read the Security Considerations section at the end for additional configuration.
+Once set up, please read the Security Considerations section at the end for additional configuration.
 
 ## Configuring Caddy or a proxy
 
@@ -14,7 +14,7 @@ If you are using a proxy to enable HTTPS, we recommend using it to also proxy to
 
 ```caddyfile
 https://localhost:9833 {
-    # Uncommend if you want to use Caddy's own certificate
+    # Uncomment if you want to use Caddy's own certificate
     # tls internal
 
     reverse_proxy http://localhost:9832 {

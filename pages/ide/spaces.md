@@ -10,7 +10,7 @@ Today, developers who want to run multiple coding agents at once in the same app
 
 * They can clone their repositories to different directories and alternate between them
 
-* They can use tools such as [worktrunks](https://worktrunk.dev/) to create and manage Git worktrees
+* They can use tools such as [worktrunk](https://worktrunk.dev/) to create and manage Git worktrees
 
 * They can use multiple containers, either local via Docker or remotely
 
@@ -18,7 +18,7 @@ Our goal with Spaces is not to prescribe a given workflow, rather integrate with
 
 * You can clone your web app to three different directories, run each of them on a separate port, such as 4000, 4001, and 4002, and connect Tidewave IDE to each. No worktrees or additional tools needed.
 
-* You can use `worktrunks` to automatically configure worktrees and spawn a web server on a different port for each of them. Then connect Tidewave IDE to it.
+* You can use `worktrunk` to automatically configure worktrees and spawn a web server on a different port for each of them. Then connect Tidewave IDE to it.
 
 * For containers, either local or remote, you can use [Tidewave IDE's Remote Access](remote_access.md)
 
@@ -32,6 +32,6 @@ Spaces have three status indicators:
 * Green - the space has completed the current task
 * Yellow - the space is blocked on your input
 
-You can see the status of each space on the sidebar. And the sidebar icon will show the reflect the color with highest priority:
+You can see the status of each space on the sidebar. And the sidebar icon will reflect the color with highest priority:
 
 <img src="assets/spaces-status.png" alt="Spaces, with different statuses" width="300px">

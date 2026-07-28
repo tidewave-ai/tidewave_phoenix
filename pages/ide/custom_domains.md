@@ -16,7 +16,7 @@ At the moment, a single Tidewave IDE session cannot navigate across domains, so 
 
 ## Configuring Cookies
 
-To configure your cookies to use `SameSite=None; Secure` across different frameworks, follow the step below. Note this requires you to run your application on a secure host, such as `localhost` and `*.localhost`, or use [HTTPS](https.md).
+To configure your cookies to use `SameSite=None; Secure` across different frameworks, follow the steps below. Note this requires you to run your application on a secure host, such as `localhost` and `*.localhost`, or use [HTTPS](https.md).
 
 <!-- tabs-open -->
 
