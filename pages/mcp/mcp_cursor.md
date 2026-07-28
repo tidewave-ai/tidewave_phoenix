@@ -24,7 +24,7 @@ Replace `$PORT` by the port your web application is running on.
 
 If you prefer, you can also add Tidewave globally to your editor
 by adding the same contents as above to the `~/.cursor/mcp.json`
-file. If you have trouble locating such file, open up Cursor's
+file. If you have trouble locating that file, open up Cursor's
 assistant tab and click on the `⋯` icon on the top right and
 choose "Chat Settings". In the new window that opens, you can
 click "MCP" on the sidebar and follow the steps there.

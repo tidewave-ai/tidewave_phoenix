@@ -10,7 +10,7 @@ The Git bar (at the bottom of the screenshot) allows developers to see and acces
 
 1. Shows the current branch. On click, it allows developers to switch branches, push/pull to the current branch, and open up pull requests
 
-2. Shows GitHub's pull request status. On mouse over it links to the pull request, show CI checks, reviews, and merge status. Requires [the GitHub CLI (gh)](https://cli.github.com)
+2. Shows GitHub's pull request status. On mouse over it links to the pull request, shows CI checks, reviews, and merge status. Requires [the GitHub CLI (gh)](https://cli.github.com)
 
 3. Shows unpushed commits. On mouse over, lists all unpushed commits, with convenient shortcuts to reword the last commit message and to push
 
@@ -26,10 +26,10 @@ Search and switch branches, create new branches, fetch origin, push, pull, and o
 
 <img src="assets/git-pr.png" alt="Git bar" width="640px">
 
-Access pull requeqst information, visualize CI checks, reviews, and merge status. Click on "Fix failures" to fetch logs from GitHub Actions runs and fix them. Click "View comments" to see reviews and pull request comments, and reference them them in your chat prompt.
+Access pull request information, visualize CI checks, reviews, and merge status. Click on "Fix failures" to fetch logs from GitHub Actions runs and fix them. Click "View comments" to see reviews and pull request comments, and reference them in your chat prompt.
 
 ## Unpushed commits
 
 <img src="assets/git-push.png" alt="Git bar" width="640px">
 
-Shows unpushed commits whenever you branch is ahead remote. You can reword the latest commit message or click a single button to push.
+Shows unpushed commits whenever your branch is ahead of remote. You can reword the latest commit message or click a single button to push.

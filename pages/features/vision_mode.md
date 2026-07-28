@@ -12,7 +12,7 @@ Once enabled, you can copy the instructions that will guide your agent to captur
 
 Screenshots are always fed back into the coding agent. Videos are for your consumption (none of the supported coding agents accept videos as input).
 
-Videos by default include overlays, animations, and sound effects (which you may ask the agent to disable). You may also opt-in into voice narration.
+Videos by default include overlays, animations, and sound effects (which you may ask the agent to disable). You may also opt into voice narration.
 
 > #### Browser support {: .info}
 >
@@ -24,11 +24,11 @@ Videos by default include overlays, animations, and sound effects (which you may
 
 ## Voice narration
 
-You can enable voice narration, so the coding agent itself narrate the videos it records. To do so, [an ElevenLabs API key will be necessary](https://elevenlabs.io/).
+You can enable voice narration, so the coding agent itself narrates the videos it records. To do so, [an ElevenLabs API key will be necessary](https://elevenlabs.io/).
 
 The following video uses the "Voice narration" feature to show you how to enable it and how it works. It also includes animations and sound effects:
 
-<iframe width="640" height="360" src="https://www.youtube.com/embed/U4CCBWmu2D0?si=XgMnDTWoWWhSkGwu" title="Tidewave agentic video recoding + narration" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe width="640" height="360" src="https://www.youtube.com/embed/U4CCBWmu2D0?si=XgMnDTWoWWhSkGwu" title="Tidewave agentic video recording + narration" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 For completeness, here is the prompt used to record the video above:
 
@@ -58,7 +58,7 @@ If you are using the Tidewave IDE, you can enable vision mode on the top right i
 
 <img src="assets/vision-enable.png" alt="Enable vision mode" height="300px">
 
-From now on, whenever the agent takes a screenshot or record a video, you will see thumbnails below the associated tool call:
+From now on, whenever the agent takes a screenshot or records a video, you will see thumbnails below the associated tool call:
 
 <div>
 <img src="assets/vision-screenshot.png" alt="Agentic screenshot" width="400px">
@@ -67,7 +67,7 @@ From now on, whenever the agent takes a screenshot or record a video, you will s
 
 Screenshots are always fed back into the coding agent. Videos are for your consumption (none of the supported coding agents accept videos as input).
 
-Videos by default include overlays, animations, and sound effects (which you may ask the agent to disable). You may also opt-in into voice narration.
+Videos by default include overlays, animations, and sound effects (which you may ask the agent to disable). You may also opt into voice narration.
 
 ## Tips
 

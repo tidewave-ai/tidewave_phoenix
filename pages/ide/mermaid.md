@@ -6,7 +6,7 @@ Tidewave IDE can render Mermaid diagrams, all you need to do is ask your coding 
 
 You can use Mermaid in Tidewave IDE for:
 
-* Visualizing existing code: Tidewave IDE could analyze existing code and generate diagrams to help developers understand relationship between modules, files, etc
+* Visualizing existing code: Tidewave IDE could analyze existing code and generate diagrams to help developers understand relationships between modules, files, etc
 
 * Documentation generation: after implementing a feature, Tidewave IDE can generate sequence diagrams showing the request/response flow, architecture diagrams, state transitions, and others
 

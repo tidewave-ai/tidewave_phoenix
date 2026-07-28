@@ -18,7 +18,7 @@ To enable Tidewave Connect, simply install the [Tidewave MCP](../mcp/mcp.md) in 
 
 Tidewave connects your coding agent to your browser via your web app. If your app is running on `localhost:4000`, your coding agent should connect to `localhost:4000/tidewave/mcp` and you should open up your browser at `localhost:4000/tidewave`, and now your coding agent will be able to control your browser. Consequently:
 
-* You can open up `localhost:4000/tidewave` in three different browsers and your coding agent should be able capable of managing sessions on each of them
+* You can open up `localhost:4000/tidewave` in three different browsers and your coding agent should be capable of managing sessions on each of them
 
 * Each Tidewave Connect session is per domain/origin, due to browser restrictions. Therefore, if your application runs on `localhost:4000` and `admin.localhost:4000`, you will likely require two Tidewave Connect sessions
 

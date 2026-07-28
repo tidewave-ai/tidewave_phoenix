@@ -52,7 +52,7 @@ When you use another editor than VSCode, you can build a similar experience to
 devcontainer, with your web app and Tidewave IDE running inside Docker, but your
 editor on your local machine.
 
-First, because you usally have some external systems you depend on, for example
+First, because you usually have some external systems you depend on, for example
 a Postgres database, let's define a `docker-compose.dev.yml` file inside your
 project:
 
@@ -138,7 +138,7 @@ through a different IP.
 You could configure your project to listen on all addresses in development, but this
 could lead to security issues if you sometimes also run your project outside of Docker.
 If you are using databases or other resources, such as Redis, you must also forward them.
-The examples above assume there is a PostgreSQL instance running on port 5421 and
+The examples above assume there is a PostgreSQL instance running on port 5432 and
 therefore we also use socat to forward any traffic from port 5432 to the `db` container.
 
 To comfortably start the container with all network settings, let's also create a
