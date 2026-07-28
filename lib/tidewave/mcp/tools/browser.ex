@@ -7,25 +7,33 @@ defmodule Tidewave.MCP.Tools.Browser do
     [
       %{
         name: "browser_eval",
-        description: description(),
+        description: """
+        Runs JavaScript in a real browser interacting with the application.
+
+        You MUST use "help" action first to learn the full API.
+        """,
         inputSchema: %{
           type: "object",
           properties: %{
+            action: %{
+              type: "string",
+              enum: ["help", "eval"]
+            },
             code: %{
               type: "string",
               description:
-                "JavaScript that interacts with the page. It MUST use the global `browser` object API. Omit it on the first call to handshake and discover a session and the API."
+                "JavaScript that interacts with the page. It MUST use the global `browser` object API."
             },
             sid: %{
               type: "string",
-              description:
-                "The session to target, e.g. \"nice-cactus#1\". Omit it to use a new primary session (returned to you as `sid`)."
+              description: ~S|The session to target, e.g. "nice-cactus#1".|
             },
             timeout: %{
               type: "number",
               description: "Timeout in milliseconds. Defaults to 45000."
             }
-          }
+          },
+          required: ["action"]
         },
         callback: &browser_eval/2
       }
@@ -40,15 +48,12 @@ defmodule Tidewave.MCP.Tools.Browser do
         BrowserSessions.run(sid, "browser_eval", args, eval_timeout(args))
         |> direct_result(sid, url)
 
-      %{"code" => ""} ->
+      %{"action" => "help"} ->
         # the broadcast case is only expected to run for initial discovery
         broadcast("browser_eval", args, 5_000) |> broadcast_result(url)
 
-      args when not is_map_key(args, "code") ->
-        broadcast("browser_eval", args, 5_000) |> broadcast_result(url)
-
-      _ ->
-        {:error, "browser_eval requires a `sid` when `code` is not empty."}
+      %{"action" => action} ->
+        {:error, ~s|browser_eval requires a "sid" for action "#{action}".|}
     end
   end
 
@@ -105,19 +110,5 @@ defmodule Tidewave.MCP.Tools.Browser do
       ms when is_integer(ms) and ms > 0 -> min(ms + 5_000, 60_000)
       _ -> 15_000
     end
-  end
-
-  defp description do
-    """
-    Runs JavaScript in a real browser page that Tidewave controls (an iframe in your \
-    application, on the same origin), to validate UI-affecting changes.
-
-    Call it with NO arguments first: that connects to an open browser session and returns \
-    its `sid` along with the full `browser` API documentation. Then call again with `code` \
-    (and the `sid` you were given) to interact with the page.
-
-    Use it to verify visibility, text, state, and interactions - DO NOT use it to validate
-    design, styles, or general CSS.
-    """
   end
 end
