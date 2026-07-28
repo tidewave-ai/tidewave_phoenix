@@ -42,6 +42,12 @@ find module/function definitions.
 
 You can customize the rule to match your workflow.
 
+> #### Exclude browser tools {: .info}
+>
+> By default, the Tidewave MCP will include browser tools, such `browser_eval`.
+> If you don't plan to use browser tools, you can set your MCP URL to
+> `/tidewave/mcp?include_browser_tools=false`.
+
 ## Troubleshooting
 
 This page contains several steps to help debug issues when integrating Tidewave with an editor or MCP client. There are usually three distinct components to investigate:
