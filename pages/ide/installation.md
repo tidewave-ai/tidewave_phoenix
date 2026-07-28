@@ -30,8 +30,8 @@ Then you can put the address of your web application and Tidewave IDE will conne
 
 * [Tidewave IDE for Phoenix](https://github.com/tidewave-ai/tidewave_phoenix)
 * [Tidewave IDE for Ruby on Rails](https://github.com/tidewave-ai/tidewave_rails)
-* [Tidewave IDE for TanStack Start](https://github.com/tidewave-ai/tidewave_js#tanstack-start)
-* [Tidewave IDE for Vite](https://github.com/tidewave-ai/tidewave_js#vite)
+* [Tidewave IDE for TanStack Start](https://github.com/tidewave-ai/tidewave_js)
+* [Tidewave IDE for Vite](https://github.com/tidewave-ai/tidewave_js)
 
 The Tidewave IDE app will remain running on your menu bar (top right on macOS/Linux, bottom right on Windows), you can click it to open up, configure, and update Tidewave IDE.
 
