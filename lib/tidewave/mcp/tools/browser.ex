@@ -65,7 +65,7 @@ defmodule Tidewave.MCP.Tools.Browser do
     end
   end
 
-  defp direct_result({:ok, result}, _sid, _url), do: {:ok, result}
+  defp direct_result({:ok, %{"result" => result}}, _sid, _url), do: {:ok, result}
 
   defp direct_result({:error, :invalid_sid}, sid, _url) do
     {:error, "Invalid sid \"#{sid}\". A sid looks like \"nice-cactus#1\"."}
@@ -86,7 +86,7 @@ defmodule Tidewave.MCP.Tools.Browser do
      "The browser disconnected before responding. Open #{url}/tidewave in your browser to open a new session."}
   end
 
-  defp broadcast_result({:ok, result}, _url), do: {:ok, result}
+  defp broadcast_result({:ok, %{"result" => result}}, _url), do: {:ok, result}
   defp broadcast_result({:error, :no_clients}, url), do: {:error, no_browser_message(url)}
   defp broadcast_result({:error, :timeout}, url), do: {:error, no_browser_message(url)}
 
