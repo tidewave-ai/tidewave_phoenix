@@ -1,4 +1,4 @@
-# Browser connect
+# Connect
 
 Tidewave Connect allows your coding agent to connect to your browser and control your web application:
 
@@ -18,11 +18,15 @@ To enable Tidewave Connect, simply install the [Tidewave MCP](../mcp/mcp.md) in 
 
 Tidewave connects your coding agent to your browser via your web app. If your app is running on `localhost:4000`, your coding agent should connect to `localhost:4000/tidewave/mcp` and you should open up your browser at `localhost:4000/tidewave`, and now your coding agent will be able to control your browser. Consequently:
 
-* You can open up `localhost:4000/tidewave` in three different browsers and your coding agent should be capable of managing sessions on each of them
+* You can open up `localhost:4000/tidewave` in three different browsers and your coding agent should be capable to connect to each of them
 
-* Each Tidewave Connect session is per domain/origin, due to browser restrictions. Therefore, if your application runs on `localhost:4000` and `admin.localhost:4000`, you will likely require two Tidewave Connect sessions
+* Tidewave Connect is per domain/origin, due to browser restrictions. Therefore, if your application runs on `localhost:4000` and `admin.localhost:4000`, you will have to open `/tidewave` per host
 
-* Similarly, if you want to manage remote sessions, such as `myapp.staging.example.com`, you simply need to connect your coding agent to `myapp.staging.example.com/tidewave/mcp` and open `myapp.staging.example.com/tidewave` in your browser, and you are good to go
+* Similarly, if you want to establish remote connections, such as `myapp.staging.example.com`, you simply need to connect your coding agent to `myapp.staging.example.com/tidewave/mcp` and open `myapp.staging.example.com/tidewave` in your browser, and you are good to go
+
+## Multiple sessions
+
+Once connected to a particular browser, your coding agent gets its own session, but the agent can start as many sessions as it wants on demand. This means you can trivially run parallel workflows. For example, you can ask your coding agent to spawn a few subagents to navigate through the website, looking for bugs, security gaps, etc.
 
 ## Viewport
 
