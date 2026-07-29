@@ -74,7 +74,7 @@ defmodule Tidewave.MCP.Tools.Browser do
   defp direct_result({:error, :unknown_client}, sid, _url) do
     {:error,
      "No connected browser owns sid \"#{sid}\". It may have disconnected — " <>
-       "call browser_eval with no arguments to discover a live session."}
+       "call browser_eval({\"action\": \"new-session\"}) to start a new one."}
   end
 
   defp direct_result({:error, :timeout}, _sid, _url) do
@@ -82,8 +82,7 @@ defmodule Tidewave.MCP.Tools.Browser do
   end
 
   defp direct_result({:error, :disconnected}, _sid, url) do
-    {:error,
-     "The browser disconnected before responding. Open #{url}/tidewave in your browser to open a new session."}
+    {:error, "The browser disconnected before responding. " <> open_message(url)}
   end
 
   defp broadcast_result({:ok, %{"result" => result}}, _url), do: {:ok, result}
@@ -91,7 +90,10 @@ defmodule Tidewave.MCP.Tools.Browser do
   defp broadcast_result({:error, :timeout}, url), do: {:error, no_browser_message(url)}
 
   defp no_browser_message(url) do
-    "No browser is connected to the Tidewave control page. " <>
-      "Open #{url}/tidewave in your browser and try again."
+    "No browser is connected to the Tidewave control page. " <> open_message(url)
+  end
+
+  defp open_message(url) do
+    "Use the `open` command (or similar) to open #{url}/tidewave in the browser and try again"
   end
 end

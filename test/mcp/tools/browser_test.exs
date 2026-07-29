@@ -9,9 +9,8 @@ defmodule Tidewave.MCP.Tools.BrowserTest do
     test "errors when no sid is given and no browser is connected" do
       assert {:error, message} = Browser.browser_eval(%{"action" => "help"}, @assigns)
 
-      assert message ==
-               "No browser is connected to the Tidewave control page. " <>
-                 "Open http://localhost:4000/tidewave in your browser and try again."
+      assert message =~
+               "No browser is connected to the Tidewave control page. Use the `open` command"
     end
 
     test "broadcasts when the sid is blank" do
