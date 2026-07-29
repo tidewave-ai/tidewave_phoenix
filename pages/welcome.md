@@ -24,4 +24,4 @@ Additionally, the sidebar is organized as follows:
 
 * Tidewave IDE: an optional tool that runs an agentic dev environment, for Phoenix and Rails, in your browser
 
-* Guides: a general collection of articles on assorted topics
+* References: a general collection of articles on assorted topics

@@ -8,7 +8,9 @@ To enable UI variants in the Tidewave Toolbar, simply click the "UI Variants" ic
 
 <img src="assets/variants.png" alt="UI variants example" width="500px">
 
-When using the Tidewave IDE, the agent already knows the existence of UI variants, you simply need to ask it to build different UI variants.
+> #### Tidewave IDE {: .info}
+>
+> When using the Tidewave IDE, the agent already knows about the existence of UI variants, you simply need to ask it to build different UI variants of the selected component.
 
 ## How does it work?
 

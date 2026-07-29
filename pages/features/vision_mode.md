@@ -14,6 +14,10 @@ Screenshots are always fed back into the coding agent. Videos are for your consu
 
 Videos by default include overlays, animations, and sound effects (which you may ask the agent to disable). You may also opt into voice narration.
 
+> #### Tidewave IDE {: .info}
+>
+> Vision mode is also available in the Tidewave IDE by clicking the video icon on the top right.
+
 > #### Browser support {: .info}
 >
 > Vision mode depends on the [RestrictionTarget API](https://developer.mozilla.org/en-US/docs/Web/API/RestrictionTarget/fromElement_static#browser_compatibility), which is, at the moment, available only on Chromium based browsers (Chrome, Edge, etc).

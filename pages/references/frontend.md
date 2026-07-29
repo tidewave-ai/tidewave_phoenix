@@ -1,4 +1,4 @@
-# Frontend
+# React and Vue
 
 Tidewave directly integrates with [React](https://react.dev) and [Vue](https://vuejs.org/). We can automatically detect React and Vue components on the page, [inspect them](inspector.md), and send their source location to the agent.
 

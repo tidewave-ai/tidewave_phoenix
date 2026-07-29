@@ -99,13 +99,13 @@ defmodule Tidewave.MixProject do
         "pages/ide/voice_input.md",
         "pages/features/accessibility.md",
         "pages/features/connect.md",
-        "pages/features/editors.md",
-        "pages/features/frontend.md",
         "pages/features/inspector.md",
-        "pages/features/teams.md",
         "pages/features/ui_variants.md",
         "pages/features/vision_mode.md",
-        "pages/guides/security.md",
+        "pages/references/editors.md",
+        "pages/references/frontend.md",
+        "pages/references/teams.md",
+        "pages/references/security.md",
         "pages/mcp/mcp.md",
         "pages/mcp/mcp_claude_code.md",
         "pages/mcp/mcp_cursor.md",
@@ -115,10 +115,11 @@ defmodule Tidewave.MixProject do
         "pages/mcp/mcp_vscode.md"
       ],
       groups_for_extras: [
+        Welcome: "pages/welcome.md",
         Tidewave: ~r/(pages\/features\/.?)/,
         "Tidewave MCP": ~r/pages\/mcp\/.?/,
         "Tidewave IDE": ~r/(pages\/ide\/.?)/,
-        Guides: ~r/(pages\/guides\/.?)/
+        References: ~r/(pages\/references\/.?)/
       ],
       redirects: %{
         "react" => "frontend",

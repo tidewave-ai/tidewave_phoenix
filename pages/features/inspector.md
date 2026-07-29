@@ -12,6 +12,10 @@ Clicking any element adds it to your prompt, which you can then copy and submit 
 
 You can click multiple elements and ask multiple elements to be changed at once. Once you send the prompt, Tidewave will include precise information about that element, such as its location on the page, part of its contents, as well as the server-side templates and client components involved in rendering the particular element.
 
+> #### Tidewave IDE {: .info}
+>
+> The inspector is also available in the Tidewave IDE by clicking the inspector icon on the top right.
+
 ## Depth-based inspector
 
 Sometimes you may want to select an element that is behind another element. To do so, simply right-click any position and Tidewave will open up a contextual menu with all DOM elements at the chosen point! Then you can either use the keyboard or the mouse to select the desired element:
