@@ -8,7 +8,7 @@ defmodule Tidewave.MCP.Tools.Browser do
       %{
         name: "browser_eval",
         description: """
-        Runs JavaScript in a real browser interacting with the application.
+        Runs JavaScript in a real browser to interact with the application.
 
         You MUST use "help" action first to learn the full API.
         """,
@@ -16,21 +16,16 @@ defmodule Tidewave.MCP.Tools.Browser do
           type: "object",
           properties: %{
             action: %{
-              type: "string",
-              enum: ["help", "eval"]
-            },
-            code: %{
-              type: "string",
-              description:
-                "JavaScript that interacts with the page. It MUST use the global `browser` object API."
+              type: "string"
             },
             sid: %{
               type: "string",
               description: ~S|The session to target, e.g. "nice-cactus#1".|
             },
-            timeout: %{
-              type: "number",
-              description: "Timeout in milliseconds. Defaults to 45000."
+            args: %{
+              type: "object",
+              additionalProperties: true,
+              description: ~S|Parameters for the action, as documented by "help".|
             }
           },
           required: ["action"]
@@ -45,15 +40,12 @@ defmodule Tidewave.MCP.Tools.Browser do
 
     case args do
       %{"sid" => sid} when is_binary(sid) and sid != "" ->
-        BrowserSessions.run(sid, "browser_eval", args, eval_timeout(args))
+        BrowserSessions.run(sid, "browser_eval", args, :infinity)
         |> direct_result(sid, url)
 
-      %{"action" => "help"} ->
+      %{} ->
         # the broadcast case is only expected to run for initial discovery
         broadcast("browser_eval", args, 5_000) |> broadcast_result(url)
-
-      %{"action" => action} ->
-        {:error, ~s|browser_eval requires a "sid" for action "#{action}".|}
     end
   end
 
@@ -101,14 +93,5 @@ defmodule Tidewave.MCP.Tools.Browser do
   defp no_browser_message(url) do
     "No browser is connected to the Tidewave control page. " <>
       "Open #{url}/tidewave in your browser and try again."
-  end
-
-  # Server-side wait: a little longer than the browser's own timeout so the
-  # browser's result (or its own timeout) comes back before we give up.
-  defp eval_timeout(args) do
-    case args["timeout"] do
-      ms when is_integer(ms) and ms > 0 -> min(ms + 5_000, 60_000)
-      _ -> 15_000
-    end
   end
 end
