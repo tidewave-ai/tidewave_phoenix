@@ -2,7 +2,7 @@
 
 UI variants allows your coding agent to propose multiple versions of a page section or UI component, integrated directly with your web framework:
 
-<iframe width="640" height="360" src="https://www.youtube.com/embed/8px8GdpID74?si=MfHsIGPMS9veQR0H" title="Variants in Tidewave" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/nnwckXZgnmY?si=x2grzQd8uuBjyply" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 To enable UI variants in the Tidewave Toolbar, simply click the "UI Variants" icon in the prompt composer, which will then become active, and describe the variants you want:
 
