@@ -1,4 +1,4 @@
-# Connect
+# Browser automation (Connect)
 
 Tidewave Connect allows your coding agent to connect to your browser and control your web application:
 
@@ -7,6 +7,8 @@ Tidewave Connect allows your coding agent to connect to your browser and control
 It is similar to tools like [Playwright](https://playwright.dev) or the browser in your editor, with a few notable differences:
 
 * **Uses your browser**: Tidewave uses your existing browser and sessions, making it much easier for the agent to see and debug the same page you are working with
+
+* **Integrated framework diagnostics**: Tidewave automatically detects client defects and server errors while your agent navigates, allowing your agent to spot defects before their hit production 
 
 * **Error handling**: Because Tidewave understands your framework, it automatically recognizes error pages and feeds stacktraces, logs, framework metadata to the agent
 
