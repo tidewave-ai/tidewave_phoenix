@@ -30,9 +30,15 @@ Once connected to a particular browser, your coding agent gets its own session, 
 
 > #### Adversarial UI testing {: .tip}
 >
-> When developing new features, you can ask your coding agent to perform adversarial testing by spawning multiple agents, each with their own session, looking for bugs, exploring corner cases, and usability issues. Here is a sample paragraph:
+> When developing new features, you can ask your coding agent to perform adversarial testing by spawning multiple agents, each with their own session, looking for bugs, exploring corner cases, and usability issues. Here is a sample prompt:
 >
-> > Use Tidewave's `browser_eval` to perform adversarial testing of the feature implemented. Try to break features (click twice rapidly, submit empty forms, use the back button, etc) and corner cases (empty states, form recovery, invalid inputs, etc).
+> > Use Tidewave's `browser_eval` to perform adversarial testing of the feature implemented. Come up with different ideas to break features (click twice rapidly, submit empty forms, use the back button, etc) and corner cases (empty states, form recovery, invalid inputs, etc) and spawn subagents to try them. Each subagent should start its own `browser_eval` session.
+
+> #### Parallel accessibility screening {: .tip}
+>
+> You can ask your coding agent to scan the accessibility of your website in parallel, finding accessibility violations, and either fixing them or reporting them back. Here is a sample prompt:
+>
+> > Use Tidewave's `browser_eval` to improve the accessibility of the website by invoking `browser.accessibilityReport()`. First, do an initial scan and address any bugs in the layout (which would be shared across pages). Then select several routes/pages to assess and spawn a subagent for each of them.
 
 ## Viewport
 
