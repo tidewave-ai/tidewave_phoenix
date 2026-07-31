@@ -28,6 +28,12 @@ Tidewave connects your coding agent to your browser via your web app. If your ap
 
 Once connected to a particular browser, your coding agent gets its own session, but the agent can start as many sessions as it wants on demand. This means you can trivially run parallel workflows. For example, you can ask your coding agent to spawn a few subagents to navigate through the website, looking for bugs, security gaps, etc.
 
+> #### Adversarial UI testing {: .tip}
+>
+> When developing new features, you can ask your coding agent to perform adversarial testing by spawning multiple agents, each with their own session, looking for bugs, exploring corner cases, and usability issues. Here is a sample paragraph:
+>
+> > Use Tidewave's `browser_eval` to perform adversarial testing of the feature implemented. Try to break features (click twice rapidly, submit empty forms, use the back button, etc) and corner cases (empty states, form recovery, invalid inputs, etc).
+
 ## Viewport
 
 Tidewave Connect offers the ability to customize the viewport, allowing developers to simulate different devices. To use it, click on the display icon on the top right:
