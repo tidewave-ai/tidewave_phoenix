@@ -30,27 +30,9 @@ Videos by default include overlays, animations, and sound effects (which you may
 
 You can enable voice narration, so the coding agent itself narrates the videos it records. To do so, [an ElevenLabs API key will be necessary](https://elevenlabs.io/).
 
-The following video uses the "Voice narration" feature to show you how to enable it and how it works. It also includes animations and sound effects:
+The following video uses the "Voice narration". It also includes animations and sound effects:
 
-<iframe width="640" height="360" src="https://www.youtube.com/embed/U4CCBWmu2D0?si=XgMnDTWoWWhSkGwu" title="Tidewave agentic video recording + narration" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-
-For completeness, here is the prompt used to record the video above:
-
-```text
-Please record the following video:
-
-overlay: This is Tidewave's video recorder.
-
-overlay: First add your Eleven Labs API key
-open up settings, focus on this element: {Selected element <div>}
-
-overlay: Then tell your agent what to record
-now close settings, focus on {Selected element <div>}
-(use 2x zoom in), and type "make an awesome video!", zoom out
-```
-
-The `{Selected element <div>}` snippets are page elements selected with
-our [Inspector](inspector.md) feature.
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/V55wcYMDueI?si=m3_DfPn269no-kf-" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 > #### ElevenLabs API key {: .info}
 >
