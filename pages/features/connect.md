@@ -8,9 +8,7 @@ It is similar to tools like [Playwright](https://playwright.dev) or the browser 
 
 * **Uses your browser**: Tidewave uses your existing browser and sessions, making it much easier for the agent to see and debug the same page you are working with
 
-* **Integrated framework diagnostics**: Tidewave automatically detects client defects and server errors while your agent navigates, allowing your agent to spot defects before their hit production 
-
-* **Error handling**: Because Tidewave understands your framework, it automatically recognizes error pages and feeds stacktraces, logs, framework metadata to the agent
+* **Integrated error handling and diagnostics**: Because Tidewave understands your framework, it runs custom client diagnostics, helping your agent spot defects before they hit production, and automatically recognizes error pages, feeding stacktraces, logs, framework metadata to the agent
 
 * **Vision mode**: [Tidewave's vision mode](vision_mode.md) includes the ability to record videos with captions, narration, and other bells and whistles for proof of work
 
