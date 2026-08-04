@@ -10,6 +10,8 @@ Tidewave is the complete AI dev toolkit for full-stack Phoenix and Rails. It is 
 
 * [Tidewave MCP](mcp/mcp.md): connect your coding agent to your web framework, allowing it to run code, query your database, read the docs for your exact dependencies and more
 
+* [Tidewave IDE](ide/installation.md): an agentic dev environment for Phoenix and Rails. It is an IDE that runs in the browser, allowing your coding agent to seamlessly interact with your web application. It is a separate product you may opt into using
+
 To get started with Tidewave, [follow the installation steps from the website](https://tidewave.ai/install) and then [configure your coding agent to use Tidewave as a MCP](mcp/mcp.md).
 
 ### How to read these docs
