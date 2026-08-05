@@ -22,7 +22,7 @@ defmodule Tidewave.MCP.Tools.Browser do
               type: "string",
               description: ~S|The session to target, e.g. "nice-cactus#1".|
             },
-            args: %{
+            action_inputs: %{
               type: "object",
               additionalProperties: true,
               description: ~S|Parameters for the action, as documented by "help".|
