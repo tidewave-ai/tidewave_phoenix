@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.8.2 (2026-08-05)
+
+* Use `action_inputs` for `browser_eval`
+
 ## v0.8.1 (2026-07-29)
 
 * Add Tidewave Connect support
