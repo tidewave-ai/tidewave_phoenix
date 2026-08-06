@@ -1,5 +1,7 @@
 # Tidewave Phoenix
 
+[![MCP Toplist](https://mcptoplist.com/badge/io.github.tidewave-ai%2Ftidewave-phoenix.svg)](https://mcptoplist.com/server/io.github.tidewave-ai%2Ftidewave-phoenix)
+
 Tidewave Phoenix is an MCP server that provides runtime-level tools for developing Phoenix apps using coding agents.
 
 Your agent will be able to use this MCP server to talk to your running Phoenix app in development to:
