@@ -2,12 +2,12 @@ defmodule Mix.Tasks.Tidewave.Proxy do
   @shortdoc "Proxies Tidewave MCP requests over stdio"
 
   @moduledoc """
-  Proxies Tidewave MCP requests from standard input to a running Tidewave HTTP server.
+  Proxies Tidewave MCP requests from standard input to a running Phoenix application.
 
       mix tidewave.proxy
 
   Each advertised tool includes a required `port` argument. Tool calls are
-  forwarded to the Tidewave HTTP server listening on that port at `127.0.0.1`.
+  forwarded to the Phoenix application listening on that port at `127.0.0.1`.
 
   Browser tools are included by default. Pass `--no-browser-tools` to exclude
   them from the advertised tools.

@@ -52,7 +52,8 @@ defmodule Mix.Tasks.Tidewave.ProxyTest do
     assert Enum.all?(initialize["result"]["tools"], fn tool ->
              tool["inputSchema"]["properties"]["port"] == %{
                "type" => "integer",
-               "description" => "The port of the Tidewave HTTP server handling this tool call"
+               "description" =>
+                 "The port of the running Phoenix application related to this worktree"
              } and "port" in tool["inputSchema"]["required"]
            end)
 
