@@ -43,6 +43,18 @@ defmodule Tidewave.MCP.HandlerTest do
       refute "create_design_canvas" in tool_names
     end
 
+    test "transforms tool definitions" do
+      message = %{"jsonrpc" => "2.0", "method" => "tools/list", "id" => 2}
+      transform_tools = &Enum.map(&1, fn tool -> Map.put(tool, :transformed, true) end)
+
+      assert {:reply, response} =
+               Handler.handle_message(message, tidewave_config(),
+                 transform_tools: transform_tools
+               )
+
+      assert Enum.all?(response.result.tools, & &1.transformed)
+    end
+
     test "validates JSON-RPC independently of a transport" do
       assert {:reply, response} =
                Handler.handle_message(%{"invalid" => "message"}, tidewave_config())

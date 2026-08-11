@@ -1,12 +1,16 @@
-defmodule Mix.Tasks.Tidewave.Mcp do
-  @shortdoc "Runs the Tidewave MCP server over stdio"
+defmodule Mix.Tasks.Tidewave.Proxy do
+  @shortdoc "Proxies Tidewave MCP requests over stdio"
 
   @moduledoc """
-  Runs the Tidewave MCP server over standard input and standard output.
+  Proxies Tidewave MCP requests from standard input to a running Tidewave HTTP server.
 
-      mix tidewave.mcp
+      mix tidewave.proxy
 
-  Browser tools are not available through this transport.
+  Each advertised tool includes a required `port` argument. Tool calls are
+  forwarded to the Tidewave HTTP server listening on that port at `127.0.0.1`.
+
+  Browser tools are included by default. Pass `--no-browser-tools` to exclude
+  them from the advertised tools.
   """
 
   use Mix.Task
@@ -15,7 +19,11 @@ defmodule Mix.Tasks.Tidewave.Mcp do
 
   @impl Mix.Task
   def run(argv) do
-    {opts, _args} = OptionParser.parse!(argv, strict: [logger_redirect: :boolean])
+    {opts, _args} =
+      OptionParser.parse!(argv,
+        strict: [logger_redirect: :boolean, browser_tools: :boolean]
+      )
+
     stdio = Process.group_leader()
 
     if Keyword.get(opts, :logger_redirect, true) do
@@ -24,8 +32,13 @@ defmodule Mix.Tasks.Tidewave.Mcp do
 
     redirect_io_to_stderr()
     start_mcp!()
+    Mix.ensure_application!(:inets)
+    {:ok, _apps} = Application.ensure_all_started(:inets)
 
-    Tidewave.MCP.Stdio.run(stdio)
+    Tidewave.MCP.Stdio.run(stdio,
+      proxy: true,
+      browser_tools: Keyword.get(opts, :browser_tools, true)
+    )
   end
 
   defp start_mcp! do

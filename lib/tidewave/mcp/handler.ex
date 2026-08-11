@@ -59,14 +59,17 @@ defmodule Tidewave.MCP.Handler do
     end
   end
 
-  defp tools(include_browser_tools?) do
+  defp tools(include_browser_tools?, transform_tools) do
     {tools, _} = tools_and_dispatch(include_browser_tools?)
 
-    for tool <- tools do
-      tool
-      |> Map.put(:description, String.trim(tool.description))
-      |> Map.drop([:callback])
-    end
+    tools =
+      for tool <- tools do
+        tool
+        |> Map.put(:description, String.trim(tool.description))
+        |> Map.drop([:callback])
+      end
+
+    transform_tools.(tools)
   end
 
   # A callback must return either
@@ -118,7 +121,7 @@ defmodule Tidewave.MCP.Handler do
     reply(request_id, %{})
   end
 
-  defp handle_initialize(request_id, params, include_browser_tools?) do
+  defp handle_initialize(request_id, params, include_browser_tools?, transform_tools) do
     case validate_protocol_version(params["protocolVersion"]) do
       :ok ->
         reply(request_id, %{
@@ -132,7 +135,7 @@ defmodule Tidewave.MCP.Handler do
             name: "Tidewave MCP Server",
             version: @vsn
           },
-          tools: tools(include_browser_tools?)
+          tools: tools(include_browser_tools?, transform_tools)
         })
 
       {:error, reason} ->
@@ -140,8 +143,8 @@ defmodule Tidewave.MCP.Handler do
     end
   end
 
-  defp handle_list_tools(request_id, _params, include_browser_tools?) do
-    reply(request_id, %{tools: tools(include_browser_tools?)})
+  defp handle_list_tools(request_id, _params, include_browser_tools?, transform_tools) do
+    reply(request_id, %{tools: tools(include_browser_tools?, transform_tools)})
   end
 
   defp handle_list_prompts(request_id, _params) do
@@ -228,7 +231,8 @@ defmodule Tidewave.MCP.Handler do
   defp route_message(
          %{"method" => "notifications/initialized"},
          _assigns,
-         _include_browser_tools?
+         _include_browser_tools?,
+         _transform_tools
        ) do
     Logger.info("Received initialized notification")
     :notification
@@ -237,7 +241,8 @@ defmodule Tidewave.MCP.Handler do
   defp route_message(
          %{"method" => "notifications/" <> _ = method},
          _assigns,
-         _include_browser_tools?
+         _include_browser_tools?,
+         _transform_tools
        ) do
     Logger.debug("Ignoring notification: #{method}")
     :notification
@@ -246,7 +251,8 @@ defmodule Tidewave.MCP.Handler do
   defp route_message(
          %{"method" => method, "id" => id} = message,
          assigns,
-         include_browser_tools?
+         include_browser_tools?,
+         transform_tools
        ) do
     Logger.info("Routing MCP message: #{method} (id=#{id})")
     Logger.debug("Full message: #{inspect(message, pretty: true)}")
@@ -260,10 +266,10 @@ defmodule Tidewave.MCP.Handler do
           "Handling initialize request with params: #{inspect(message["params"], pretty: true)}"
         )
 
-        handle_initialize(id, message["params"], include_browser_tools?)
+        handle_initialize(id, message["params"], include_browser_tools?, transform_tools)
 
       "tools/list" ->
-        handle_list_tools(id, message["params"], include_browser_tools?)
+        handle_list_tools(id, message["params"], include_browser_tools?, transform_tools)
 
       "tools/call" ->
         Logger.debug(
@@ -326,10 +332,11 @@ defmodule Tidewave.MCP.Handler do
   @doc false
   def handle_message(message, assigns, opts \\ []) do
     include_browser_tools? = Keyword.get(opts, :include_browser_tools, true)
+    transform_tools = Keyword.get(opts, :transform_tools, &Function.identity/1)
 
     case validate_jsonrpc_message(message) do
       {:ok, message} ->
-        route_message(message, assigns, include_browser_tools?)
+        route_message(message, assigns, include_browser_tools?, transform_tools)
 
       {:error, :invalid_jsonrpc} ->
         Logger.warning("Invalid JSON-RPC message format")

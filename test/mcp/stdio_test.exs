@@ -37,7 +37,7 @@ defmodule Tidewave.MCP.StdioTest do
              Jason.decode!(output)
   end
 
-  test "does not expose browser tools" do
+  test "exposes browser tools by default" do
     message = Jason.encode!(%{"jsonrpc" => "2.0", "method" => "tools/list", "id" => 1})
     {:ok, stdio} = StringIO.open(message <> "\n")
 
@@ -45,6 +45,6 @@ defmodule Tidewave.MCP.StdioTest do
     assert {_input, output} = StringIO.contents(stdio)
 
     response = Jason.decode!(output)
-    refute "browser_eval" in Enum.map(response["result"]["tools"], & &1["name"])
+    assert "browser_eval" in Enum.map(response["result"]["tools"], & &1["name"])
   end
 end
