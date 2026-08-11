@@ -59,6 +59,7 @@ defmodule Tidewave do
 
   defp call(conn) do
     conn
+    |> silence_tidewave_requests()
     |> Plug.Conn.register_before_send(fn conn ->
       conn
       |> maybe_rewrite_csp()
@@ -125,6 +126,16 @@ defmodule Tidewave do
       end
     end
     |> Enum.join("; ")
+  end
+
+  defp silence_tidewave_requests(conn) do
+    case Plug.Conn.get_req_header(conn, "x-tidewave-diagnostic") do
+      [] ->
+        conn
+
+      ["true" | _] ->
+        Logger.put_process_level(self(), :none)
+    end
   end
 
   defp control_url(conn) do
