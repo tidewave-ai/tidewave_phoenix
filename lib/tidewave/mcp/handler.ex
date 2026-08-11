@@ -1,9 +1,8 @@
-defmodule Tidewave.MCP.Server do
+defmodule Tidewave.MCP.Handler do
   @moduledoc false
 
   require Logger
 
-  import Plug.Conn
   alias Tidewave.MCP.Tools
 
   @protocol_version "2025-03-26"
@@ -117,35 +116,25 @@ defmodule Tidewave.MCP.Server do
   end
 
   defp handle_ping(request_id) do
-    {:ok,
-     %{
-       jsonrpc: "2.0",
-       id: request_id,
-       result: %{}
-     }}
+    reply(request_id, %{})
   end
 
   defp handle_initialize(request_id, params, include_browser_tools?) do
     case validate_protocol_version(params["protocolVersion"]) do
       :ok ->
-        {:ok,
-         %{
-           jsonrpc: "2.0",
-           id: request_id,
-           result: %{
-             protocolVersion: @protocol_version,
-             capabilities: %{
-               tools: %{
-                 listChanged: false
-               }
-             },
-             serverInfo: %{
-               name: "Tidewave MCP Server",
-               version: @vsn
-             },
-             tools: tools(include_browser_tools?)
-           }
-         }}
+        reply(request_id, %{
+          protocolVersion: @protocol_version,
+          capabilities: %{
+            tools: %{
+              listChanged: false
+            }
+          },
+          serverInfo: %{
+            name: "Tidewave MCP Server",
+            version: @vsn
+          },
+          tools: tools(include_browser_tools?)
+        })
 
       {:error, reason} ->
         {:error, reason}
@@ -153,40 +142,40 @@ defmodule Tidewave.MCP.Server do
   end
 
   defp handle_list_tools(request_id, _params, include_browser_tools?) do
-    result_or_error(request_id, {:ok, %{tools: tools(include_browser_tools?)}})
+    reply(request_id, %{tools: tools(include_browser_tools?)})
   end
 
   defp handle_list_prompts(request_id, _params) do
-    result_or_error(request_id, {:ok, %{prompts: []}})
+    reply(request_id, %{prompts: []})
   end
 
   defp handle_list_resources(request_id, _params) do
-    result_or_error(request_id, {:ok, %{resources: []}})
+    reply(request_id, %{resources: []})
   end
 
   defp handle_list_templates(request_id, _params) do
-    result_or_error(request_id, {:ok, %{templates: []}})
+    reply(request_id, %{templates: []})
   end
 
-  defp result_or_error(request_id, {:ok, text, metadata})
+  defp reply(request_id, result) do
+    {:reply, %{jsonrpc: "2.0", id: request_id, result: result}}
+  end
+
+  # Translate the tool callback contract into the handler contract.
+  defp handle_tool_result(request_id, {:ok, text, metadata})
        when is_binary(text) and is_map(metadata) do
-    result_or_error(request_id, {:ok, %{content: [%{type: "text", text: text}], _meta: metadata}})
+    reply(request_id, %{content: [%{type: "text", text: text}], _meta: metadata})
   end
 
-  defp result_or_error(request_id, {:ok, text}) when is_binary(text) do
-    result_or_error(request_id, {:ok, %{content: [%{type: "text", text: text}]}})
+  defp handle_tool_result(request_id, {:ok, text}) when is_binary(text) do
+    reply(request_id, %{content: [%{type: "text", text: text}]})
   end
 
-  defp result_or_error(request_id, {:ok, result}) when is_map(result) do
-    {:ok,
-     %{
-       jsonrpc: "2.0",
-       id: request_id,
-       result: result
-     }}
+  defp handle_tool_result(request_id, {:ok, result}) when is_map(result) do
+    reply(request_id, result)
   end
 
-  defp result_or_error(request_id, {:error, :invalid_arguments}) do
+  defp handle_tool_result(request_id, {:error, :invalid_arguments}) do
     {:error,
      %{
        jsonrpc: "2.0",
@@ -195,16 +184,13 @@ defmodule Tidewave.MCP.Server do
      }}
   end
 
-  defp result_or_error(request_id, {:error, message}) when is_binary(message) do
+  defp handle_tool_result(request_id, {:error, message}) when is_binary(message) do
     # tool errors should be treated as successful response with isError: true
     # https://spec.modelcontextprotocol.io/specification/2024-11-05/server/tools/#error-handling
-    result_or_error(
-      request_id,
-      {:ok, %{content: [%{type: "text", text: message}], isError: true}}
-    )
+    reply(request_id, %{content: [%{type: "text", text: message}], isError: true})
   end
 
-  defp result_or_error(request_id, {:error, error}) when is_map(error) do
+  defp handle_tool_result(request_id, {:error, error}) when is_map(error) do
     {:error,
      %{
        jsonrpc: "2.0",
@@ -215,7 +201,11 @@ defmodule Tidewave.MCP.Server do
 
   defp handle_call_tool(request_id, %{"name" => name} = params, assigns, include_browser_tools?) do
     args = Map.get(params, "arguments", %{})
-    result_or_error(request_id, dispatch(name, args, assigns, include_browser_tools?))
+
+    handle_tool_result(
+      request_id,
+      dispatch(name, args, assigns, include_browser_tools?)
+    )
   end
 
   defp safe_call_tool(request_id, params, assigns, include_browser_tools?) do
@@ -224,42 +214,37 @@ defmodule Tidewave.MCP.Server do
     kind, reason ->
       # tool exceptions should be treated as successful response with isError: true
       # https://spec.modelcontextprotocol.io/specification/2024-11-05/server/tools/#error-handling
-      {:ok,
-       %{
-         jsonrpc: "2.0",
-         id: request_id,
-         result: %{
-           content: [
-             %{
-               type: "text",
-               text: "Failed to call tool: #{Exception.format(kind, reason, __STACKTRACE__)}"
-             }
-           ],
-           isError: true
-         }
-       }}
+      reply(request_id, %{
+        content: [
+          %{
+            type: "text",
+            text: "Failed to call tool: #{Exception.format(kind, reason, __STACKTRACE__)}"
+          }
+        ],
+        isError: true
+      })
   end
 
   # Built-in message routing
-  defp handle_message(
+  defp route_message(
          %{"method" => "notifications/initialized"},
          _assigns,
          _include_browser_tools?
        ) do
     Logger.info("Received initialized notification")
-    {:ok, nil}
+    :notification
   end
 
-  defp handle_message(
+  defp route_message(
          %{"method" => "notifications/" <> _ = method},
          _assigns,
          _include_browser_tools?
        ) do
     Logger.debug("Ignoring notification: #{method}")
-    {:ok, nil}
+    :notification
   end
 
-  defp handle_message(
+  defp route_message(
          %{"method" => method, "id" => id} = message,
          assigns,
          include_browser_tools?
@@ -315,8 +300,6 @@ defmodule Tidewave.MCP.Server do
     end
   end
 
-  ## HTTP transport functions
-
   defp validate_jsonrpc_message(%{"jsonrpc" => "2.0"} = message) do
     cond do
       # Request must have method and id (string or number)
@@ -341,57 +324,23 @@ defmodule Tidewave.MCP.Server do
 
   defp validate_jsonrpc_message(_), do: {:error, :invalid_jsonrpc}
 
-  defp send_json(conn, data) do
-    conn
-    |> put_resp_content_type("application/json")
-    |> send_resp(conn.status || 200, Jason.encode!(data))
-  end
+  @doc false
+  def handle_message(message, assigns, opts \\ []) do
+    include_browser_tools? = Keyword.get(opts, :include_browser_tools, true)
 
-  defp send_jsonrpc_error(conn, id, code, message, data \\ nil) do
-    error = %{
-      code: code,
-      message: message
-    }
-
-    error = if data, do: Map.put(error, :data, data), else: error
-
-    response = %{
-      jsonrpc: "2.0",
-      id: id,
-      error: error
-    }
-
-    conn
-    |> put_resp_content_type("application/json")
-    |> send_resp(200, Jason.encode!(response))
-  end
-
-  def handle_http_message(conn) do
-    Logger.info("Received #{conn.method} message")
-    params = conn.body_params
-    conn = fetch_query_params(conn)
-    include_browser_tools? = conn.query_params["include_browser_tools"] != "false"
-    Logger.debug("Raw params: #{inspect(params, pretty: true)}")
-
-    case validate_jsonrpc_message(params) do
+    case validate_jsonrpc_message(message) do
       {:ok, message} ->
-        case handle_message(message, conn.private.tidewave_config, include_browser_tools?) do
-          {:ok, nil} ->
-            # Notifications that don't return a response
-            conn |> put_status(202) |> send_json(%{status: "ok"})
-
-          {:ok, response} ->
-            Logger.debug("Sending HTTP response: #{inspect(response, pretty: true)}")
-            conn |> put_status(200) |> send_json(response)
-
-          {:error, error_response} ->
-            Logger.warning("Error handling message: #{inspect(error_response)}")
-            conn |> put_status(400) |> send_json(error_response)
-        end
+        route_message(message, assigns, include_browser_tools?)
 
       {:error, :invalid_jsonrpc} ->
         Logger.warning("Invalid JSON-RPC message format")
-        send_jsonrpc_error(conn, nil, -32600, "Could not parse message")
+
+        {:reply,
+         %{
+           jsonrpc: "2.0",
+           id: nil,
+           error: %{code: -32600, message: "Could not parse message"}
+         }}
     end
   end
 end
