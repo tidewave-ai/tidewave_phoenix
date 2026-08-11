@@ -1,14 +1,11 @@
 defmodule Tidewave.MCP.HTTP do
   @moduledoc false
 
-  require Logger
-
   import Plug.Conn
 
   alias Tidewave.MCP.Handler
 
-  def handle_message(conn) do
-    Logger.info("Received #{conn.method} message")
+  def run(conn) do
     message = conn.body_params
     conn = fetch_query_params(conn)
     include_browser_tools? = conn.query_params["include_browser_tools"] != "false"
