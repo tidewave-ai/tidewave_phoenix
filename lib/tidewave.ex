@@ -129,12 +129,16 @@ defmodule Tidewave do
   end
 
   defp silence_tidewave_requests(conn) do
-    case Plug.Conn.get_req_header(conn, "x-tidewave-diagnostic") do
-      [] ->
-        conn
-
-      ["true" | _] ->
+    case {conn.method, Plug.Conn.get_req_header(conn, "x-tidewave-diagnostic"),
+          Plug.Conn.get_req_header(conn, "sec-fetch-site")} do
+      # We only silence GET requests with the header from a browser on the same origin.
+      # Any other request might be a malicious client trying to hide from
+      # logging.
+      {"GET", ["true" | _], ["same-origin" | _]} ->
         Logger.put_process_level(self(), :none)
+
+      {_, _, _} ->
+        conn
     end
   end
 
