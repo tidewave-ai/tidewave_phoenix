@@ -2,7 +2,7 @@
 
 When your app runs in Tidewave IDE or uses the Tidewave Toolbar, Tidewave watches it for runtime problems and reports them in the Diagnostics panel. Reports can come from your web framework or from uncaught JavaScript errors and unhandled promise rejections.
 
-Unlike static analysis, diagnostics are collected while you use the app. This means Tidewave can report problems with the exact page and elements that triggered them, including framework metadata when it is available.
+Diagnostics are collected while you use the app. This means Tidewave can report problems with the exact page and elements that triggered them, including framework metadata when it is available. Whenever your coding agent is driving the browser through Tidewave Connect or Tidewave IDE, we will automatically include any page diagnostics we find in tool call reports, allowing your agent to find and fix bugs that would not be found by static analysis.
 
 ## Usage
 
@@ -14,25 +14,9 @@ Open the Diagnostics panel by clicking the diagnostics icon. A badge on the icon
 
 Each report includes the source, diagnostic type, severity, and a description of the problem. When a report identifies affected elements, hover an element button to highlight it on the page. Tidewave also attaches the element's selector and framework rendering information to the report, helping the coding agent find the relevant source code.
 
-You can select individual reports if you only want to address some of them. By default, all diagnostics are selected.
+You can select individual reports if you only want to address some of them. By default, all diagnostics are selected. Below we list the diagnostics we find per runtime/framework.
 
-* In Tidewave IDE, click **Fix issues** to send the selected reports directly to your coding agent.
-
-* In the Toolbar, click **Copy prompt to fix issues**, then paste the resulting prompt into your coding agent.
-
-Click **Clear** to remove the collected reports. Clearing a report does not fix or suppress the underlying problem, so it will appear again if the app triggers it again.
-
-## JavaScript diagnostics
-
-For every supported framework, Tidewave reports uncaught JavaScript errors and unhandled promise rejections. When available, the report includes a source-mapped stack trace so the coding agent can trace the failure back to application source code.
-
-## Framework integration
-
-Framework integrations add structured, actionable reports that are not available from JavaScript exceptions alone. For example, Tidewave can associate a problem with affected DOM elements and enrich those elements with server-side template or component information.
-
-For example, for Rails applications, Tidewave also reports uncaught errors from Stimulus and identifies the affected element when Stimulus provides one.
-
-### Phoenix LiveView diagnostics
+## Phoenix (LiveView) diagnostics
 
 Tidewave turns application-level diagnostics emitted by Phoenix LiveView into reports with a suggested fix. It currently recognizes problems involving, among others:
 
@@ -48,10 +32,18 @@ Tidewave turns application-level diagnostics emitted by Phoenix LiveView into re
 
 When LiveView includes elements in a diagnostic, Tidewave adds their selectors and HEEx component information to the prompt. Enable `debug_heex_annotations` and `debug_attributes` in your Phoenix development configuration to get the most precise source information.
 
-#### Validate LiveView navigation
+### Validate LiveView navigation
 
-Live navigation can appear to work while depending on transient socket state that will not exist when someone opens, refreshes, or bookmarks the resulting URL. Tidewave detects this by fetching each same-origin URL reached through LiveView navigation and checking that it can also load directly.
+When building LiveView applications, it is common to use the patch operation to update the current LiveView and reflect its state in the URL (address bar). However, when patching a LiveView, one could accidentally rely on `socket.assigns` that were loaded by another action. In such cases, if you were to reload the page in the browser, LiveView would crash as certain assigns would be missing.
 
-This check is enabled by default. You can turn it on or off under **Settings > Diagnostics > Validate LiveView navigation** or by  clicking **Configure** in the Diagnostics panel.
+To detect such bugs, for every LiveView patch operation, Tidewave automatically fetches the whole page behind the scene and see if it returns a successful status code. If not, it emits a diagnostic. The report guides the coding agent to ensure that `mount/3` and `handle_params/3` reconstruct the required assigns from the URL, session, or persistent data instead of relying on state established by `handle_event/3`.
 
-If the direct request fails or returns a non-successful response, Tidewave creates a diagnostic with the HTTP or Phoenix error details. The report guides the coding agent to ensure that `mount/3` and `handle_params/3` reconstruct the required assigns from the URL, session, or persistent data instead of relying on state established by `handle_event/3`.
+This check is enabled by default. You can turn it on or off under **Settings > Diagnostics > Validate LiveView navigation** or by clicking **Configure** in the Diagnostics panel.
+
+## Rails diagnostics
+
+Tidewave reports uncaught errors from Stimulus and identifies the affected element when Stimulus provides one. No additional work is necessary for tracking Turbo requests, as those failures are automatically included in server logs.
+
+## JavaScript diagnostics
+
+For every supported framework, Tidewave reports uncaught JavaScript errors and unhandled promise rejections. When available, the report includes a source-mapped stack trace so the coding agent can trace the failure back to application source code.
