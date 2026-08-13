@@ -1,8 +1,10 @@
-# Page Diagnostics
+# Page diagnostics
 
-When your app runs in Tidewave IDE or uses the Tidewave Toolbar, Tidewave watches it for runtime problems and reports them in the Diagnostics panel. Reports can come from your web framework or from uncaught JavaScript errors and unhandled promise rejections.
+When your app runs in Tidewave IDE or uses the Tidewave Toolbar, Tidewave watches it for runtime problems and reports them in the Diagnostics panel. Reports can come from your web framework or from unhandled JavaScript errors and are collected while you use the application.
 
-Diagnostics are collected while you use the app. This means Tidewave can report problems with the exact page and elements that triggered them, including framework metadata when it is available. Whenever your coding agent is driving the browser through Tidewave Connect or Tidewave IDE, we will automatically include any page diagnostics we find in tool call reports, allowing your agent to find and fix bugs that would not be found by static analysis.
+Additionally, whenever your coding agent is navigating your application through Tidewave Connect or Tidewave IDE, Tidewave will include any page diagnostics it finds in tool call reports, allowing your agent to find and fix bugs that would not be found by static analysis.
+
+Similar to [accessibility diagnostics](accessibility.md), the page diagnostics emitted by Tidewave are also augmented with framework trace and metadata, allowing Tidewave to point the exact page and elements that triggered them whenever possible.
 
 ## Usage
 

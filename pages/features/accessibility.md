@@ -6,6 +6,12 @@ Tidewave can perform accessibility checks, based on the page’s content rather 
 
 Tidewave uses a technique we call Trace-Augmented Generation to ensure coding agents can be more accurate and faster when doing full-stack changes, such as fixing accessibility reports. [Read our announcement post to learn more](https://tidewave.ai/blog/improving-web-accessibility-with-trace-augmented-generation).
 
+Tidewave also emits framework specific warnings, see [Page diagnostics](diagnostics.md) to learn more.
+
 > #### Tidewave IDE {: .info}
 >
-> Accessibility reports are also available in the Tidewave IDE by clicking the accessibility icon on the top right.
+> Accessibility diagnostics are also available in the Tidewave IDE by clicking the accessibility icon on the top right.
+
+## Agentic accessibility reports
+
+Whenever your coding agent is navigating your application through Tidewave Connect or Tidewave IDE, you can ask it to use the "browser eval" tool to collect accessibility diagnostics from any page, allowing the agent to assess, debug, and fix accessibility defects automatically.
