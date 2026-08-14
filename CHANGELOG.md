@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.8.4 (2026-08-14)
+
+* Fix crash in diagnostic log handler
+
 ## v0.8.3 (2026-08-13)
 
 * Support LiveView patching diagnostics
