@@ -136,6 +136,7 @@ defmodule Tidewave do
       # logging.
       {"GET", ["true" | _], ["same-origin" | _]} ->
         Logger.put_process_level(self(), :none)
+        conn
 
       {_, _, _} ->
         conn
