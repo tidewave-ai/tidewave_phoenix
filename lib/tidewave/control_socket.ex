@@ -36,7 +36,7 @@ defmodule Tidewave.ControlSocket do
   end
 
   defp handle_message(%{"type" => "tool_reply", "ref" => ref} = message, state) do
-    {:ok, reply_pending(state, ref, message["result"])}
+    {:ok, reply_pending(state, ref, message["reply"])}
   end
 
   defp handle_message(_other, state), do: {:ok, state}

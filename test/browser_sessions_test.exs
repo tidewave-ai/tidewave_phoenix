@@ -5,11 +5,6 @@ defmodule Tidewave.BrowserSessionsTest do
 
   alias Tidewave.BrowserSessions
 
-  setup do
-    wait_until(fn -> BrowserSessions.list_clients() == [] end)
-    :ok
-  end
-
   defmodule TestClient do
     use Task
 
@@ -159,23 +154,14 @@ defmodule Tidewave.BrowserSessionsTest do
     end
 
     test "returns the first reply and passes a nil sid" do
-      pid =
-        start_supervised!(
-          {TestClient,
-           test: self(),
-           name: "first-robin",
-           behavior: fn sid, _name, _input ->
-             %{
-               "text" => "from #{sid || "handshake"}",
-               "isError" => false,
-               "sid" => "first-robin#1"
-             }
-           end}
-        )
-
-      receive do
-        {:ready, ^pid} -> :ok
-      end
+      start_supervised!(
+        {TestClient,
+         test: self(),
+         name: "first-robin",
+         behavior: fn sid, _name, _input ->
+           %{"text" => "from #{sid || "handshake"}", "isError" => false, "sid" => "first-robin#1"}
+         end}
+      )
 
       assert {:ok, %{"text" => "from handshake", "sid" => "first-robin#1"}} =
                BrowserSessions.broadcast_run("browser_eval", %{code: ""}, 1_000)

@@ -3,7 +3,7 @@ defmodule Tidewave.MixProject do
 
   @source_url "https://github.com/tidewave-ai/tidewave_phoenix"
   @homepage_url "https://tidewave.ai/"
-  @version "0.8.0"
+  @version "0.8.4"
 
   def project do
     [
@@ -73,7 +73,7 @@ defmodule Tidewave.MixProject do
   defp docs do
     [
       api_reference: false,
-      main: "installation",
+      main: "welcome",
       logo: "logo.svg",
       footer: false,
       assets: %{"pages/assets" => "assets"},
@@ -81,57 +81,52 @@ defmodule Tidewave.MixProject do
         raise "you forgot to add \"@moduledoc false\" to #{inspect(mod)}"
       end,
       extras: [
-        "pages/installation.md",
+        "pages/welcome.md",
+        "pages/ide/installation.md",
+        "pages/ide/browser_app.md",
+        "pages/ide/code_review.md",
+        "pages/ide/containers.md",
+        "pages/ide/custom_domains.md",
+        "pages/ide/figma.md",
+        "pages/ide/git.md",
+        "pages/ide/https.md",
+        "pages/ide/mermaid.md",
+        "pages/ide/notifications.md",
+        "pages/ide/providers.md",
+        "pages/ide/remote_access.md",
+        "pages/ide/spaces.md",
+        "pages/ide/task_board.md",
+        "pages/ide/voice_input.md",
         "pages/features/accessibility.md",
-        "pages/features/browser_app.md",
-        "pages/features/code_review.md",
-        "pages/features/git.md",
+        "pages/features/connect.md",
+        "pages/features/diagnostics.md",
         "pages/features/inspector.md",
-        "pages/features/mermaid.md",
-        "pages/features/notifications.md",
-        "pages/features/spaces.md",
-        "pages/features/task_board.md",
-        "pages/features/teams.md",
         "pages/features/ui_variants.md",
-        "pages/features/viewport.md",
+        "pages/features/update_visualizer.md",
         "pages/features/vision_mode.md",
-        "pages/features/voice_input.md",
-        "pages/providers/claude_code.md",
-        "pages/providers/github_copilot.md",
-        "pages/providers/codex.md",
-        "pages/providers/opencode.md",
-        "pages/providers/third_party.md",
-        "pages/integrations/editors.md",
-        "pages/integrations/figma.md",
-        "pages/integrations/frontend.md",
-        "pages/guides/containers.md",
-        "pages/guides/custom_domains.md",
-        "pages/guides/https.md",
-        "pages/guides/prompting_tips.md",
-        "pages/guides/security.md",
-        "pages/guides/remote_access.md",
+        "pages/references/editors.md",
+        "pages/references/frontend.md",
+        "pages/references/teams.md",
+        "pages/references/security.md",
         "pages/mcp/mcp.md",
         "pages/mcp/mcp_claude_code.md",
         "pages/mcp/mcp_cursor.md",
         "pages/mcp/mcp_neovim.md",
         "pages/mcp/mcp_codex.md",
         "pages/mcp/mcp_opencode.md",
-        "pages/mcp/mcp_vscode.md",
-        "pages/mcp/mcp_zed.md"
+        "pages/mcp/mcp_vscode.md"
       ],
       groups_for_extras: [
-        Providers: ~r/(pages\/providers\/.?)/,
-        Features: ~r/(pages\/features\/.?)/,
-        Integrations: ~r/(pages\/integrations\/.?)/,
-        Guides: ~r/(pages\/guides\/.?)/,
-        MCP: ~r/pages\/mcp\/.?/
+        Welcome: "pages/welcome.md",
+        Tidewave: ~r/(pages\/features\/.?)/,
+        "Tidewave MCP": ~r/pages\/mcp\/.?/,
+        "Tidewave IDE": ~r/(pages\/ide\/.?)/,
+        References: ~r/(pages\/references\/.?)/
       ],
       redirects: %{
         "react" => "frontend",
         "vue" => "frontend",
         "mcp_troubleshooting" => "mcp",
-        "providers" => "installation",
-        "tips_and_tricks" => "prompting_tips",
         "subdomains" => "custom_domains"
       },
       before_closing_head_tag: fn _ ->

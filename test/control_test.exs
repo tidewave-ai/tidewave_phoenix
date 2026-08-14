@@ -14,9 +14,9 @@ defmodule Tidewave.ControlTest do
     def config(:http), do: [ip: {127, 0, 0, 1}, port: 9000]
   end
 
-  describe "/tidewave/app" do
+  describe "/tidewave/connect" do
     test "uses the control entrypoint" do
-      conn = conn(:get, "/tidewave/app") |> Tidewave.call(Tidewave.init([]))
+      conn = conn(:get, "/tidewave/connect") |> Tidewave.call(Tidewave.init([]))
 
       assert conn.status == 200
       assert get_resp_header_value(conn, "content-type") =~ "text/html"
@@ -35,7 +35,7 @@ defmodule Tidewave.ControlTest do
         |> Plug.Conn.put_req_header("origin", "http://control.example.com")
         |> Tidewave.call(Tidewave.init(allowed_origins: ["//control.example.com"]))
 
-      assert conn.status == 101
+      assert conn.status == nil
     end
 
     test "allows a websocket upgrade from an allowed full origin" do
@@ -44,7 +44,7 @@ defmodule Tidewave.ControlTest do
         |> Plug.Conn.put_req_header("origin", "http://control.example.com:4000")
         |> Tidewave.call(Tidewave.init(allowed_origins: ["http://control.example.com:4000"]))
 
-      assert conn.status == 101
+      assert conn.status == nil
     end
 
     test "allows a websocket upgrade from the same host as an allowed port-less origin" do
@@ -53,7 +53,7 @@ defmodule Tidewave.ControlTest do
         |> Plug.Conn.put_req_header("origin", "http://control.example.com:5173")
         |> Tidewave.call(Tidewave.init(allowed_origins: ["//control.example.com"]))
 
-      assert conn.status == 101
+      assert conn.status == nil
     end
 
     test "allows a websocket upgrade from a wildcard origin" do
@@ -62,7 +62,7 @@ defmodule Tidewave.ControlTest do
         |> Plug.Conn.put_req_header("origin", "http://control.example.com")
         |> Tidewave.call(Tidewave.init(allowed_origins: ["//*.example.com"]))
 
-      assert conn.status == 101
+      assert conn.status == nil
     end
 
     test "falls back to the phoenix endpoint url host" do
@@ -72,7 +72,7 @@ defmodule Tidewave.ControlTest do
         |> Plug.Conn.put_private(:phoenix_endpoint, Endpoint)
         |> Tidewave.call(Tidewave.init([]))
 
-      assert conn.status == 101
+      assert conn.status == nil
     end
 
     test "falls back to the phoenix endpoint url host when the port is configured on http" do
@@ -82,7 +82,7 @@ defmodule Tidewave.ControlTest do
         |> Plug.Conn.put_private(:phoenix_endpoint, EndpointWithHttpPort)
         |> Tidewave.call(Tidewave.init([]))
 
-      assert conn.status == 101
+      assert conn.status == nil
     end
 
     test "rejects a websocket upgrade from a foreign origin" do

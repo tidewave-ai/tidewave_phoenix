@@ -59,6 +59,7 @@ defmodule Tidewave do
 
   defp call(conn) do
     conn
+    |> silence_tidewave_requests()
     |> Plug.Conn.register_before_send(fn conn ->
       conn
       |> maybe_rewrite_csp()
@@ -127,6 +128,21 @@ defmodule Tidewave do
     |> Enum.join("; ")
   end
 
+  defp silence_tidewave_requests(conn) do
+    case {conn.method, Plug.Conn.get_req_header(conn, "x-tidewave-diagnostic"),
+          Plug.Conn.get_req_header(conn, "sec-fetch-site")} do
+      # We only silence GET requests with the header from a browser on the same origin.
+      # Any other request might be a malicious client trying to hide from
+      # logging.
+      {"GET", ["true" | _], ["same-origin" | _]} ->
+        Logger.put_process_level(self(), :none)
+        conn
+
+      {_, _, _} ->
+        conn
+    end
+  end
+
   defp control_url(conn) do
     scheme = conn.scheme |> to_string() |> String.downcase()
     "#{scheme}://#{conn.host}#{port_suffix(scheme, conn.port)}"
@@ -164,6 +180,14 @@ defmodule Tidewave do
   defp tidewave_html(conn) do
     client_url = Application.get_env(:tidewave, :client_url, "https://tidewave.ai")
 
+    """
+    <meta name="tidewave:config" content="#{tidewave_config_meta(conn) |> Jason.encode!() |> Plug.HTML.html_escape()}" />
+    <script async type="module" src="#{client_url}/tc/toolbar.js"></script>
+    """
+  end
+
+  @doc false
+  def tidewave_config_meta(conn) do
     app_paths =
       if Code.loaded?(Mix.Project) do
         for {app, path} <- Mix.Project.deps_paths(), into: %{}, do: {to_string(app), path}
@@ -171,7 +195,7 @@ defmodule Tidewave do
         %{}
       end
 
-    config = %{
+    %{
       tidewave: tidewave_config(conn),
       root: Tidewave.MCP.root(),
       wsl_distro: System.get_env("WSL_DISTRO_NAME"),
@@ -179,11 +203,6 @@ defmodule Tidewave do
         app_paths: app_paths
       }
     }
-
-    """
-    <meta name="tidewave:config" content="#{config |> Jason.encode!() |> Plug.HTML.html_escape()}" />
-    <script async type="module" src="#{client_url}/tc/toolbar.js"></script>
-    """
   end
 
   @doc false

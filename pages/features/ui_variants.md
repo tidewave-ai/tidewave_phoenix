@@ -2,7 +2,15 @@
 
 UI variants allows your coding agent to propose multiple versions of a page section or UI component, integrated directly with your web framework:
 
-<iframe width="640" height="360" src="https://www.youtube.com/embed/8px8GdpID74?si=MfHsIGPMS9veQR0H" title="Variants in Tidewave" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/nnwckXZgnmY?si=x2grzQd8uuBjyply" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+To enable UI variants in the Tidewave Toolbar, simply click the "UI Variants" icon in the prompt composer, which will then become active, and describe the variants you want:
+
+<img src="assets/variants.png" alt="UI variants example" width="500px">
+
+> #### Tidewave IDE {: .info}
+>
+> When using the Tidewave IDE, the agent already knows about the existence of UI variants, you simply need to ask it to build different UI variants of the selected component.
 
 ## How does it work?
 
@@ -10,7 +18,7 @@ The variant system works by instructing the agent to annotate different HTML ele
 
 Whenever variants are added to a page, Tidewave will show a floating UI at the bottom of the page that lets the user switch and explore variants.
 
-Note that all variants are rendered on the page but only one given variant is shown at a given time. This means variant are great for exploring UI changes and smaller components. If you need to explore whole different pages or navigation flows altogether, using separate `git` branches may be a better fit.
+Note that all variants are rendered on the page but only one given variant is shown at a given time. This means variants are great for exploring UI changes and smaller components. If you need to explore whole different pages or navigation flows altogether, using separate `git` branches may be a better fit.
 
 ## Tips
 

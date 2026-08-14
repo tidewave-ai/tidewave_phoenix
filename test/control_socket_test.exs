@@ -36,16 +36,20 @@ defmodule Tidewave.ControlSocketTest do
       ControlSocket.handle_info({:run_tool, reply_to, "a#1", "browser_eval", %{code: "x"}}, state)
 
     ref = Jason.decode!(json)["ref"]
-    reply = ~s({"type":"tool_reply","ref":#{ref},"result":{"text":"hi","isError":false}})
+
+    reply =
+      ~s({"type":"tool_reply","ref":#{ref},"reply":{"result":{"text":"hi","isError":false}}})
 
     assert {:ok, state} = ControlSocket.handle_in({reply, [opcode: :text]}, state)
     assert state.pending == %{}
-    assert_receive {:browser_reply, ^reply_to, %{"text" => "hi", "isError" => false}}
+
+    assert_receive {:browser_reply, ^reply_to,
+                    %{"result" => %{"text" => "hi", "isError" => false}}}
   end
 
   test "ignores tool_reply for an unknown ref" do
     {:ok, state} = ControlSocket.init(%{})
-    reply = ~s({"type":"tool_reply","ref":999,"result":{}})
+    reply = ~s({"type":"tool_reply","ref":999,"reply":{}})
 
     assert {:ok, ^state} = ControlSocket.handle_in({reply, [opcode: :text]}, state)
   end

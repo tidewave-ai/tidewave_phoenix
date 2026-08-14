@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.8.4 (2026-08-14)
+
+* Fix crash in diagnostic log handler
+
+## v0.8.3 (2026-08-13)
+
+* Support LiveView patching diagnostics
+
+## v0.8.2 (2026-08-05)
+
+* Use `action_inputs` for `browser_eval`
+
+## v0.8.1 (2026-07-29)
+
+* Add Tidewave Connect support
+
 ## v0.8.0 (2026-07-22)
 
 * Add the Tidewave Toolbar

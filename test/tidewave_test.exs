@@ -114,6 +114,23 @@ defmodule TidewaveTest do
     assert Plug.Conn.get_resp_header(conn, "x-frame-options") == []
   end
 
+  test "silences same-origin diagnostic GET requests" do
+    require Logger
+
+    refute ExUnit.CaptureLog.capture_log(fn ->
+             conn =
+               conn(:get, "/foo")
+               |> put_req_header("x-tidewave-diagnostic", "true")
+               |> put_req_header("sec-fetch-site", "same-origin")
+               |> Tidewave.call(Tidewave.init([]))
+               |> tap(fn _ -> Logger.error("oops") end)
+               |> send_resp(200, "foo")
+
+             assert conn.status == 200
+             assert conn.resp_body == "foo"
+           end) =~ "oops"
+  end
+
   test "updates CSP header if set (no toolbar)" do
     conn =
       conn(:get, "/foo")

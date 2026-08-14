@@ -1,12 +1,8 @@
 # VS Code
 
-You can use Tidewave MCP with Visual Studio Code through the [GitHub Copilot extension](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot).
+You can connect Visual Studio Code to Tidewave through the [GitHub Copilot extension](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot).
 
-> #### Public preview required {: .warning}
->
-> At the time of writing, MCP support in GitHub Copilot is in public preview and only
-available when **a)** the "Editor Preview Features" flag is enabled in your GitHub
-settings and **b)** your Copilot session is in "Agent" mode. Given the preview state of the feature, the instructions below may be out of date.
+## Install
 
 > #### Organization settings {: .warning}
 >
@@ -18,7 +14,7 @@ configure it.
 
 ![VSCode AI panel](assets/vscode.png)
 
-And then at the center top choose "+ Add MCP Server..." and follow one these steps:
+And then at the center top choose "+ Add MCP Server..." and follow these steps:
 
 1. Choose "HTTP (HTTP or Server-Sent events)"
 
@@ -26,7 +22,8 @@ And then at the center top choose "+ Add MCP Server..." and follow one these ste
 
 3. Add a name of your choice
 
-And you are good to go! Now the Copilot extension will list all tools from
-Tidewave available. If your application uses a SQL database, you can verify
-it all works by asking it to run `SELECT 1` as database query.
+## Verify
+
+You can verify it all works by starting a new session and asking your agent if
+it can see Tidewave's tools.
 If it fails, check out [our MCP Troubleshooting section](mcp.md#troubleshooting).

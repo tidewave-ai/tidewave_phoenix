@@ -1,0 +1,346 @@
+defmodule Tidewave.MCP.Handler do
+  @moduledoc false
+
+  require Logger
+
+  alias Tidewave.MCP.Tools
+
+  @protocol_version "2025-03-26"
+  @vsn Mix.Project.config()[:version]
+
+  ## Tool management functions
+
+  defp raw_tools do
+    [
+      Tools.Logs.tools(),
+      Tools.Source.tools(),
+      Tools.Eval.tools(),
+      Tools.Ecto.tools(),
+      Tools.Ash.tools()
+    ]
+    |> List.flatten()
+  end
+
+  defp browser_tools do
+    Tools.Browser.tools()
+  end
+
+  defp dispatch_map(tools) do
+    Map.new(tools, fn tool -> {tool.name, tool.callback} end)
+  end
+
+  @doc false
+  def init_tools do
+    tools = raw_tools()
+    browser_tools = browser_tools()
+    dispatch_map = dispatch_map(tools)
+    browser_dispatch_map = dispatch_map(browser_tools)
+
+    # TODO: switch back to persistent_term when we don't support OTP 27 any more
+    # :persistent_term.put({__MODULE__, :tools_and_dispatch}, {tools, dispatch_map})
+    :ets.new(:tidewave_tools, [:set, :named_table, read_concurrency: true])
+
+    :ets.insert(
+      :tidewave_tools,
+      {:tools, {tools, dispatch_map, browser_tools, browser_dispatch_map}}
+    )
+  end
+
+  @doc false
+  def tools_and_dispatch(include_browser_tools?) do
+    # TODO: switch back to persistent_term when we don't support OTP 27 any more
+    # :persistent_term.get({__MODULE__, :tools_and_dispatch})
+    [{:tools, {tools, dispatch_map, browser_tools, browser_dispatch_map}}] =
+      :ets.lookup(:tidewave_tools, :tools)
+
+    if include_browser_tools? do
+      {tools ++ browser_tools, Map.merge(dispatch_map, browser_dispatch_map)}
+    else
+      {tools, dispatch_map}
+    end
+  end
+
+  defp tools(include_browser_tools?) do
+    {tools, _} = tools_and_dispatch(include_browser_tools?)
+
+    for tool <- tools do
+      tool
+      |> Map.put(:description, String.trim(tool.description))
+      |> Map.drop([:callback])
+    end
+  end
+
+  # A callback must return either
+  #
+  #   * `{:ok, result}` if the callback does not receive state
+  #   * `{:ok, result, new_state}` if the callback receives state (i.e. if it is of arity 2)
+  #   * `{:ok, result, metadata}` if the callback is of arity 1 and returns metadata (returned as `_meta`)
+  #   * `{:ok, result, new_state, metadata}` if the callback is of arity 2 and returns metadata (returned as `_meta`)
+  #   * `{:error, reason}` for any error
+  #   * `{:error, reason, new_state}` for any error that should also update the state
+  #
+  defp dispatch(name, args, assigns, include_browser_tools?) do
+    {_tools, dispatch} = tools_and_dispatch(include_browser_tools?)
+
+    case dispatch do
+      %{^name => callback} when is_function(callback, 2) ->
+        callback.(args, assigns)
+
+      %{^name => callback} when is_function(callback, 1) ->
+        callback.(args)
+
+      _ ->
+        {:error,
+         %{
+           code: -32601,
+           message: "Method not found",
+           data: %{name: name}
+         }}
+    end
+  end
+
+  ## MCP message processing
+
+  defp validate_protocol_version(client_version) do
+    cond do
+      is_nil(client_version) ->
+        {:error, "Protocol version is required"}
+
+      client_version < unquote(@protocol_version) ->
+        {:error,
+         "Unsupported protocol version. Server supports #{unquote(@protocol_version)} or later"}
+
+      true ->
+        :ok
+    end
+  end
+
+  defp handle_ping(request_id) do
+    reply(request_id, %{})
+  end
+
+  defp handle_initialize(request_id, params, include_browser_tools?) do
+    case validate_protocol_version(params["protocolVersion"]) do
+      :ok ->
+        reply(request_id, %{
+          protocolVersion: @protocol_version,
+          capabilities: %{
+            tools: %{
+              listChanged: false
+            }
+          },
+          serverInfo: %{
+            name: "Tidewave MCP Server",
+            version: @vsn
+          },
+          tools: tools(include_browser_tools?)
+        })
+
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
+
+  defp handle_list_tools(request_id, _params, include_browser_tools?) do
+    reply(request_id, %{tools: tools(include_browser_tools?)})
+  end
+
+  defp handle_list_prompts(request_id, _params) do
+    reply(request_id, %{prompts: []})
+  end
+
+  defp handle_list_resources(request_id, _params) do
+    reply(request_id, %{resources: []})
+  end
+
+  defp handle_list_templates(request_id, _params) do
+    reply(request_id, %{templates: []})
+  end
+
+  defp reply(request_id, result) do
+    {:reply, %{jsonrpc: "2.0", id: request_id, result: result}}
+  end
+
+  # Translate the tool callback contract into the handler contract.
+  defp handle_tool_result(request_id, {:ok, text, metadata})
+       when is_binary(text) and is_map(metadata) do
+    reply(request_id, %{content: [%{type: "text", text: text}], _meta: metadata})
+  end
+
+  defp handle_tool_result(request_id, {:ok, text}) when is_binary(text) do
+    reply(request_id, %{content: [%{type: "text", text: text}]})
+  end
+
+  defp handle_tool_result(request_id, {:ok, result}) when is_map(result) do
+    reply(request_id, result)
+  end
+
+  defp handle_tool_result(request_id, {:error, :invalid_arguments}) do
+    {:error,
+     %{
+       jsonrpc: "2.0",
+       id: request_id,
+       error: %{code: -32602, message: "Invalid arguments for tool"}
+     }}
+  end
+
+  defp handle_tool_result(request_id, {:error, message}) when is_binary(message) do
+    # tool errors should be treated as successful response with isError: true
+    # https://spec.modelcontextprotocol.io/specification/2024-11-05/server/tools/#error-handling
+    reply(request_id, %{content: [%{type: "text", text: message}], isError: true})
+  end
+
+  defp handle_tool_result(request_id, {:error, error}) when is_map(error) do
+    {:error,
+     %{
+       jsonrpc: "2.0",
+       id: request_id,
+       error: error
+     }}
+  end
+
+  defp handle_call_tool(request_id, %{"name" => name} = params, assigns, include_browser_tools?) do
+    args = Map.get(params, "arguments", %{})
+
+    handle_tool_result(
+      request_id,
+      dispatch(name, args, assigns, include_browser_tools?)
+    )
+  end
+
+  defp safe_call_tool(request_id, params, assigns, include_browser_tools?) do
+    handle_call_tool(request_id, params, assigns, include_browser_tools?)
+  catch
+    kind, reason ->
+      # tool exceptions should be treated as successful response with isError: true
+      # https://spec.modelcontextprotocol.io/specification/2024-11-05/server/tools/#error-handling
+      reply(request_id, %{
+        content: [
+          %{
+            type: "text",
+            text: "Failed to call tool: #{Exception.format(kind, reason, __STACKTRACE__)}"
+          }
+        ],
+        isError: true
+      })
+  end
+
+  # Built-in message routing
+  defp route_message(
+         %{"method" => "notifications/initialized"},
+         _assigns,
+         _include_browser_tools?
+       ) do
+    Logger.info("Received initialized notification")
+    :notification
+  end
+
+  defp route_message(
+         %{"method" => "notifications/" <> _ = method},
+         _assigns,
+         _include_browser_tools?
+       ) do
+    Logger.debug("Ignoring notification: #{method}")
+    :notification
+  end
+
+  defp route_message(
+         %{"method" => method, "id" => id} = message,
+         assigns,
+         include_browser_tools?
+       ) do
+    Logger.info("Routing MCP message: #{method} (id=#{id})")
+    Logger.debug("Full message: #{inspect(message, pretty: true)}")
+
+    case method do
+      "ping" ->
+        handle_ping(id)
+
+      "initialize" ->
+        Logger.info(
+          "Handling initialize request with params: #{inspect(message["params"], pretty: true)}"
+        )
+
+        handle_initialize(id, message["params"], include_browser_tools?)
+
+      "tools/list" ->
+        handle_list_tools(id, message["params"], include_browser_tools?)
+
+      "tools/call" ->
+        Logger.debug(
+          "Handling tool call request with params: #{inspect(message["params"], pretty: true)}"
+        )
+
+        safe_call_tool(id, message["params"], assigns, include_browser_tools?)
+
+      "prompts/list" ->
+        handle_list_prompts(id, message["params"])
+
+      "resources/list" ->
+        handle_list_resources(id, message["params"])
+
+      "resources/templates/list" ->
+        handle_list_templates(id, message["params"])
+
+      other ->
+        Logger.warning("Received unsupported method: #{other}")
+
+        {:error,
+         %{
+           jsonrpc: "2.0",
+           id: id,
+           error: %{
+             code: -32601,
+             message: "Method not found",
+             data: %{
+               name: other
+             }
+           }
+         }}
+    end
+  end
+
+  defp validate_jsonrpc_message(%{"jsonrpc" => "2.0"} = message) do
+    cond do
+      # Request must have method and id (string or number)
+      Map.has_key?(message, "id") and Map.has_key?(message, "method") ->
+        case message["id"] do
+          id when is_binary(id) or is_number(id) -> {:ok, message}
+          _ -> {:error, :invalid_jsonrpc}
+        end
+
+      # Notification must have method but no id
+      not Map.has_key?(message, "id") and Map.has_key?(message, "method") ->
+        {:ok, message}
+
+      # reply (e.g. to ping) with ID + result
+      Map.has_key?(message, "id") and Map.has_key?(message, "result") ->
+        {:ok, message}
+
+      true ->
+        {:error, :invalid_jsonrpc}
+    end
+  end
+
+  defp validate_jsonrpc_message(_), do: {:error, :invalid_jsonrpc}
+
+  @doc false
+  def handle_message(message, assigns, opts \\ []) do
+    include_browser_tools? = Keyword.get(opts, :include_browser_tools, true)
+
+    case validate_jsonrpc_message(message) do
+      {:ok, message} ->
+        route_message(message, assigns, include_browser_tools?)
+
+      {:error, :invalid_jsonrpc} ->
+        Logger.warning("Invalid JSON-RPC message format")
+
+        {:reply,
+         %{
+           jsonrpc: "2.0",
+           id: nil,
+           error: %{code: -32600, message: "Could not parse message"}
+         }}
+    end
+  end
+end
