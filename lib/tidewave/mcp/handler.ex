@@ -22,7 +22,7 @@ defmodule Tidewave.MCP.Handler do
   end
 
   defp browser_tools do
-    Tools.Browser.tools()
+    Tools.Browser.tools() ++ Tools.DesignCanvas.tools()
   end
 
   defp dispatch_map(tools) do

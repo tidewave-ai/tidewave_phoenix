@@ -27,7 +27,9 @@ defmodule Tidewave.MCP.HandlerTest do
 
       assert response.id == 1
       assert response.result.protocolVersion == "2025-03-26"
-      assert "browser_eval" in Enum.map(response.result.tools, & &1.name)
+      tool_names = Enum.map(response.result.tools, & &1.name)
+      assert "browser_eval" in tool_names
+      assert "create_design_canvas" in tool_names
     end
 
     test "accepts handler options" do
@@ -36,7 +38,9 @@ defmodule Tidewave.MCP.HandlerTest do
       assert {:reply, response} =
                Handler.handle_message(message, tidewave_config(), include_browser_tools: false)
 
-      refute "browser_eval" in Enum.map(response.result.tools, & &1.name)
+      tool_names = Enum.map(response.result.tools, & &1.name)
+      refute "browser_eval" in tool_names
+      refute "create_design_canvas" in tool_names
     end
 
     test "validates JSON-RPC independently of a transport" do
