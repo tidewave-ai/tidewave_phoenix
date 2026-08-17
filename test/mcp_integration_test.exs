@@ -92,21 +92,6 @@ defmodule Tidewave.MCPIntegrationTest do
     assert response["error"]["message"] == "Invalid arguments for tool"
   end
 
-  test "does not expect arguments to be given" do
-    id = System.unique_integer([:positive])
-
-    response =
-      send_http_request(%{
-        "jsonrpc" => "2.0",
-        "id" => id,
-        "method" => "tools/call",
-        "params" => %{"name" => "get_ecto_schemas"}
-      })
-
-    assert response["id"] == id
-    assert response["result"]
-  end
-
   ### helpers
 
   defp initialize_and_get_tools() do

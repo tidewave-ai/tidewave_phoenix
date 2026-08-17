@@ -15,8 +15,7 @@ defmodule Tidewave.MCP.Handler do
       Tools.Logs.tools(),
       Tools.Source.tools(),
       Tools.Eval.tools(),
-      Tools.Ecto.tools(),
-      Tools.Ash.tools()
+      Tools.Ecto.tools()
     ]
     |> List.flatten()
   end

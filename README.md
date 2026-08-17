@@ -147,20 +147,6 @@ Get the source location for a given module/function, across both your app and it
 
 Your agent can use it to jump straight to where a module/function is defined, by file and line, instead of grepping for it, including when the definition lives in a hex dependency.
 
-### `get_ecto_schemas`
-
-Lists all Ecto schema modules and their file paths.
-
-[![get_ecto_schemas demo](readme/get_ecto_schemas-poster.png)](https://asciinema.org/a/1260519)
-
-### `get_ash_resources`
-
-Returns all Ash domains and their resources for the current project.
-
-[![get_ash_resources demo](readme/get_ash_resources-poster.png)](https://asciinema.org/a/1260520)
-
-Only available if you are using Ash.
-
 ## Troubleshooting
 
 ### Using multiple hosts/subdomains

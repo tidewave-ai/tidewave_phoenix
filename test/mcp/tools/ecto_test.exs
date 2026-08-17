@@ -8,7 +8,7 @@ defmodule Tidewave.MCP.Tools.EctoTest do
       assert tools = Ecto.tools()
       assert execute_sql_query = Enum.find(tools, &(&1.name == "execute_sql_query"))
       assert execute_sql_query.inputSchema.properties.repo.description =~ "MockRepo"
-      assert Enum.find(tools, &(&1.name == "get_ecto_schemas"))
+      assert [execute_sql_query] == tools
     end
   end
 
@@ -107,29 +107,6 @@ defmodule Tidewave.MCP.Tools.EctoTest do
 
       assert text =~ "Query returned 100 rows. Only the first 50 rows are included in the result."
       refute text =~ "51"
-    end
-  end
-
-  describe "get_ecto_schemas/1" do
-    test "returns list of Ecto schema modules and their file path" do
-      assert {:error, "No Ecto schemas found in the project"} = Ecto.get_ecto_schemas(%{})
-
-      {:module, _, bin, _} =
-        defmodule Elixir.TestSchema do
-          def __changeset__ do
-            %{}
-          end
-        end
-
-      compile_path = Mix.Project.compile_path()
-      File.write!("#{compile_path}/Elixir.TestSchema.beam", bin)
-
-      on_exit(fn ->
-        File.rm("#{compile_path}/Elixir.TestSchema.beam")
-      end)
-
-      {:ok, text} = Ecto.get_ecto_schemas(%{})
-      assert text == "* TestSchema at test/mcp/tools/ecto_test.exs"
     end
   end
 end

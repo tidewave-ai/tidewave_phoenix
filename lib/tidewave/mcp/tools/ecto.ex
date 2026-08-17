@@ -1,7 +1,6 @@
 defmodule Tidewave.MCP.Tools.Ecto do
   @moduledoc false
 
-  alias Tidewave.MCP.Tools.Source
   @limit 50
 
   def tools do
@@ -63,22 +62,6 @@ defmodule Tidewave.MCP.Tools.Ecto do
             }
           },
           callback: &execute_sql_query/2
-        },
-        %{
-          name: "get_ecto_schemas",
-          description: """
-          Lists all Ecto schema modules and their file path in the current project.
-
-          Use this tool to get an overview of available schemas if the project uses Ecto.
-          You should prefer this tool over grepping the file system when you need to find a specific schema.
-          """,
-          inputSchema: %{
-            type: "object",
-            required: [],
-            properties: %{}
-          },
-          annotations: %{readOnlyHint: true},
-          callback: &get_ecto_schemas/1
         }
       ]
     else
@@ -121,36 +104,6 @@ defmodule Tidewave.MCP.Tools.Ecto do
     {:error, :invalid_arguments}
   end
 
-  def get_ecto_schemas(_args) do
-    schemas =
-      for module <- project_modules(),
-          Code.ensure_loaded?(module),
-          function_exported?(module, :__changeset__, 0) do
-        location =
-          case Source.get_source_location(%{"reference" => inspect(module)}) do
-            {:ok, source_location} -> " at #{source_location}"
-            _ -> ""
-          end
-
-        spark_context = spark_is_context(module)
-
-        "* #{inspect(module)}#{location}#{spark_context}"
-      end
-
-    case schemas do
-      [] -> {:error, "No Ecto schemas found in the project"}
-      schemas -> {:ok, Enum.join(schemas, "\n")}
-    end
-  end
-
-  defp spark_is_context(module) do
-    if function_exported?(module, :spark_is, 0) do
-      " (#{inspect(module.spark_is())})"
-    else
-      ""
-    end
-  end
-
   defp apps do
     # This is the same code ecto uses to find repos for tasks like mix ecto.migrate
     # https://github.com/elixir-ecto/ecto/blob/cd0f70b4cdd949767ea7cbe7d635e70917384b38/lib/mix/ecto.ex#L24-L52
@@ -176,20 +129,5 @@ defmodule Tidewave.MCP.Tools.Ecto do
 
   defp repos_configured? do
     ecto_repos() != []
-  end
-
-  defp project_modules do
-    build_path = Mix.Project.build_path()
-
-    files =
-      apps()
-      |> Enum.flat_map(fn app ->
-        File.ls!(Path.join(build_path, "lib/#{app}/ebin"))
-      end)
-      |> :lists.usort()
-
-    for file <- files, [basename, ""] <- [:binary.split(file, ".beam")] do
-      String.to_atom(basename)
-    end
   end
 end
