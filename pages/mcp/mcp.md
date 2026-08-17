@@ -21,12 +21,12 @@ Here is a baseline comparison of the tools supported by different frameworks/lan
 
 | Features                     | Phoenix | Rails | Vite / TanStack Start |
 | :--------------------------- | :-----: | :---: | :-------------------: |
-| `browser_eval`               | ✅      | Soon™ | Soon™                 |
+| `create_design_canvas`       | ✅      | ✅    | ✅                    |
+| `browser_eval`               | ✅      | ✅    | ✅                    |
 | `project_eval`               | ✅      | ✅    | ✅                    |
 | `get_docs`                   | ✅      | ✅    | ✅                    |
 | `get_source_location`        | ✅      | ✅    | ✅                    |
 | `get_logs`                   | ✅      | ✅    | ✅                    |
-| `get_models` / `get_schemas` | ✅      | ✅    |                       |
 | `execute_sql_query`          | ✅      | ✅    |                       |
 
 You may want to nudge your coding agent into using Tidewave MCP's capabilities more frequently by using rules, so you don't need to ask explicitly each time. Each editor places those rules at different locations, so make sure to consult their documentation.
@@ -44,13 +44,13 @@ You can customize the rule to match your workflow.
 
 > #### Exclude browser tools {: .info}
 >
-> By default, the Tidewave MCP will include browser tools, such `browser_eval`.
-> If you don't plan to use browser tools, you can set your MCP URL to
-> `/tidewave/mcp?include_browser_tools=false`.
+> By default, the Tidewave MCP will include browser tools, such `browser_eval`
+> and `create_design_canvas`. If you don't plan to use browser tools, you can
+> set your MCP URL to `/tidewave/mcp?include_browser_tools=false`.
 
 ## Troubleshooting
 
-This page contains several steps to help debug issues when integrating Tidewave with an editor or MCP client. There are usually three distinct components to investigate:
+This section contains information help debug issues when integrating Tidewave with an editor or MCP client. There are usually two components to investigate:
 
 * Your web application
 * Your agent/editor
@@ -102,7 +102,7 @@ Things to check for:
 
 * Do the response headers (the lines starting with `<`) include a "transfer-encoding" that indicates compression? Some web servers may automatically compress responses, which may not be handled correctly by your editor or MCP client. In such cases, you may need to disable compression or use an MCP proxy.
 
-* Are you using Docker or similar? By default, Tidewave and your web server only accept requests coming from localhost. Depending on the bridge mode you use, you need to configure both to allow external connections. (Remember to only expose your Docker ports locally.)
+* Are you using Docker or similar? By default, Tidewave and your web server only accept requests coming from localhost. Depending on the bridge mode you use, you need to configure both to allow external connections. Remember to only expose your Docker ports locally.
 
 ### Your agent/editor
 
