@@ -157,7 +157,7 @@ defmodule TidewaveTest do
       |> Plug.Conn.send_resp(200, "foo")
 
     assert Plug.Conn.get_resp_header(conn, "content-security-policy") == [
-             "default-src 'self' http://example.com; connect-src 'none'; script-src https://tidewave.ai 'unsafe-eval' 'self'"
+             "default-src 'self' http://example.com; connect-src https://tidewave.ai 'none'; script-src https://tidewave.ai 'unsafe-eval' 'self'"
            ]
   end
 
