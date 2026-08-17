@@ -118,6 +118,9 @@ defmodule Tidewave do
             _ -> "script-src #{toolbar_host}#{directives}"
           end
 
+        ["connect-src", directives] ->
+          "connect-src #{toolbar_host}#{directives}"
+
         [policy, directives] ->
           "#{policy} #{directives}"
 
