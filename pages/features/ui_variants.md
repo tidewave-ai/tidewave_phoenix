@@ -1,12 +1,16 @@
 # UI variants
 
-UI variants allows your coding agent to propose multiple versions of a page section or UI component, integrated directly with your web framework:
+UI variants allows your coding agent to propose multiple versions of a page section or UI component, directly on the page you are working on:
 
 <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/nnwckXZgnmY?si=x2grzQd8uuBjyply" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 To enable UI variants in the Tidewave Toolbar, simply click the "UI Variants" icon in the prompt composer, which will then become active, and describe the variants you want:
 
 <img src="assets/variants.png" alt="UI variants example" width="500px">
+
+> #### UI variants vs design canvas {: .info}
+>
+> Tidewave also has a feature called [design canvas](design_canvas.md). Use UI variants when you want to try out different variations of a component within an existing page. Use the design canvas when you need to step back and explore different versions at a macro level, explore alternative navigation flows, or when you need to share the artifact with colleagues.
 
 > #### Tidewave IDE {: .info}
 >

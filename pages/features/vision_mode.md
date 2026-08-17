@@ -16,7 +16,7 @@ Videos by default include overlays, animations, and sound effects (which you may
 
 > #### Tidewave IDE {: .info}
 >
-> Vision mode is also available in the Tidewave IDE by clicking the video icon on the top right.
+> Vision mode is also available in the Tidewave IDE by clicking the video icon within the address bar.
 
 > #### Browser support {: .info}
 >
@@ -40,7 +40,7 @@ The following video uses the "Voice narration". It also includes animations and 
 
 ## Tidewave IDE
 
-If you are using the Tidewave IDE, you can enable vision mode on the top right instead:
+If you are using the Tidewave IDE, you can enable vision mode on the address bar instead:
 
 <img src="assets/vision-enable.png" alt="Enable vision mode" height="300px">
 

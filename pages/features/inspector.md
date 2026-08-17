@@ -1,6 +1,6 @@
 # Inspector
 
-Tidewave includes a default inspector integrated with our coding agent. The Inspector understands both server-side templates and client-side components.
+The Tidewave Toolbar and Tidewave IDE includes an inspector that allows you to point and click to elements on the page and request changes. The Inspector understands both server-side templates and client-side components and use this information to augment the prompt sent to agents.
 
 ## Usage
 

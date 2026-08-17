@@ -99,6 +99,7 @@ defmodule Tidewave.MixProject do
         "pages/ide/voice_input.md",
         "pages/features/accessibility.md",
         "pages/features/connect.md",
+        "pages/features/design_canvas.md",
         "pages/features/diagnostics.md",
         "pages/features/inspector.md",
         "pages/features/ui_variants.md",

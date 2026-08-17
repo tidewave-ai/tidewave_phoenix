@@ -1,0 +1,923 @@
+<!--
+# Design document API reference
+
+Use these custom elements to present rounds of design options around ordinary
+HTML. The design options should build on the base theme of the current application
+(such as fonts, color themes, and sizes) unless the user explicitly asks otherwise.
+
+The file should be self-contained. If you want to load resources, such as fonts,
+prefer loading from a CDN.
+
+## Canonical structure
+
+```html
+<design-document theme="auto">
+  <design-round marker="1">
+    <design-header>Landing page directions</design-header>
+    <design-note>
+      Optional notes about the following design options.
+    </design-note>
+    <design-options>
+      <design-option marker="1a">
+        <design-header>Centered hero</design-header>
+        <design-card class="desktop-page">
+          <main class="landing-page">...</main>
+        </design-card>
+        <design-note>Short rationale for this option.</design-note>
+      </design-option>
+    </design-options>
+  </design-round>
+</design-document>
+```
+
+## `<design-document>`
+
+The root element for a design document. Place rounds directly inside it.
+
+Attributes:
+
+- `type` is optional: `canvas` (default) or `page`.
+- `theme` is optional: `auto` (default), `light`, or `dark`. Auto follows
+  `prefers-color-scheme`. The light background is `#e6e6e6`; the dark background
+  is `#191919`. Theme and type are independent.
+
+Use the default canvas type unless the user requests a simpler navigation flow.
+In that case, set `type="page"` for normal document layout and scrolling.
+
+## `<design-round>`
+
+Groups the options for one request, exploration, or iteration.
+
+Attributes:
+
+- `marker` is required. Use sequential numbers: `1`, `2`, `3`, ...
+
+Allowed direct children, in order: zero or one `<design-header>`, zero or one
+`<design-note>`, then zero or one `<design-options>`.
+
+Use `<design-link>` to refer to the round elsewhere, such as in notes of later
+rounds.
+
+Place more recent design rounds at the top, so the numbers run from highest to
+lowest.
+
+## `<design-options>`
+
+Groups the options in one round and lays them out with wrapping.
+
+- It has no custom attributes.
+- Its direct children must be `<design-option>` elements.
+
+## `<design-option>`
+
+Contains one proposed design direction.
+
+Attributes:
+
+- `marker` is required. It must be the round marker followed by a letter
+  suffix: `1a`, `1b`, `1c`, ...
+
+Allowed direct children, in order: zero or one `<design-header>`, one or more
+`<design-card>` elements, then zero or one `<design-note>`.
+
+## `<design-header>`
+
+Provides the authored heading for a round or option.
+
+- It has no custom attributes.
+- It must be a direct child of `<design-round>` or `<design-option>`.
+- It may contain text and ordinary semantic markup.
+
+## `<design-card>`
+
+Contains the design itself. Everything inside it belongs to the user
+application.
+
+- It has no custom attributes.
+- Use native `class`, `style`, `data-*`, and accessibility attributes as needed.
+- The design-document font family and text color do not apply inside it.
+- Prefer reusable CSS classes over repeated inline styles.
+
+Give every card deliberate dimensions. Fixed viewports and page designs should
+usually define both `width` and `height`. Content-driven cards may instead use
+`min-width`, `min-height`, or `aspect-ratio`.
+
+Do not add `overflow: auto` or `overflow: scroll` to `<design-card>` itself. Let
+the design document handle navigation. If scrolling is part of the prototype,
+put it on a dedicated viewport element inside the card, such as
+`.prototype-viewport { height: 100%; overflow: auto; }`.
+
+## `<design-note>`
+
+Provides notes, rationale, status, or suggested next steps for a round or
+option.
+
+- It has no custom attributes.
+- It must be a direct child of `<design-round>` or `<design-option>`.
+- It may contain text, links, and ordinary semantic markup.
+
+## `<design-link>`
+
+Links to another round or option in the same document.
+
+Attributes:
+
+- `marker` is required. It must match the `marker` of a `<design-round>` or
+  `<design-option>` in the same document.
+
+## CSS custom properties
+
+The design document colors follow the `theme` attribute. To customize them,
+set these properties on `design-document`:
+
+- `--design-color-override` overrides the header and note text color.
+- `--design-background-override` overrides the canvas background.
+
+The overrides apply regardless of the active theme, so when using them, also
+set an explicit `theme` attribute that matches.
+
+```css
+design-document {
+  --design-color-override: #21201c;
+  --design-background-override: #f2efe9;
+}
+```
+
+## When to use Vue
+
+Use Vue when design rounds or options come from reactive data or when a
+card contains an interactive prototype. Static documents do not need it.
+
+For a standalone document, import Vue's browser build, mark `design-*` tags as
+custom elements, and mount the app on a normal root element.
+
+```html
+<div id="app">
+  <design-document theme="auto">
+    <design-round
+      v-for="round in rounds"
+      :key="round.marker"
+      :marker="round.marker"
+    >
+      <design-header>{{ round.name }}</design-header>
+      <design-options>
+        <design-option
+          v-for="option in round.options"
+          :key="option.marker"
+          :marker="option.marker"
+        >
+          <design-header>{{ option.label }}</design-header>
+          <design-card class="prototype-card">...</design-card>
+        </design-option>
+      </design-options>
+    </design-round>
+  </design-document>
+</div>
+
+<script type="module">
+  import { createApp } from "https://unpkg.com/vue@3/dist/vue.esm-browser.prod.js";
+
+  const app = createApp({
+    data() {
+      return { rounds: [] };
+    },
+  });
+
+  app.config.compilerOptions.isCustomElement = function isCustomElement(tag) {
+    return tag.startsWith("design-");
+  };
+
+  app.mount("#app");
+</script>
+```
+
+-->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Design</title>
+    <meta name="tidewave:canvas:version" content="1" />
+    <script src="https://tidewave.ai/tc/canvas.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=DM+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <style>
+      .hero-card {
+        width: 1200px;
+        height: 660px;
+      }
+
+      .page {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 26px 56px;
+      }
+
+      .brand {
+        font-family: "Fraunces", serif;
+        font-size: 22px;
+        font-weight: 600;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 32px;
+        font-size: 15px;
+      }
+
+      .nav-links a {
+        text-decoration: none;
+        color: inherit;
+        opacity: 0.7;
+      }
+
+      .nav-links a:hover {
+        opacity: 1;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 48px;
+        padding: 0 28px;
+        border-radius: 999px;
+        font-size: 15px;
+        font-weight: 500;
+        text-decoration: none;
+        border: 1px solid transparent;
+        color: inherit;
+      }
+
+      .btn-small {
+        height: 40px;
+        padding: 0 22px;
+        font-size: 14px;
+      }
+
+      .eyebrow {
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+
+      .headline {
+        font-family: "Fraunces", serif;
+        font-weight: 500;
+        line-height: 1.04;
+        letter-spacing: -0.01em;
+        margin: 0;
+      }
+
+      .subline {
+        font-size: 18px;
+        line-height: 1.6;
+        opacity: 0.75;
+      }
+
+      /* Option 1a — warm centered */
+
+      .hero-a {
+        background: #f8f2e7;
+        color: #2c1e12;
+      }
+
+      .hero-a .btn-primary {
+        background: #2c1e12;
+        color: #f8f2e7;
+      }
+
+      .hero-a .btn-ghost {
+        border-color: #2c1e1240;
+      }
+
+      .hero-a-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: 22px;
+        padding: 0 80px;
+      }
+
+      .hero-a .eyebrow {
+        color: #b3562b;
+      }
+
+      .hero-a .headline {
+        font-size: 66px;
+        max-width: 720px;
+      }
+
+      .hero-a .subline {
+        max-width: 540px;
+      }
+
+      .hero-a-actions {
+        display: flex;
+        gap: 14px;
+        margin-top: 8px;
+      }
+
+      .hero-a-meta {
+        display: flex;
+        justify-content: center;
+        gap: 48px;
+        padding: 24px 56px 30px;
+        border-top: 1px solid #2c1e121f;
+        font-size: 14px;
+        opacity: 0.7;
+      }
+
+      /* Option 1b — split with illustration */
+
+      .hero-b {
+        background: #fbf7ef;
+        color: #2c1e12;
+        flex-direction: row;
+      }
+
+      .hero-b-left {
+        flex: 1.15;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .hero-b-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 22px;
+        padding: 0 72px 48px 56px;
+      }
+
+      .hero-b .eyebrow {
+        color: #8a5a3b;
+      }
+
+      .hero-b .headline {
+        font-size: 58px;
+        max-width: 520px;
+      }
+
+      .hero-b .subline {
+        max-width: 460px;
+      }
+
+      .hero-b .btn-primary {
+        background: #3e2417;
+        color: #f8f2e7;
+      }
+
+      .hero-b .btn-ghost {
+        border-color: #2c1e1240;
+      }
+
+      .hero-b-actions {
+        display: flex;
+        gap: 14px;
+        margin-top: 8px;
+      }
+
+      .hero-b-rating {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        opacity: 0.75;
+        margin-top: 10px;
+      }
+
+      .hero-b-stars {
+        color: #b3562b;
+        letter-spacing: 2px;
+      }
+
+      .hero-b-right {
+        flex: 1;
+        background: #3e2417;
+        color: #f2e5d3;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 28px;
+        position: relative;
+      }
+
+      .hero-b-right svg {
+        width: 300px;
+        height: 300px;
+      }
+
+      .hero-b-badge {
+        position: absolute;
+        bottom: 40px;
+        right: 40px;
+        background: #f8f2e7;
+        color: #2c1e12;
+        border-radius: 12px;
+        padding: 14px 20px;
+        font-size: 14px;
+        line-height: 1.45;
+        box-shadow: 0 12px 32px #00000040;
+      }
+
+      .hero-b-badge strong {
+        display: block;
+        font-family: "Fraunces", serif;
+        font-size: 16px;
+      }
+
+      /* Option 1c — dark editorial */
+
+      .hero-c {
+        background: radial-gradient(80% 90% at 50% 0%, #2a1a0f 0%, #191009 60%);
+        color: #f3e9d7;
+      }
+
+      .hero-c .nav {
+        border-bottom: 1px solid #f3e9d71a;
+      }
+
+      .hero-c-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 26px;
+        padding: 0 96px;
+      }
+
+      .hero-c .eyebrow {
+        color: #cf9455;
+      }
+
+      .hero-c .headline {
+        font-size: 76px;
+        font-style: italic;
+        font-weight: 400;
+        max-width: 780px;
+      }
+
+      .hero-c .subline {
+        max-width: 520px;
+        opacity: 0.65;
+      }
+
+      .hero-c-actions {
+        display: flex;
+        align-items: center;
+        gap: 28px;
+        margin-top: 10px;
+      }
+
+      .hero-c .btn-primary {
+        background: #cf9455;
+        color: #191009;
+      }
+
+      .hero-c-link {
+        color: #f3e9d7;
+        font-size: 15px;
+        text-decoration: underline;
+        text-underline-offset: 5px;
+        opacity: 0.8;
+      }
+
+      .hero-c-meta {
+        display: flex;
+        gap: 48px;
+        padding: 26px 96px 34px;
+        border-top: 1px solid #f3e9d71a;
+        font-size: 14px;
+        opacity: 0.6;
+      }
+
+      /* Round 2 — CTA pair variants for option 1c */
+
+      .cta-card {
+        width: 560px;
+        height: 190px;
+      }
+
+      .cta-stage {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(120% 160% at 50% 0%, #2a1a0f 0%, #191009 70%);
+        color: #f3e9d7;
+        font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .cta-stage a {
+        transition: opacity 120ms ease, filter 120ms ease;
+      }
+
+      .cta-stage a:hover {
+        filter: brightness(1.06);
+        opacity: 1;
+      }
+
+      .cta-row {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+      }
+
+      .cta-stage .btn-primary {
+        background: #cf9455;
+        color: #191009;
+      }
+
+      .cta-stage .btn-ghost {
+        border-color: #f3e9d74d;
+      }
+
+      .cta-b-primary {
+        font-family: "Fraunces", serif;
+        font-style: italic;
+        font-size: 24px;
+        color: #cf9455;
+        text-decoration: underline;
+        text-decoration-thickness: 1px;
+        text-underline-offset: 7px;
+      }
+
+      .cta-b-secondary {
+        font-size: 15px;
+        color: #f3e9d7;
+        opacity: 0.7;
+        text-decoration: underline;
+        text-underline-offset: 5px;
+      }
+
+      .cta-c-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        height: 46px;
+        padding: 0 26px;
+        border-radius: 2px;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        text-decoration: none;
+      }
+
+      .cta-c-primary {
+        background: #cf9455;
+        color: #191009;
+      }
+
+      .cta-c-secondary {
+        border: 1px solid #f3e9d74d;
+        color: #f3e9d7;
+      }
+
+      .cta-d-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        height: 48px;
+        padding: 0 28px;
+        border-radius: 999px;
+        background: #f3e9d7;
+        color: #191009;
+        font-size: 15px;
+        font-weight: 500;
+        text-decoration: none;
+      }
+
+      .cta-d-secondary {
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #cf9455;
+        text-decoration: none;
+        border-bottom: 1px solid #cf945566;
+        padding-bottom: 3px;
+      }
+
+      .cta-e {
+        display: inline-flex;
+        align-items: stretch;
+        border: 1px solid #f3e9d733;
+        border-radius: 999px;
+        overflow: hidden;
+      }
+
+      .cta-e a {
+        display: inline-flex;
+        align-items: center;
+        height: 52px;
+        padding: 0 28px;
+        font-size: 15px;
+        text-decoration: none;
+        color: inherit;
+      }
+
+      .cta-e-primary {
+        background: #cf9455;
+        color: #191009;
+        font-weight: 500;
+      }
+
+      .cta-e-secondary {
+        opacity: 0.85;
+      }
+    </style>
+
+    <design-document theme="auto">
+      <design-round marker="2">
+        <design-header>CTA pair variants for the dark editorial hero</design-header>
+        <design-note>
+          Variants of the selected action pair from option
+          <design-link marker="1c"></design-link>, on the same backdrop. All
+          keep the primary/secondary hierarchy; they differ in how quiet the
+          secondary action is and how "editorial" the shapes feel.
+        </design-note>
+        <design-options>
+          <design-option marker="2a">
+            <design-header>Pill pair</design-header>
+            <design-card class="cta-card">
+              <div class="cta-stage">
+                <div class="cta-row">
+                  <a class="btn btn-primary" href="#">Reserve a table</a>
+                  <a class="btn btn-ghost" href="#">Tonight's pours</a>
+                </div>
+              </div>
+            </design-card>
+            <design-note>
+              The secondary link becomes a ghost pill, matching options
+              <design-link marker="1a"></design-link>/<design-link marker="1b"></design-link>.
+              More balanced, but the two actions compete a little more.
+            </design-note>
+          </design-option>
+
+          <design-option marker="2b">
+            <design-header>All text, editorial</design-header>
+            <design-card class="cta-card">
+              <div class="cta-stage">
+                <div class="cta-row" style="gap: 32px">
+                  <a class="cta-b-primary" href="#">Reserve a table</a>
+                  <a class="cta-b-secondary" href="#">Tonight's pours →</a>
+                </div>
+              </div>
+            </design-card>
+            <design-note>
+              No buttons at all — the primary is an italic Fraunces link in the
+              gold accent. Quietest option; leans hard into the wine-list mood.
+            </design-note>
+          </design-option>
+
+          <design-option marker="2c">
+            <design-header>Sharp &amp; uppercase</design-header>
+            <design-card class="cta-card">
+              <div class="cta-stage">
+                <div class="cta-row" style="gap: 14px">
+                  <a class="cta-c-btn cta-c-primary" href="#">Reserve a table</a>
+                  <a class="cta-c-btn cta-c-secondary" href="#">Tonight's pours</a>
+                </div>
+              </div>
+            </design-card>
+            <design-note>
+              Squared corners and letter-spaced caps read more print/menu than
+              app. Pairs well with the italic headline by contrast.
+            </design-note>
+          </design-option>
+
+          <design-option marker="2d">
+            <design-header>Cream pill + eyebrow link</design-header>
+            <design-card class="cta-card">
+              <div class="cta-stage">
+                <div class="cta-row" style="gap: 30px">
+                  <a class="cta-d-primary" href="#">Reserve a table <span>→</span></a>
+                  <a class="cta-d-secondary" href="#">Tonight's pours</a>
+                </div>
+              </div>
+            </design-card>
+            <design-note>
+              Swaps the gold fill for cream so the accent color is reserved for
+              the secondary action, styled like the eyebrow above the headline.
+            </design-note>
+          </design-option>
+
+          <design-option marker="2e">
+            <design-header>Segmented capsule</design-header>
+            <design-card class="cta-card">
+              <div class="cta-stage">
+                <div class="cta-e">
+                  <a class="cta-e-primary" href="#">Reserve a table</a>
+                  <a class="cta-e-secondary" href="#">Tonight's pours →</a>
+                </div>
+              </div>
+            </design-card>
+            <design-note>
+              Both actions in one capsule, like a reservation widget. Most
+              distinctive, but the secondary action is easiest to miss.
+            </design-note>
+          </design-option>
+        </design-options>
+      </design-round>
+
+      <design-round marker="1">
+        <design-header>Coffee shop hero section</design-header>
+        <design-note>
+          Three directions for a fictional shop, "Solstice Coffee". All use
+          Fraunces for display type and DM Sans for UI text; the palette stays
+          in espresso browns and creams with one warm accent per option.
+        </design-note>
+        <design-options>
+          <design-option marker="1a">
+            <design-header>Warm centered</design-header>
+            <design-card class="hero-card">
+              <main class="page hero-a">
+                <nav class="nav">
+                  <span class="brand">Solstice Coffee</span>
+                  <div class="nav-links">
+                    <a href="#">Menu</a>
+                    <a href="#">Beans</a>
+                    <a href="#">Locations</a>
+                    <a href="#">Our story</a>
+                  </div>
+                  <a class="btn btn-small btn-primary" href="#">Order ahead</a>
+                </nav>
+                <div class="hero-a-main">
+                  <span class="eyebrow">Est. 2018 · Roasted in Portland</span>
+                  <h1 class="headline">Slow mornings, good coffee.</h1>
+                  <p class="subline">
+                    Small-batch beans roasted in-house every Tuesday, pulled on
+                    a vintage Marzocco, and served without any hurry at all.
+                  </p>
+                  <div class="hero-a-actions">
+                    <a class="btn btn-primary" href="#">See the menu</a>
+                    <a class="btn btn-ghost" href="#">Find us</a>
+                  </div>
+                </div>
+                <div class="hero-a-meta">
+                  <span>Open daily 7am – 4pm</span>
+                  <span>212 Alder St, Portland</span>
+                  <span>Fresh roast every Tuesday</span>
+                </div>
+              </main>
+            </design-card>
+            <design-note>
+              Classic and safe. The centered layout keeps the copy front and
+              center, and the meta strip grounds it with practical info.
+            </design-note>
+          </design-option>
+
+          <design-option marker="1b">
+            <design-header>Split with illustration</design-header>
+            <design-card class="hero-card">
+              <main class="page hero-b">
+                <div class="hero-b-left">
+                  <nav class="nav">
+                    <span class="brand">Solstice Coffee</span>
+                    <div class="nav-links">
+                      <a href="#">Menu</a>
+                      <a href="#">Beans</a>
+                      <a href="#">Visit</a>
+                    </div>
+                  </nav>
+                  <div class="hero-b-content">
+                    <span class="eyebrow">Neighborhood roastery &amp; café</span>
+                    <h1 class="headline">Your corner of the morning.</h1>
+                    <p class="subline">
+                      Espresso, filter, and pastries from the bakery next door.
+                      Order ahead and skip the line, or don't — the line is
+                      where the regulars are.
+                    </p>
+                    <div class="hero-b-actions">
+                      <a class="btn btn-primary" href="#">Order ahead</a>
+                      <a class="btn btn-ghost" href="#">Browse beans</a>
+                    </div>
+                    <div class="hero-b-rating">
+                      <span class="hero-b-stars">★★★★★</span>
+                      <span>4.9 from 2,100 neighbors</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="hero-b-right">
+                  <svg viewBox="0 0 200 200" role="img" aria-label="Steaming coffee cup">
+                    <path
+                      d="M82 30c-9 11 9 17 0 28"
+                      stroke="#f2e5d3"
+                      stroke-width="6"
+                      fill="none"
+                      stroke-linecap="round"
+                      opacity="0.7"
+                    />
+                    <path
+                      d="M110 22c-9 11 9 17 0 28"
+                      stroke="#f2e5d3"
+                      stroke-width="6"
+                      fill="none"
+                      stroke-linecap="round"
+                      opacity="0.7"
+                    />
+                    <path
+                      d="M146 94h8a18 18 0 0 1 0 36h-10"
+                      stroke="#f2e5d3"
+                      stroke-width="10"
+                      fill="none"
+                      stroke-linecap="round"
+                    />
+                    <path
+                      d="M54 84h92v36a46 46 0 0 1-92 0z"
+                      fill="#f2e5d3"
+                    />
+                    <ellipse cx="100" cy="84" rx="46" ry="10" fill="#8a5a3b" />
+                    <ellipse
+                      cx="100"
+                      cy="172"
+                      rx="58"
+                      ry="8"
+                      fill="#f2e5d3"
+                      opacity="0.35"
+                    />
+                  </svg>
+                  <div class="hero-b-badge">
+                    <strong>Roasted in-house</strong>
+                    Next roast: Tuesday, 6am
+                  </div>
+                </div>
+              </main>
+            </design-card>
+            <design-note>
+              More product-forward: the split gives room for a CTA pair plus
+              social proof, and the illustration panel can later swap to a
+              photo without changing the layout.
+            </design-note>
+          </design-option>
+
+          <design-option marker="1c">
+            <design-header>Dark editorial</design-header>
+            <design-card class="hero-card">
+              <main class="page hero-c">
+                <nav class="nav">
+                  <span class="brand">Solstice Coffee</span>
+                  <div class="nav-links">
+                    <a href="#">Menu</a>
+                    <a href="#">Beans</a>
+                    <a href="#">Visit</a>
+                  </div>
+                </nav>
+                <div class="hero-c-main">
+                  <span class="eyebrow">Café · Roastery · Wine after five</span>
+                  <h1 class="headline">Coffee worth staying for</h1>
+                  <p class="subline">
+                    A daytime café that turns into a natural wine bar at dusk.
+                    Same room, same records, different glassware.
+                  </p>
+                  <div class="hero-c-actions">
+                    <a class="btn btn-primary" href="#">Reserve a table</a>
+                    <a class="hero-c-link" href="#">Tonight's pours →</a>
+                  </div>
+                </div>
+                <div class="hero-c-meta">
+                  <span>Coffee 7am – 5pm</span>
+                  <span>Wine 5pm – 11pm</span>
+                  <span>212 Alder St, Portland</span>
+                </div>
+              </main>
+            </design-card>
+            <design-note>
+              For a moodier, evening-leaning brand. The italic serif and gold
+              accent read more wine-bar than café — fits the café-by-day,
+              bar-by-night angle.
+            </design-note>
+          </design-option>
+        </design-options>
+      </design-round>
+    </design-document>
+  </body>
+</html>
