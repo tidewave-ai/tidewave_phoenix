@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.9.0 (2026-08-18)
+
+* Add `create_design_canvas` tool
+* Allow requests to tidewave.ai in CSP if toolbar is enabled
+* Remove `get_*_schema` tools
+
 ## v0.8.4 (2026-08-14)
 
 * Fix crash in diagnostic log handler
