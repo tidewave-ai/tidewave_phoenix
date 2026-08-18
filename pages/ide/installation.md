@@ -6,7 +6,7 @@ Tidewave IDE is an additional product which requires installing a desktop app (o
 
 > #### Tidewave vs Tidewave IDE {: .info}
 >
-> This page is about installing the Tidewave IDE, which is an agentic IDE that runs in your browser. If you are looking for the Tidewave Toolbar and Tidewave Connect, [follow the steps to install the Tidewave package instead](https://tidewave.ai/install).
+> This page is about installing the Tidewave IDE, which is an agentic IDE that runs in your browser. If you are looking for the Tidewave Toolbar, [follow the steps to install the Tidewave package instead](https://tidewave.ai/toolbar#download).
 
 ## Installing the app
 

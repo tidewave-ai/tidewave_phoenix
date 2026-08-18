@@ -6,9 +6,9 @@ The design canvas allows you to explore and refine interface ideas with your cod
 <img src="assets/design-canvas.png" alt="Design canvas example" />
 </a>
 
-You can ask your coding agent to create a design canvas at any moment, which is then done by invoking the `create_design_canvas` tool from Tidewave's MCP. The design canvas comes with a inspector and a zoom feature. You can also use drag and drop to navigate the canvas, or hold `Cmd`/`Ctrl` and use your scroll wheel to zoom in and out.
+The canvas is a standalone HTML file, written to disk, which you can check-in into version control or share with your colleagues on Slack. [Here is a sample design canvas for a coffee shop website](assets/coffee-hero-canvas.html){:target="_blank"}.
 
-The canvas is a standalone HTML file, which you can check-in into version control or share with your colleagues on Slack. [Here is a sample design canvas for a coffee shop website](assets/coffee-hero-canvas.html){:target="_blank"}.
+You can ask your coding agent to create a design canvas at any moment, which is then done by invoking the `create_design_canvas` tool from Tidewave's MCP. The design canvas comes with both inspector and zoom features. You can also use drag and drop to navigate the canvas, or hold `Cmd`/`Ctrl` and use your scroll wheel to zoom in and out.
 
 > #### Design canvas vs UI variants {: .info}
 >
