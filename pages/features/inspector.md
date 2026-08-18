@@ -4,7 +4,7 @@ The Tidewave Toolbar and Tidewave IDE includes an inspector that allows you to p
 
 ## Usage
 
-You can find the inspector on your Tidewave toolbar, on the top right of your browser window. Once enabled, you can hover page elements:
+You can find the inspector on your Tidewave Toolbar, on the top right of your browser window. Once enabled, you can hover page elements:
 
 ![Inspector example](assets/inspector.png)
 
@@ -14,7 +14,7 @@ You can click multiple elements and ask multiple elements to be changed at once.
 
 > #### Tidewave IDE {: .info}
 >
-> The inspector is also available in the Tidewave IDE by clicking the inspector icon on the top right.
+> The inspector is available in the Tidewave IDE by clicking the inspector icon on the top right. Both have the same functionality.
 
 ## Depth-based inspector
 

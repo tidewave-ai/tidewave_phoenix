@@ -1,6 +1,6 @@
 # Update visualizer
 
-The update visualizer highlights parts of your page as they change. It helps you understand which interactions update the DOM, but also which interactions cause framework specific changes, such as visualizing the diff from a Phoenix LiveView server render.
+You can use the Tidewave Toolbar to highlights parts of your page as they change. It helps you understand which interactions update the DOM, but also which interactions cause framework specific changes, such as visualizing the diff from a Phoenix LiveView server render.
 
 ![Update visualizer highlighting page changes](assets/visualizer.gif)
 

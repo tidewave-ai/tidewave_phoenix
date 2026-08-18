@@ -1,8 +1,6 @@
 # Vision mode
 
-[Tidewave Connect](connect.md) includes a vision mode feature that allows the agent to capture screenshots and record videos. You can enable vision mode on the bottom left:
-
-<img src="assets/vision-mode.png" alt="Vision mode">
+[Tidewave's browser automation](connect.md) includes a vision mode feature that allows the agent to capture screenshots and record videos.
 
 Once enabled, you can copy the instructions that will guide your agent to capture screenshots or record videos accordingly:
 
@@ -10,13 +8,9 @@ Once enabled, you can copy the instructions that will guide your agent to captur
 
 * **Recordings** — Enable vision mode and allow the agent to record videos to reproduce bugs or as proof of work, with support for captioning and narration
 
-Screenshots are always fed back into the coding agent. Videos are for your consumption (none of the supported coding agents accept videos as input).
+Screenshots are either fed back into the coding agent or saved to disk (if you request so). Videos are always saved to disk (none of the supported coding agents accept videos as input).
 
 Videos by default include overlays, animations, and sound effects (which you may ask the agent to disable). You may also opt into voice narration.
-
-> #### Tidewave IDE {: .info}
->
-> Vision mode is also available in the Tidewave IDE by clicking the video icon within the address bar.
 
 > #### Browser support {: .info}
 >
@@ -24,21 +18,9 @@ Videos by default include overlays, animations, and sound effects (which you may
 
 > #### When to enable vision mode? {: .info}
 >
-> By default, Tidewave Connect exposes the accessibility tree of the current page as text to your coding agent. In our tests, this is the most efficient format and allows the agent to effectively use and navigate your app. Screenshots are useful when trying to understand the overall colors and themes of the page, or to fix alignment issues.
+> By default, Tidewave exposes the accessibility tree of the current page as text to your coding agent. In our tests, this is the most efficient format and allows the agent to effectively use and navigate your app. Screenshots are useful when trying to understand the overall colors and themes of the page, or to fix alignment issues.
 
-## Voice narration
-
-You can enable voice narration, so the coding agent itself narrates the videos it records. To do so, [an ElevenLabs API key will be necessary](https://elevenlabs.io/).
-
-The following video uses the "Voice narration". It also includes animations and sound effects:
-
-<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/V55wcYMDueI?si=m3_DfPn269no-kf-" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-
-> #### ElevenLabs API key {: .info}
->
-> Your API key is only kept on the client and never sent to our servers.
-
-## Tidewave IDE
+## Using with Tidewave IDE
 
 If you are using the Tidewave IDE, you can enable vision mode on the address bar instead:
 
@@ -51,9 +33,25 @@ From now on, whenever the agent takes a screenshot or records a video, you will 
 <img src="assets/vision-video.png" alt="Agentic video" width="400px">
 </div>
 
-Screenshots are always fed back into the coding agent. Videos are for your consumption (none of the supported coding agents accept videos as input).
+## Using with Tidewave Toolbar (Connect)
 
-Videos by default include overlays, animations, and sound effects (which you may ask the agent to disable). You may also opt into voice narration.
+If you are using Tidewave Connect, you can enable vision mode on the bottom left:
+
+<img src="assets/vision-mode.png" alt="Vision mode">
+
+Videos are then saved to the `tidewave` directory of your web application.
+
+## Voice narration
+
+You can enable voice narration, so the coding agent itself narrates the videos it records. To do so, [an ElevenLabs API key will be necessary](https://elevenlabs.io/).
+
+The following video uses the "Voice narration". It also includes animations and sound effects:
+
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/V55wcYMDueI?si=m3_DfPn269no-kf-" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+> #### ElevenLabs API key {: .info}
+>
+> Your API key is only kept on the client and never sent to our servers.
 
 ## Tips
 

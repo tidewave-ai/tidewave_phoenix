@@ -10,8 +10,8 @@ Tidewave also emits framework specific warnings, see [Page diagnostics](diagnost
 
 > #### Tidewave IDE {: .info}
 >
-> Accessibility diagnostics are also available in the Tidewave IDE by clicking the accessibility icon on the top right.
+> Accessibility diagnostics are available in the Tidewave IDE by clicking the accessibility icon on the top right. Both have the same functionality.
 
 ## Agentic accessibility reports
 
-Whenever your coding agent is navigating your application through Tidewave Connect or Tidewave IDE, you can ask it to use the "browser eval" tool to collect accessibility diagnostics from any page, allowing the agent to assess, debug, and fix accessibility defects automatically.
+Whenever your coding agent is navigating your application through Tidewave Connect or Tidewave IDE, you can ask it to use the `browser_eval` tool to collect accessibility diagnostics from any page, allowing the agent to assess, debug, and fix accessibility defects automatically.

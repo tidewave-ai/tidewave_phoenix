@@ -8,13 +8,11 @@ To enable UI variants in the Tidewave Toolbar, simply click the "UI Variants" ic
 
 <img src="assets/variants.png" alt="UI variants example" width="500px">
 
+If using the Tidewave IDE, the agent already knows how to use UI variants, no need to activate it. Simple ask your agent to build different UI variants of any component you inspect/select.
+
 > #### UI variants vs design canvas {: .info}
 >
 > Tidewave also has a feature called [design canvas](design_canvas.md). Use UI variants when you want to try out different variations of a component within an existing page. Use the design canvas when you need to step back and explore different versions at a macro level, explore alternative navigation flows, or when you need to share the artifact with colleagues.
-
-> #### Tidewave IDE {: .info}
->
-> When using the Tidewave IDE, the agent already knows about the existence of UI variants, you simply need to ask it to build different UI variants of the selected component.
 
 ## How does it work?
 

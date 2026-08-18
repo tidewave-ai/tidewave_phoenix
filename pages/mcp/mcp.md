@@ -1,6 +1,10 @@
 # Set up Tidewave MCP
 
-For your coding agent (or editor) to access some of Tidewave's features, they must be configured to use Tidewave MCP. Tidewave MCP runs inside your web app, so it is a matter of connecting your coding agent (or editor) to your web app.
+You can access some of Tidewave's features from your editor/agent via the Model Context Protocol (MCP). Our MCP integrates your coding agent directly with your framework runtime, allowing it to query the database, and run code within the context of your app. Additional features, such as browser automation and the design canvas, are also exposed via Tidewave MCP.
+
+> #### Compatibilith with the Tidewave IDE
+>
+> The Tidewave IDE automatically connects your web application to Tidewave MCP, therefore the steps in this section are not strictly required. However, if you are using both Tidewave IDE and Tidewave MCP, you can disable this automatic connection in Tidewave IDE's settings pane.
 
 ## Instructions
 

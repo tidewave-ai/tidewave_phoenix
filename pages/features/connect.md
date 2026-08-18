@@ -1,6 +1,6 @@
-# Browser automation (Connect)
+# Browser automation
 
-Tidewave Connect allows your coding agent to connect to your browser and control your web application:
+The Tidewave Toolbar and Tidewave IDE allow your coding agent to connect to your browser and control your web application:
 
 <img src="assets/connect.png" alt="Tidewave Connect">
 
@@ -12,11 +12,27 @@ It is similar to tools like [Playwright](https://playwright.dev) or the browser 
 
 * **Vision mode**: [Tidewave's vision mode](vision_mode.md) includes the ability to record videos with captions, narration, and other bells and whistles for proof of work
 
-To enable Tidewave Connect, simply install the [Tidewave MCP](../mcp/mcp.md) in your coding agent of choice and ask it to use the `browser_eval` tool. You will need to also open up your web app at `/tidewave` in your browser of choice.
+To use browser automation with the Tidewave Toolbar, you need to click the "Tidewave Connect" icon in the toolbar and set up [Tidewave MCP](../mcp/mcp.md). Browser automation is built-in to the Tidewave IDE and it works out of the box. No additional configuration needed.
 
-## Managing connections
+## Using with Tidewave IDE
 
-Tidewave connects your coding agent to your browser via your web app. If your app is running on `localhost:4000`, your coding agent should connect to `localhost:4000/tidewave/mcp` and you should open up your browser at `localhost:4000/tidewave`, and now your coding agent will be able to control your browser. Consequently:
+Browser automation is built-in to the Tidewave IDE. Simply ask Tidewave to investigate or verify something on the current page and it will do so immediately.
+
+> #### Adversarial UI testing {: .tip}
+>
+> When developing new features, you can ask your coding agent to perform adversarial testing by spawning multiple agents, each with their own session, looking for bugs, exploring corner cases, and usability issues. Here is a sample prompt:
+>
+> > Use Tidewave's `browser_eval` to perform adversarial testing of the feature implemented. Come up with different ideas to break features (click twice rapidly, submit empty forms, use the back button, etc) and corner cases (empty states, form recovery, invalid inputs, etc) and spawn subagents to try them. Each subagent should start its own `browser_eval` session.
+
+## Using with Tidewave Toolbar (Connect)
+
+To get started with browser automation in the toolbar, first click the Tidewave Connect icon:
+
+<img src="assets/connect-arrow.png" alt="Tidewave Connect icon in the Toolbar">
+
+The new page will guide you to connect your coding agent to the browser via [Tidewave MCP](../mcp/mcp.md). If your app is running on `localhost:4000`, your coding agent should connect to `localhost:4000/tidewave/mcp` and you should open up your browser at `localhost:4000/tidewave`, and now your coding agent will be able to control your browser via the `browser_eval` tool.
+
+This architecture also enables some interesting workflows you may want to try:
 
 * You can open up `localhost:4000/tidewave` in three different browsers and your coding agent should be capable to connect to each of them
 
@@ -24,15 +40,9 @@ Tidewave connects your coding agent to your browser via your web app. If your ap
 
 * Similarly, if you want to establish remote connections, such as `myapp.staging.example.com`, you simply need to connect your coding agent to `myapp.staging.example.com/tidewave/mcp` and open `myapp.staging.example.com/tidewave` in your browser, and you are good to go
 
-## Multiple sessions
+### Multiple sessions
 
 Once connected to a particular browser, your coding agent gets its own session, but the agent can start as many sessions as it wants on demand. This means you can trivially run parallel workflows. For example, you can ask your coding agent to spawn a few subagents to navigate through the website, looking for bugs, security gaps, etc.
-
-> #### Adversarial UI testing {: .tip}
->
-> When developing new features, you can ask your coding agent to perform adversarial testing by spawning multiple agents, each with their own session, looking for bugs, exploring corner cases, and usability issues. Here is a sample prompt:
->
-> > Use Tidewave's `browser_eval` to perform adversarial testing of the feature implemented. Come up with different ideas to break features (click twice rapidly, submit empty forms, use the back button, etc) and corner cases (empty states, form recovery, invalid inputs, etc) and spawn subagents to try them. Each subagent should start its own `browser_eval` session.
 
 > #### Parallel accessibility screening {: .tip}
 >
@@ -42,7 +52,7 @@ Once connected to a particular browser, your coding agent gets its own session, 
 
 ## Viewport
 
-Tidewave Connect offers the ability to customize the viewport, allowing developers to simulate different devices. To use it, click on the display icon on the top right:
+You can customize the viewport in Tidewave and simulate different devices. To use it, click on the display icon on the top right:
 
 <img src="assets/viewport.png" alt="Tidewave Viewport">
 
