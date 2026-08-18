@@ -202,6 +202,7 @@ defmodule Tidewave do
       tidewave: tidewave_config(conn),
       root: Tidewave.MCP.root(),
       wsl_distro: System.get_env("WSL_DISTRO_NAME"),
+      host_path: System.get_env("TIDEWAVE_HOST_PATH"),
       framework: %{
         app_paths: app_paths
       }
