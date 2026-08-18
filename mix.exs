@@ -120,8 +120,8 @@ defmodule Tidewave.MixProject do
       groups_for_extras: [
         Welcome: "pages/welcome.md",
         Tidewave: ~r/(pages\/features\/.?)/,
-        "Tidewave MCP": ~r/pages\/mcp\/.?/,
         "Tidewave IDE": ~r/(pages\/ide\/.?)/,
+        "Tidewave MCP": ~r/pages\/mcp\/.?/,
         References: ~r/(pages\/references\/.?)/
       ],
       redirects: %{

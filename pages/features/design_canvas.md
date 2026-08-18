@@ -12,7 +12,7 @@ You can ask your coding agent to create a design canvas at any moment, which is 
 
 > #### Design canvas vs UI variants {: .info}
 >
-> Tidewave also has a feature called [UI variants](ui_variants.md). Use UI variants when you want to try out different variations of a component within an existing page. Use the design canvas when you need to step back and explore different versions at a macro level, explore alternative navigation flows, or when you need to share the artifact with colleagues.
+> Tidewave also has a feature called [UI variants](ui_variants.md). Use UI variants when you want to try out different variations of a component within an existing page. Use the design canvas when you need to step back and explore different versions at a macro level, visualize navigation across screens, or when you need to share the artifact with colleagues.
 
 > #### Tidewave IDE {: .info}
 >
