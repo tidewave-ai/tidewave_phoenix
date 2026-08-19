@@ -103,6 +103,15 @@ We also have specific instructions for:
 - [VS Code](https://tidewave.hexdocs.pm/mcp_vscode.html)
 - [Others](https://tidewave.hexdocs.pm/mcp.html)
 
+> [!TIP]
+> If you are using worktrees, you are likely running your web server
+> on different ports, and therefore there isn't a single host and port
+> combo you can use.
+>
+> In such cases, you may want to add `mix tidewave.proxy` as STDIO MCP
+> instead, which adds a "port" parameter to all tool definitions, and
+> is responsible to dispatch to the correct application.
+
 ## Usage
 
 As with any other MCP server, your agent will call the tools exposed by the Tidewave MCP whenever it sees fit. But you can also prompt it to call them explicitly.

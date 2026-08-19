@@ -24,7 +24,7 @@ defmodule Tidewave.MCP.HTTPTest do
     }
 
     conn = %{conn | body_params: message}
-    response = Tidewave.MCP.HTTP.handle_message(conn)
+    response = Tidewave.MCP.HTTP.run(conn)
 
     assert response.status == 200
     response_body = Jason.decode!(response.resp_body)
@@ -42,7 +42,7 @@ defmodule Tidewave.MCP.HTTPTest do
     }
 
     conn = %{conn | body_params: message}
-    response = Tidewave.MCP.HTTP.handle_message(conn)
+    response = Tidewave.MCP.HTTP.run(conn)
 
     assert response.status == 202
     assert response.resp_body == "{\"status\":\"ok\"}"
@@ -56,7 +56,7 @@ defmodule Tidewave.MCP.HTTPTest do
     }
 
     conn = %{conn | body_params: message}
-    response = Tidewave.MCP.HTTP.handle_message(conn)
+    response = Tidewave.MCP.HTTP.run(conn)
 
     assert response.status == 202
     assert response.resp_body == "{\"status\":\"ok\"}"
@@ -69,7 +69,7 @@ defmodule Tidewave.MCP.HTTPTest do
     }
 
     conn = %{conn | body_params: message}
-    response = Tidewave.MCP.HTTP.handle_message(conn)
+    response = Tidewave.MCP.HTTP.run(conn)
 
     assert response.status == 202
     assert response.resp_body == "{\"status\":\"ok\"}"
@@ -83,7 +83,7 @@ defmodule Tidewave.MCP.HTTPTest do
     }
 
     conn = %{conn | body_params: message}
-    response = Tidewave.MCP.HTTP.handle_message(conn)
+    response = Tidewave.MCP.HTTP.run(conn)
 
     assert response.status == 200
     response_body = Jason.decode!(response.resp_body)
@@ -101,7 +101,7 @@ defmodule Tidewave.MCP.HTTPTest do
     }
 
     conn = %{mcp_conn("/tidewave/mcp?include_browser_tools=false") | body_params: message}
-    response = Tidewave.MCP.HTTP.handle_message(conn)
+    response = Tidewave.MCP.HTTP.run(conn)
 
     assert response.status == 200
     response_body = Jason.decode!(response.resp_body)
@@ -117,7 +117,7 @@ defmodule Tidewave.MCP.HTTPTest do
     }
 
     conn = %{mcp_conn("/tidewave/mcp?include_browser_tools=false") | body_params: message}
-    response = Tidewave.MCP.HTTP.handle_message(conn)
+    response = Tidewave.MCP.HTTP.run(conn)
 
     assert response.status == 400
     response_body = Jason.decode!(response.resp_body)
@@ -133,7 +133,7 @@ defmodule Tidewave.MCP.HTTPTest do
     }
 
     conn = %{mcp_conn("/tidewave/mcp?include_browser_tools=true") | body_params: message}
-    response = Tidewave.MCP.HTTP.handle_message(conn)
+    response = Tidewave.MCP.HTTP.run(conn)
 
     assert response.status == 400
     response_body = Jason.decode!(response.resp_body)
@@ -147,7 +147,7 @@ defmodule Tidewave.MCP.HTTPTest do
     log =
       capture_log([level: :warning], fn ->
         conn = %{conn | body_params: message}
-        response = Tidewave.MCP.HTTP.handle_message(conn)
+        response = Tidewave.MCP.HTTP.run(conn)
 
         assert response.status == 200
         response_body = Jason.decode!(response.resp_body)
@@ -170,7 +170,7 @@ defmodule Tidewave.MCP.HTTPTest do
     }
 
     conn = %{conn | body_params: message}
-    response = Tidewave.MCP.HTTP.handle_message(conn)
+    response = Tidewave.MCP.HTTP.run(conn)
 
     assert response.status == 200
     response_body = Jason.decode!(response.resp_body)
@@ -187,7 +187,7 @@ defmodule Tidewave.MCP.HTTPTest do
     }
 
     conn = %{conn | body_params: message}
-    response = Tidewave.MCP.HTTP.handle_message(conn)
+    response = Tidewave.MCP.HTTP.run(conn)
 
     assert response.status == 200
     response_body = Jason.decode!(response.resp_body)
@@ -202,7 +202,7 @@ defmodule Tidewave.MCP.HTTPTest do
     }
 
     conn = %{conn | body_params: message}
-    response = Tidewave.MCP.HTTP.handle_message(conn)
+    response = Tidewave.MCP.HTTP.run(conn)
 
     assert response.status == 200
     response_body = Jason.decode!(response.resp_body)
@@ -217,7 +217,7 @@ defmodule Tidewave.MCP.HTTPTest do
     }
 
     conn = %{conn | body_params: message}
-    response = Tidewave.MCP.HTTP.handle_message(conn)
+    response = Tidewave.MCP.HTTP.run(conn)
 
     assert response.status == 200
     response_body = Jason.decode!(response.resp_body)
