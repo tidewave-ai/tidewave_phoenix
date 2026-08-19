@@ -10,7 +10,7 @@ Tidewave also emits framework specific warnings, see [Page diagnostics](diagnost
 
 > #### Tidewave IDE {: .info}
 >
-> Accessibility diagnostics are available in the Tidewave IDE by clicking the accessibility icon on the top right. Both have the same functionality.
+> Accessibility diagnostics are available in the Tidewave IDE by clicking the accessibility icon on the top right. It has the same functionality as the toolbar.
 
 ## Agentic accessibility reports
 

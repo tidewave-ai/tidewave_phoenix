@@ -1,8 +1,12 @@
 # Update visualizer
 
-You can use the Tidewave Toolbar to highlights parts of your page as they change. It helps you understand which interactions update the DOM, but also which interactions cause framework specific changes, such as visualizing the diff from a Phoenix LiveView server render.
+You can use the Tidewave Toolbar and the Tidewave IDE to highlight parts of your page as they change. It helps you understand which interactions update the DOM, but also which interactions cause framework specific changes, such as visualizing the diff from a Phoenix LiveView server render.
 
 ![Update visualizer highlighting page changes](assets/visualizer.gif)
+
+> #### Tidewave IDE {: .info}
+>
+> The update visualizer is available in the Tidewave IDE by clicking the visualizer icon on the top right. It has the same functionality as the toolbar.
 
 ## Usage
 
@@ -30,6 +34,8 @@ This visualization reflects the final DOM. It cannot detect a render that produc
 ## LiveView renders
 
 **LiveView renders** complements DOM updates by showing the regions touched by a diff from the LiveView server. It can therefore reveal a dynamic expression that was rendered and sent again even if its value, and consequently the DOM, stayed the same. This is useful for spotting unexpected renders and investigating how much data an interaction causes LiveView to send.
+
+<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/wL-kCtxi_R8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 LiveView render labels distinguish content from attribute updates and include an approximate size for the associated diff value.
 

@@ -8,7 +8,7 @@ Similar to [accessibility diagnostics](accessibility.md), the page diagnostics e
 
 > #### Tidewave IDE {: .info}
 >
-> Page diagnostics are available in the Tidewave IDE by clicking the diagnostics icon on the top right. Both have the same functionality.
+> Page diagnostics are available in the Tidewave IDE by clicking the diagnostics icon on the top right. It has the same functionality as the toolbar.
 
 ## Usage
 
