@@ -69,26 +69,6 @@ mix igniter.install tidewave
 
 For umbrella projects, you can follow the manual steps above in the application that defines your Phoenix endpoint (typically `apps/your_app_web`).
 
-#### In non-Phoenix applications
-
-Tidewave can be used as a MCP in any Elixir project. For example, you can use `bandit` (and `tidewave`) in dev mode in your `mix.exs`:
-
-```elixir
-{:tidewave, "~> 0.6", only: :dev},
-{:bandit, "~> 1.0", only: :dev},
-```
-
-And then adding an alias in your `mix.exs`:
-
-```elixir
-aliases: [
-  tidewave:
-    "run --no-halt -e 'Agent.start(fn -> Bandit.start_link(plug: Tidewave, port: 4000) end)'"
-]
-```
-
-Now run `mix tidewave`
-
 ### 2. Add the Tidewave MCP to your agent/editor
 
 Add the Tidewave MCP server to your editor or MCP client configuration as the type "http" (streamable), pointing to the `/tidewave/mcp` path and port your web application is running at. For example, `http://localhost:4000/tidewave/mcp`.
