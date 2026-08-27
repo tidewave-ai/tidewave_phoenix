@@ -10,11 +10,12 @@ defmodule Tidewave.MCP.Handler do
 
   ## Tool management functions
 
-  defp raw_tools do
+  @doc false
+  def raw_tools(project_eval? \\ Application.get_env(:tidewave, :enable_project_eval, true)) do
     [
       Tools.Logs.tools(),
       Tools.Source.tools(),
-      Tools.Eval.tools(),
+      if(project_eval?, do: Tools.Eval.tools(), else: []),
       Tools.Ecto.tools()
     ]
     |> List.flatten()

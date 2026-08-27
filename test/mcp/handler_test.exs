@@ -14,6 +14,19 @@ defmodule Tidewave.MCP.HandlerTest do
     end
   end
 
+  test "excludes project_eval when it is disabled" do
+    tool_names =
+      false
+      |> Handler.raw_tools()
+      |> Enum.map(& &1.name)
+
+    refute "project_eval" in tool_names
+    assert "get_logs" in tool_names
+    assert "execute_sql_query" in tool_names
+
+    assert "project_eval" in Enum.map(Handler.raw_tools(true), & &1.name)
+  end
+
   describe "handle_message/3" do
     test "handles a decoded message without a transport" do
       message = %{

@@ -151,6 +151,15 @@ If you have enabled Content-Security-Policy, Tidewave will automatically enable 
 
 ## Configuration
 
+You may disable the `project_eval` MCP tool before Tidewave starts:
+
+```elixir
+config :tidewave, enable_project_eval: false
+```
+
+The tool is enabled by default. When disabled, it is removed from both tool discovery and dispatch,
+while tools such as `execute_sql_query` remain available.
+
 You may configure the `Tidewave` plug using the following syntax:
 
 ```elixir
