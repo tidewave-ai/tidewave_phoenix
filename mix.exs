@@ -14,10 +14,6 @@ defmodule Tidewave.MixProject do
       deps: deps(),
       package: package(),
       elixirc_paths: if(Mix.env() == :test, do: ["lib", "test/support"], else: ["lib"]),
-      aliases: [
-        tidewave:
-          "run --no-halt -e 'Agent.start(fn -> Bandit.start_link(plug: Tidewave, port: 4000) end)'"
-      ],
 
       # Docs
       name: "Tidewave",
@@ -78,7 +74,11 @@ defmodule Tidewave.MixProject do
       footer: false,
       assets: %{"pages/assets" => "assets"},
       filter_modules: fn mod, _ ->
-        raise "you forgot to add \"@moduledoc false\" to #{inspect(mod)}"
+        if mod == Mix.Tasks.Tidewave.Proxy do
+          false
+        else
+          raise "you forgot to add \"@moduledoc false\" to #{inspect(mod)}"
+        end
       end,
       extras: [
         "pages/welcome.md",
