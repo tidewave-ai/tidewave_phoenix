@@ -18,6 +18,8 @@ Click the pulse icon in the Tidewave Toolbar to open **Visualize updates**, then
 | --- | --- | --- |
 | **DOM updates** | Elements whose content or attributes change in the DOM | All applications |
 | **LiveView renders** | Regions included in a Phoenix LiveView server render, even when the resulting DOM does not change | Phoenix LiveView 1.2.9 or later |
+| **React re-renders** | React components that re-render, even when the resulting DOM does not change | React applications |
+| **Vue re-renders** | Vue components that re-render, even when the resulting DOM does not change | Vue applications |
 
 Note that only available options are shown. If you are using the Toolbar with a Rails app, the LiveView option won't be shown.
 
@@ -52,3 +54,7 @@ config :phoenix_live_view,
 ```
 
 These options are enabled by default in the `dev.exs` config file of new Phoenix apps.
+
+## React/Vue re-renders
+
+Both modes highlight components whenever they re-render, including renders that do not result in any DOM changes. This makes it useful for spotting unexpected or unnecessary renders and understanding which components are affected by an interaction.

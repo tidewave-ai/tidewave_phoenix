@@ -1,14 +1,14 @@
 # Teams
 
-The Tidewave Team plan provides a central place to manage billing and configuration. Currently in beta, this plan offers early adopters special pricing and the opportunity to shape our roadmap.
+The Tidewave Team plans provide a central place to manage billing and configuration.
 
-[You can create and manage your teams on Tidewave](https://tidewave.ai/teams). Then configure your project to use your Tidewave Team settings. This gives all developers in your project the opportunity to leverage Tidewave's full-stack agentic coding capabilities.
+[You can create and manage your teams on Tidewave](https://tidewave.ai/teams). Then configure your project to use your Tidewave Team settings. This gives all developers in your project the opportunity to leverage Tidewave's capabilities.
 
 ## Configuration
 
-Applications that use Tidewave Team must be explicitly configured to do so. Once you create your team, you can find the "Installation" steps for your preferred framework in your Team page.
+Applications that use Tidewave Team must be explicitly configured to use your team account. Once you create your team, you can find the "Installation" steps for your preferred framework in your Team page.
 
-Note the Tidewave Team plan is separate from your Tidewave Pro account. You don't need a Tidewave Pro account if your project is configured to use the Tidewave Team plan.
+Note Tidewave team plans are separate from your personal plan. You don't need a personal plan if your project is configured to use your team account.
 
 ## Invitations
 
