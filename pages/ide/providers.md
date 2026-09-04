@@ -66,7 +66,7 @@ There are three mechanisms by which you can extend Tidewave IDE beyond the provi
 
 * [By using Codex with custom providers](#codex-custom-providers). The Codex CLI can be customized to run with any OpenAI compatible providers, which includes [Ollama](https://ollama.com) and external services
 
-* By using External Agents that implement the [Agent Client Protocol](https://agentclientprotocol.com/get-started/registry) (ACP) - you can enable them in the "External Agents" tab under the advanced settings. Given ACP is still evolving, keep in mind Tidewave IDE may not work as expected with all possible agents
+* By using External Agents that implement the [Agent Client Protocol](https://agentclientprotocol.com/get-started/registry) (ACP) - you can enable them in the "External Agents" tab under the advanced settings. For example, in order to run Grok Build, you can use `grok agent stdio` as your agent command. Given ACP is still evolving, keep in mind Tidewave IDE may not work as expected with all possible agents
 
 ### OpenCode providers
 
