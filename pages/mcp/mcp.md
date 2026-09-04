@@ -46,7 +46,7 @@ find module/function definitions.
 
 You can customize the rule to match your workflow.
 
-> #### Exclude browser tools {: .info}
+> #### Optionally exclude browser tools {: .info}
 >
 > By default, the Tidewave MCP will include browser tools, such `browser_eval`
 > and `create_design_canvas`. If you don't plan to use browser tools, you can
