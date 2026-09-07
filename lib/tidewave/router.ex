@@ -240,6 +240,7 @@ defmodule Tidewave.Router do
     client_url = Application.get_env(:tidewave, :client_url, "https://tidewave.ai")
 
     """
+    <!DOCTYPE html>
     <html>
       <head>
         <meta charset="UTF-8" />
@@ -255,6 +256,7 @@ defmodule Tidewave.Router do
     client_url = Application.get_env(:tidewave, :client_url, "https://tidewave.ai")
 
     """
+    <!DOCTYPE html>
     <html>
       <head>
         <meta charset="UTF-8" />
