@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.9.1 (2026-09-23)
+
+* Add `mix tidewave.proxy`
+* Add "instructions" to MCP initialization response
+
 ## v0.9.0 (2026-08-18)
 
 * Add `create_design_canvas` tool
