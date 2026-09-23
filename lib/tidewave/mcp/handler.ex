@@ -135,7 +135,17 @@ defmodule Tidewave.MCP.Handler do
             name: "Tidewave MCP Server",
             version: @vsn
           },
-          tools: tools(include_browser_tools?, transform_tools)
+          tools: tools(include_browser_tools?, transform_tools),
+          instructions: """
+          Tidewave connects you to this Phoenix application while it is running in development: the same process, database and logs the developer is using. Anything you would run through `mix run` can run inside the already-booted app instead, with no startup cost per call. Questions about the app's actual state (docs, state, loaded code, etc) are answered from the live process rather than inferred from files.
+
+          What is available and when each is relevant:
+          - project_eval: run Elixir inside the running app: schemas, queries, processes, ets tables, etc. Relevant whenever you would otherwise write a script, start `mix run`, or to debug
+          - execute_sql_query: query the development database directly. Relevant when the answer is in the database (counts, rows, what a record looks like)
+          - get_source_location: where a module or function, across the app and every package, including Phoenix itself. Uses runtime information, so it works even across meta-programming. Use when you know the exact name and would otherwise grep
+          - get_docs: documentation for a module or function, across the app and every package, for the exact versions this app has installed
+          - get_logs: the app's log output from real requests. Relevant when checking what happened during a request (the queries it ran, errors)
+          """
         })
 
       {:error, reason} ->
