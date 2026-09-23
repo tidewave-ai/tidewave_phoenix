@@ -30,13 +30,17 @@ If you ask the agent to commit and you are in your default branch (typically `ma
 
 All commits done by Tidewave IDE will append an "Assisted-by: Model Version Tidewave IDE" line to the commit message. You can disable this behaviour or provide custom commit and branch naming instructions in Settings.
 
-> #### Opening up diffs and files in your editor {: .tip}
->
-> If you `Ctrl+Click` (or `Cmd+Click`) a line number, either within the code review or while viewing a file, Tidewave IDE will automatically open up that file+line in your editor of choice.
+## Making changes
 
-## Configuration
+Within Tidewave's code review pane, you can change any of the existing files directly, which is handy for quick changes. However, if you prefer, use `Ctrl+Click` (or `Cmd+Click`) on a line number, either within the code review or while viewing a file, and the Tidewave IDE will automatically open up that file+line in your editor of choice.
 
-We currently support both unified and split diffs and have an option to wrap lines. Click on the `⋮` button on the top-right to configure it:
+## Reviewing branches and pull requests
+
+By default, the Code Review pane compares your working tree with the latest commit in the current branch. However, you can ask Tidewave to compare your current branch with "main", which allows you to review all changes in the current branch / pull request.
+
+## Unified vs split diffs
+
+We support both unified and split diffs and have an option to wrap lines. Click on the `⋮` button on the top-right to configure it:
 
 <img src="assets/review-config.png" alt="Code review: configuration" width="450px">
 
