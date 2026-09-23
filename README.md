@@ -25,7 +25,7 @@ Add the `tidewave` package to your `mix.exs`:
 ```elixir
 def deps do
   [
-    {:tidewave, "~> 0.6", only: :dev},
+    {:tidewave, "~> 0.9", only: :dev},
     {:phoenix, ...},
   ]
 end

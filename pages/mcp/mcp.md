@@ -52,6 +52,12 @@ You can customize the rule to match your workflow.
 > and `create_design_canvas`. If you don't plan to use browser tools, you can
 > set your MCP URL to `/tidewave/mcp?include_browser_tools=false`.
 
+## Worktrees
+
+If you are using worktrees, you are likely running your web server on different ports, and therefore there isn't a single host and port combo you can use.
+
+In such cases, you may want to add `mix tidewave.proxy` as STDIO MCP instead, which adds a "port" parameter to all tool definitions, and is responsible to dispatch to the correct application.
+
 ## Troubleshooting
 
 This section contains information help debug issues when integrating Tidewave with an editor or MCP client. There are usually two components to investigate:
