@@ -30,7 +30,7 @@ By holding the `Ctrl` key (or `Cmd` key on macOS) while the Inspector is enabled
 
 <iframe width="640" height="360" src="https://www.youtube.com/embed/7bYxfcgaisc?si=R_V5_RF_Vd-rJpvr" title="Tidewave Framework Overlay" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
-Clicking the element while the `Ctrl` key (or `Cmd` key on macOS) is pressed will open up the template/component in your [configured editor](editors.md).
+Clicking the element while the `Ctrl` key (or `Cmd` key on macOS) is pressed will open up the file that defines the given template/component.
 
 ## Shortcuts
 

@@ -2,17 +2,13 @@
 
 Tidewave can open up files and page elements directly in your editor.
 
-Whenever Tidewave renders a file location, you can directly `Ctrl+Click` (or `Cmd+Click`) the filename to open it in your editor. They will be identified with an upward right facing arrow (↗):
+Whenever Tidewave renders a file location, you can click the location to open the file in Tidewave or `Ctrl+Click` (or `Cmd+Click`) to open it in your editor. They will be identified with an upward right facing arrow (↗):
 
 <img src="assets/file-editor.png" alt="File editor integration" width="400px">
 
 When you click the filename for the first time, Tidewave will open up the "Editor integration" pane on Settings, where you can choose between a few preset editors, or set up a custom URL.
 
-There are a few additional places you can open in editor:
-
-* In the [Inspector](../features/inspector.md), `Ctrl+Click` (or `Cmd+Click`) an element pointed by the inspector to open its source
-
-* Whenever viewing a file or a diff during [Tidewave IDE's Code Review](../ide/code_review.md), you can `Ctrl+Click` (or `Cmd+Click`) the line number to open up the file at that location
+You can also `Ctrl+Click` (or `Cmd+Click`) any line within Tidewave's file viewer to open it in your editor.
 
 ## Custom URLs
 
