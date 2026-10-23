@@ -174,10 +174,7 @@ defmodule Tidewave do
   defp port_suffix(_scheme, port), do: ":#{port}"
 
   defp maybe_inject_toolbar(conn) do
-    # The toolbar embeds project metadata, so we only inject it on allowed
-    # hosts to avoid leaking it through DNS rebinding.
-    if conn.private.tidewave_config.toolbar and conn.resp_body != nil and html?(conn) and
-         Tidewave.Router.allowed_host?(conn) do
+    if conn.private.tidewave_config.toolbar and conn.resp_body != nil and html?(conn) do
       resp_body = IO.iodata_to_binary(conn.resp_body)
 
       if String.contains?(resp_body, "</head>") do
@@ -204,9 +201,25 @@ defmodule Tidewave do
     client_url = Application.get_env(:tidewave, :client_url, "https://tidewave.ai")
 
     """
-    <meta name="tidewave:config" content="#{tidewave_config_meta(conn) |> Jason.encode!() |> Plug.HTML.html_escape()}" />
+    #{tidewave_meta(conn)}
     <script async type="module" src="#{client_url}/tc/toolbar.js"></script>
     """
+  end
+
+  # The config embeds project metadata, so we only inject it on allowed
+  # hosts to avoid leaking it through DNS rebinding. Otherwise, we inject
+  # an error, so the toolbar can tell the user how to fix it.
+  defp tidewave_meta(conn) do
+    if Tidewave.Router.allowed_host?(conn) do
+      ~s|<meta name="tidewave:config" content="#{tidewave_config_meta(conn) |> Jason.encode!() |> Plug.HTML.html_escape()}" />|
+    else
+      error =
+        "For security reasons, Tidewave only works on the same host your web app is running on. " <>
+          "If you really want to allow this host, configure the " <>
+          "`allowed_origins: [#{inspect("//" <> conn.host)}]` option in your `plug Tidewave` call."
+
+      ~s|<meta name="tidewave:error" content="#{Plug.HTML.html_escape(error)}" />|
+    end
   end
 
   @doc false

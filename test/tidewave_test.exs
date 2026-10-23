@@ -139,10 +139,11 @@ defmodule TidewaveTest do
 
         assert conn.status == 200
         refute conn.resp_body =~ "tidewave:config"
+        assert conn.resp_body =~ "tidewave:error"
       end
     end
 
-    test "only injects the toolbar on allowed hosts" do
+    test "only injects the config on allowed hosts" do
       html = "<html><head></head><body></body></html>"
 
       conn =
@@ -153,6 +154,7 @@ defmodule TidewaveTest do
         |> send_resp(200, html)
 
       assert conn.resp_body =~ "tidewave:config"
+      refute conn.resp_body =~ "tidewave:error"
 
       conn =
         conn(:get, "http://evil.com/foo")
@@ -161,7 +163,10 @@ defmodule TidewaveTest do
         |> put_resp_content_type("text/html")
         |> send_resp(200, html)
 
-      assert conn.resp_body == html
+      refute conn.resp_body =~ "tidewave:config"
+      assert conn.resp_body =~ ~s|<meta name="tidewave:error"|
+      assert conn.resp_body =~ "allowed_origins: [&quot;//evil.com&quot;]"
+      assert conn.resp_body =~ "/tc/toolbar.js"
     end
   end
 
