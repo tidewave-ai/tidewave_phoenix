@@ -167,7 +167,7 @@ defmodule Tidewave.Router do
           conn
         else
           log_and_send_403(conn, """
-          For security reasons, Tidewave only accepts requests from the same origin your web app is running on.
+          For security reasons, Tidewave only accepts requests from the same host your web app is running on.
 
           If you really want to allow this origin, configure the `allowed_origins: [#{inspect(origin)}]` option.
           """)
@@ -181,59 +181,23 @@ defmodule Tidewave.Router do
     end
   end
 
-  # When origins are explicitly configured, we match against them.
-  # Otherwise, we require the request to come from the same origin,
-  # as any page on another localhost port would match the host.
   defp valid_origin?(conn, origin) do
-    case conn.private.tidewave_config.allowed_origins do
-      [_ | _] = allowed_origins ->
-        Enum.any?(allowed_origins, &allowed_origin?(origin, &1))
-
-      _ ->
-        same_origin?(conn, origin)
-    end
+    Enum.any?(allowed_origins(conn), &allowed_origin?(origin, &1))
   end
 
-  defp same_origin?(conn, origin) do
-    case get_req_header(conn, "sec-fetch-site") do
-      # Sec-Fetch-Site is computed by the browser, so it is reliable even
-      # when a proxy rewrites the Host header. We must not accept same-site,
-      # as all localhost ports belong to the same site.
-      [site] ->
-        site == "same-origin"
-
-      # Sec-Fetch-Site is only sent to trustworthy origins (https and localhost),
-      # so we fall back to comparing the origin with the host. The host itself
-      # has already been validated by check_host. Without Sec-Fetch-Site, the
-      # request is typically plain http to a non-localhost host, so conn.scheme
-      # reflects what the browser used.
-      [] ->
-        request = request_authority(conn)
-
-        origin.host != nil and String.downcase(origin.host) == String.downcase(request.host) and
-          origin.port == (request.port || URI.default_port(to_string(conn.scheme)))
-
-      _ ->
-        false
-    end
-  end
-
-  defp request_authority(conn) do
-    case get_req_header(conn, "host") do
-      [host] -> URI.parse("//" <> host)
-      _ -> %URI{host: conn.host, port: conn.port}
-    end
-  end
-
-  # When no origins are configured and no host can be derived from
-  # the Phoenix endpoint, only IP addresses and localhost are allowed.
   defp allowed_hosts(conn) do
+    Enum.map(allowed_origins(conn), & &1.host)
+  end
+
+  # When no origins are configured, we allow the host of the Phoenix endpoint.
+  # If no host can be derived, only IP addresses and localhost are allowed.
+  defp allowed_origins(conn) do
     case conn.private.tidewave_config do
       %{allowed_origins: [_ | _] = allowed_origins} ->
-        Enum.map(allowed_origins, & &1.host)
+        allowed_origins
 
       %{phoenix_endpoint: endpoint} when not is_nil(endpoint) ->
-        List.wrap(host_from_endpoint(endpoint))
+        if host = host_from_endpoint(endpoint), do: [%URI{host: host}], else: []
 
       _ ->
         []
@@ -252,7 +216,8 @@ defmodule Tidewave.Router do
   end
 
   defp allowed_origin?(origin, allowed) do
-    compare?(origin.scheme, allowed.scheme) and
+    origin.host != nil and
+      compare?(origin.scheme, allowed.scheme) and
       compare?(origin.port, allowed.port) and
       compare_host?(origin.host, allowed.host)
   end
