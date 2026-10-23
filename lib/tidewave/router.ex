@@ -106,7 +106,7 @@ defmodule Tidewave.Router do
         log_and_send_403(conn, """
         For security reasons, Tidewave does not accept remote connections by default.
 
-        If you really want to allow remote connections, configure the Tidewave with the `allow_remote_access: true` option.
+        If you really want to allow remote connections, configure the Tidewave with the `allow_remote_access: true` option. If you enable this, ensure you have an authentication proxy in front of your app.
         """)
     end
   end
