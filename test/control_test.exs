@@ -16,7 +16,7 @@ defmodule Tidewave.ControlTest do
 
   describe "/tidewave/connect" do
     test "uses the control entrypoint" do
-      conn = conn(:get, "/tidewave/connect") |> Tidewave.call(Tidewave.init([]))
+      conn = conn(:get, "http://localhost/tidewave/connect") |> Tidewave.call(Tidewave.init([]))
 
       assert conn.status == 200
       assert get_resp_header_value(conn, "content-type") =~ "text/html"
@@ -87,7 +87,7 @@ defmodule Tidewave.ControlTest do
 
     test "rejects a websocket upgrade from a foreign origin" do
       conn =
-        conn(:get, "/tidewave/ws")
+        conn(:get, "http://localhost/tidewave/ws")
         |> Plug.Conn.put_req_header("origin", "http://evil.example.com")
         |> Plug.Conn.put_private(:phoenix_endpoint, Endpoint)
         |> Tidewave.call(Tidewave.init([]))
@@ -97,7 +97,7 @@ defmodule Tidewave.ControlTest do
 
     test "raises when no allowed origins or phoenix endpoint are configured" do
       assert_raise RuntimeError, ~r/allowed_origins/, fn ->
-        conn(:get, "/tidewave/ws")
+        conn(:get, "http://localhost/tidewave/ws")
         |> Plug.Conn.put_req_header("origin", "http://app.example.com")
         |> Tidewave.call(Tidewave.init([]))
       end

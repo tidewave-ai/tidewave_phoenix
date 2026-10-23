@@ -157,7 +157,10 @@ defmodule Tidewave do
   defp port_suffix(_scheme, port), do: ":#{port}"
 
   defp maybe_inject_toolbar(conn) do
-    if conn.private.tidewave_config.toolbar and conn.resp_body != nil and html?(conn) do
+    # The toolbar embeds project metadata, so we only inject it on allowed
+    # hosts to avoid leaking it through DNS rebinding.
+    if conn.private.tidewave_config.toolbar and conn.resp_body != nil and html?(conn) and
+         Tidewave.Router.allowed_host?(conn) do
       resp_body = IO.iodata_to_binary(conn.resp_body)
 
       if String.contains?(resp_body, "</head>") do

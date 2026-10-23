@@ -8,6 +8,7 @@ defmodule Tidewave.Router do
 
   plug(:match)
   plug(:check_remote_ip)
+  plug(:check_host)
   plug(:check_origin)
   plug(:dispatch)
 
@@ -106,7 +107,7 @@ defmodule Tidewave.Router do
         log_and_send_403(conn, """
         For security reasons, Tidewave does not accept remote connections by default.
 
-        If you really want to allow remote connections, configure the Tidewave with the `allow_remote_access: true` option.
+        If you really want to allow remote connections, configure the `allow_remote_access: true` option.
         """)
     end
   end
@@ -116,6 +117,35 @@ defmodule Tidewave.Router do
   # ipv4 mapped ipv6 address ::ffff:127.0.0.1
   defp is_local?({0, 0, 0, 0, 0, 65535, 32512, 1}), do: true
   defp is_local?(_), do: false
+
+  # Validating the Host header protects against DNS rebinding attacks,
+  # where a malicious domain resolves to 127.0.0.1 and accesses Tidewave
+  # as if it were the same origin. Requests to Tidewave do not always carry
+  # an Origin header (for example, navigating to the HTML pages), so we need
+  # to validate the Host as well.
+  defp check_host(conn, _opts) do
+    if allowed_host?(conn) do
+      conn
+    else
+      log_and_send_403(conn, """
+      For security reasons, Tidewave only accepts requests to the same host your web app is running on.
+
+      If you really want to allow this host, configure the `allowed_origins: [#{inspect("//" <> conn.host)}]` option.
+      """)
+    end
+  end
+
+  @doc false
+  def allowed_host?(conn) do
+    host = conn.host |> String.downcase() |> String.trim_leading("[") |> String.trim_trailing("]")
+
+    # IP addresses cannot be rebound and localhost domains are resolved
+    # to the loopback address by browsers, so they are always allowed.
+    # We only compare hosts, as ports are not relevant to DNS rebinding.
+    match?({:ok, _}, :inet.parse_strict_address(String.to_charlist(host))) or
+      compare_host?(host, "*.localhost") or
+      Enum.any?(allowed_origins(conn), &compare_host?(host, &1.host))
+  end
 
   defp check_origin(conn, _opts) do
     case {conn.path_info, get_req_header(conn, "origin")} do
@@ -139,7 +169,7 @@ defmodule Tidewave.Router do
           log_and_send_403(conn, """
           For security reasons, Tidewave only accepts requests from the same origin your web app is running on.
 
-          If you really want to allow remote connections, configure the Tidewave with the `allowed_origins: [#{inspect(origin)}]` option.
+          If you really want to allow remote connections, configure the `allowed_origins: [#{inspect(origin)}]` option.
           """)
         end
 
@@ -152,13 +182,17 @@ defmodule Tidewave.Router do
   end
 
   defp valid_allowed_origin?(conn, origin) do
+    Enum.any?(allowed_origins(conn), &allowed_origin?(origin, &1))
+  end
+
+  defp allowed_origins(conn) do
     allowed_origins =
       case conn.private.tidewave_config.allowed_origins do
         [_ | _] = allowed_origins -> allowed_origins
         _ -> [host_from_endpoint!(conn)]
       end
 
-    Enum.any?(allowed_origins, &allowed_origin?(origin, parse_allowed_origin!(&1)))
+    Enum.map(allowed_origins, &parse_allowed_origin!/1)
   end
 
   defp host_from_endpoint!(conn) do
@@ -198,8 +232,8 @@ defmodule Tidewave.Router do
                 "Expected an origin with a host that is parsable by URI.parse/1. For example: " <>
                 "[\"https://example.com\", \"//another.com:888\", \"//other.com\"]"
 
-      %URI{} = uri ->
-        uri
+      %URI{host: host} = uri ->
+        %{uri | host: String.downcase(host)}
     end
   end
 
