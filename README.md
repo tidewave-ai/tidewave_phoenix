@@ -168,7 +168,7 @@ You may configure the `Tidewave` plug using the following syntax:
 
 The following options are available:
 
-  * `:allow_remote_access` - Tidewave only allows requests from localhost by default, even if your server listens on other interfaces, for security purposes. Read [our security guidelines for more information and when to allow remote access](https://tidewave.hexdocs.pm/security.html) (if you know what you are doing)
+  * `:allow_remote_access` - Tidewave only allows requests from localhost by default, even if your server listens on other interfaces, for security purposes. Read [our security guidelines for more information and when to allow remote access](https://tidewave.hexdocs.pm/security.html). Use this option with extreme care and, once enabled, ensure you have an authentication proxy in front of your app.
 
   * `:allowed_origins` - a list of values matched against the `Origin` and `Host` headers to prevent cross origin and DNS rebinding attacks. Each value must be a string of shape `[scheme:]//host[:port]`, where both scheme and port are optional. The host may also start with "*". Only the host is compared against the `Host` header. IP addresses, `localhost`, and `*.localhost` are always allowed as hosts. When not set, the host of your Phoenix endpoint URL is allowed and the `Origin` header must match the same origin your web app is running on (including scheme and port). Example: `["//localhost:8000", "//*.test"]`
 
