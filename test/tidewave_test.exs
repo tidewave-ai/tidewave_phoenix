@@ -14,6 +14,10 @@ defmodule TidewaveTest do
     def struct_url, do: URI.parse("http://example.com")
   end
 
+  defmodule NilHostEndpoint do
+    def config(:url), do: []
+  end
+
   test "/mcp refuses requests with origin header" do
     # /mcp should refuse any request with origin header
     conn =
@@ -113,6 +117,28 @@ defmodule TidewaveTest do
 
         assert conn.status == 403
         assert conn.resp_body =~ ~s|allowed_origins: ["//evil.com"]|
+      end
+    end
+
+    test "rejects other hosts without a phoenix endpoint or allowed origins" do
+      for endpoint <- [nil, NilHostEndpoint] do
+        conn =
+          conn(:get, "http://myapp.test/tidewave/connect")
+          |> put_private(:phoenix_endpoint, endpoint)
+          |> Tidewave.call(Tidewave.init([]))
+
+        assert conn.status == 403
+        assert conn.resp_body =~ ~s|allowed_origins: ["//myapp.test"]|
+
+        conn =
+          conn(:get, "http://myapp.test/foo")
+          |> put_private(:phoenix_endpoint, endpoint)
+          |> Tidewave.call(Tidewave.init([]))
+          |> put_resp_content_type("text/html")
+          |> send_resp(200, "<html><head></head><body></body></html>")
+
+        assert conn.status == 200
+        refute conn.resp_body =~ "tidewave:config"
       end
     end
 

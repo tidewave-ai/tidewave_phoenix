@@ -30,7 +30,11 @@ defmodule Tidewave do
   def init(opts) do
     %{
       allow_remote_access: Keyword.get(opts, :allow_remote_access, false),
-      allowed_origins: opts |> Keyword.get(:allowed_origins, []) |> List.wrap(),
+      allowed_origins:
+        opts
+        |> Keyword.get(:allowed_origins, [])
+        |> List.wrap()
+        |> Enum.map(&parse_allowed_origin!/1),
       phoenix_endpoint: nil,
       url: nil,
       team: Keyword.get(opts, :team, []),
@@ -39,6 +43,19 @@ defmodule Tidewave do
         Keyword.get(opts, :inspect_opts, charlists: :as_lists, limit: 50, pretty: true),
       tmp_dir: Keyword.get(opts, :tmp_dir, "tmp")
     }
+  end
+
+  defp parse_allowed_origin!(origin) do
+    case URI.parse(origin) do
+      %URI{host: nil} ->
+        raise ArgumentError,
+              "invalid :allowed_origins value: #{inspect(origin)}. " <>
+                "Expected an origin with a host that is parsable by URI.parse/1. For example: " <>
+                "[\"https://example.com\", \"//another.com:888\", \"//other.com\"]"
+
+      %URI{host: host} = uri ->
+        %{uri | host: String.downcase(host)}
+    end
   end
 
   @impl true

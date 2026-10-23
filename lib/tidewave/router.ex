@@ -144,7 +144,7 @@ defmodule Tidewave.Router do
     # We only compare hosts, as ports are not relevant to DNS rebinding.
     match?({:ok, _}, :inet.parse_strict_address(String.to_charlist(host))) or
       compare_host?(host, "*.localhost") or
-      Enum.any?(allowed_origins(conn), &compare_host?(host, &1.host))
+      Enum.any?(allowed_hosts(conn), &compare_host?(host, &1))
   end
 
   defp check_origin(conn, _opts) do
@@ -187,7 +187,7 @@ defmodule Tidewave.Router do
   defp valid_origin?(conn, origin) do
     case conn.private.tidewave_config.allowed_origins do
       [_ | _] = allowed_origins ->
-        Enum.any?(allowed_origins, &allowed_origin?(origin, parse_allowed_origin!(&1)))
+        Enum.any?(allowed_origins, &allowed_origin?(origin, &1))
 
       _ ->
         same_origin?(conn, origin)
@@ -225,56 +225,30 @@ defmodule Tidewave.Router do
     end
   end
 
-  defp allowed_origins(conn) do
-    allowed_origins =
-      case conn.private.tidewave_config.allowed_origins do
-        [_ | _] = allowed_origins -> allowed_origins
-        _ -> [host_from_endpoint!(conn)]
-      end
+  # When no origins are configured and no host can be derived from
+  # the Phoenix endpoint, only IP addresses and localhost are allowed.
+  defp allowed_hosts(conn) do
+    case conn.private.tidewave_config do
+      %{allowed_origins: [_ | _] = allowed_origins} ->
+        Enum.map(allowed_origins, & &1.host)
 
-    Enum.map(allowed_origins, &parse_allowed_origin!/1)
-  end
-
-  defp host_from_endpoint!(conn) do
-    case conn.private do
-      %{tidewave_config: %{phoenix_endpoint: endpoint}} when not is_nil(endpoint) ->
-        "//#{host_from_endpoint(endpoint)}"
+      %{phoenix_endpoint: endpoint} when not is_nil(endpoint) ->
+        List.wrap(host_from_endpoint(endpoint))
 
       _ ->
-        raise """
-        no Phoenix endpoint found! You must manually configure the \
-        allowed origins for Tidewave by setting the `:allowed_origins` \
-        option on the Tidewave plug:
-
-            plug Tidewave, allowed_origins: ["//localhost"]
-        """
+        []
     end
   end
 
   defp host_from_endpoint(endpoint) do
-    cond do
-      function_exported?(endpoint, :struct_url, 0) ->
-        endpoint.struct_url().host
+    host =
+      cond do
+        function_exported?(endpoint, :struct_url, 0) -> endpoint.struct_url().host
+        function_exported?(endpoint, :config, 1) -> endpoint.config(:url)[:host]
+        true -> nil
+      end
 
-      function_exported?(endpoint, :config, 1) ->
-        endpoint.config(:url)[:host]
-
-      true ->
-        nil
-    end || raise_missing_allowed_origins!()
-  end
-
-  defp parse_allowed_origin!(origin) do
-    case URI.parse(origin) do
-      %URI{host: nil} ->
-        raise ArgumentError,
-              "invalid :allowed_origins value: #{inspect(origin)}. " <>
-                "Expected an origin with a host that is parsable by URI.parse/1. For example: " <>
-                "[\"https://example.com\", \"//another.com:888\", \"//other.com\"]"
-
-      %URI{host: host} = uri ->
-        %{uri | host: String.downcase(host)}
-    end
+    host && String.downcase(host)
   end
 
   defp allowed_origin?(origin, allowed) do
@@ -292,14 +266,6 @@ defmodule Tidewave.Router do
 
   defp compare_host?(request_host, allowed_host),
     do: request_host == allowed_host
-
-  defp raise_missing_allowed_origins! do
-    raise """
-    Tidewave cannot verify the origin because no allowed origins are configured and no Phoenix endpoint URL host is available.
-
-    Configure the Tidewave plug with `allowed_origins: [...]` to list allowed origins manually.
-    """
-  end
 
   defp log_and_send_403(conn, message) do
     require Logger

@@ -139,14 +139,6 @@ defmodule Tidewave.ControlTest do
       assert conn.status == 403
     end
 
-    test "raises when no allowed origins or phoenix endpoint are configured" do
-      assert_raise RuntimeError, ~r/allowed_origins/, fn ->
-        conn(:get, "http://app.example.com/tidewave/ws")
-        |> Plug.Conn.put_req_header("origin", "http://app.example.com")
-        |> Tidewave.call(Tidewave.init([]))
-      end
-    end
-
     test "raises on invalid allowed origin configuration" do
       assert_raise ArgumentError,
                    ~r/invalid :allowed_origins value.*Expected an origin with a host/,
