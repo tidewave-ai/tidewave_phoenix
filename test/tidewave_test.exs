@@ -10,10 +10,18 @@ defmodule TidewaveTest do
     def struct_url, do: URI.parse("http://localhost:4000")
   end
 
+  defmodule ExampleEndpoint do
+    def struct_url, do: URI.parse("http://example.com")
+  end
+
+  defmodule NilHostEndpoint do
+    def config(:url), do: []
+  end
+
   test "/mcp refuses requests with origin header" do
     # /mcp should refuse any request with origin header
     conn =
-      conn(:post, "/tidewave/mcp")
+      conn(:post, "http://localhost/tidewave/mcp")
       |> put_req_header("origin", "http://localhost:4001")
       |> put_private(:phoenix_endpoint, Endpoint)
       |> Tidewave.call(Tidewave.init([]))
@@ -24,7 +32,7 @@ defmodule TidewaveTest do
   test "/config allows requests with origin header + CORS" do
     # /config should allow any request with origin header
     conn =
-      conn(:get, "/tidewave/config")
+      conn(:get, "http://localhost/tidewave/config")
       |> put_req_header("origin", "http://localhost:4001")
       |> put_private(:phoenix_endpoint, Endpoint)
       |> Tidewave.call(Tidewave.init([]))
@@ -35,7 +43,7 @@ defmodule TidewaveTest do
 
   test "/ services entrypoint if given" do
     conn =
-      conn(:get, "/tidewave?entrypoint=foo")
+      conn(:get, "http://localhost/tidewave?entrypoint=foo")
       |> put_private(:phoenix_endpoint, Endpoint)
       |> Tidewave.call(Tidewave.init([]))
 
@@ -46,14 +54,14 @@ defmodule TidewaveTest do
   test "/ (root) allows any origin" do
     # / should allow any origin
     conn =
-      conn(:get, "/tidewave")
+      conn(:get, "http://localhost/tidewave")
       |> put_req_header("origin", "http://example.com")
       |> Tidewave.call(Tidewave.init([]))
 
     assert conn.status == 200
 
     conn =
-      conn(:get, "/tidewave")
+      conn(:get, "http://localhost/tidewave")
       |> put_req_header("origin", "http://localhost:4000")
       |> Tidewave.call(Tidewave.init([]))
 
@@ -62,7 +70,7 @@ defmodule TidewaveTest do
 
   test "allows requests with no origin header" do
     conn =
-      conn(:post, "/tidewave/mcp")
+      conn(:post, "http://localhost/tidewave/mcp")
       |> Tidewave.call(Tidewave.init([]))
 
     # invalid JSON-RPC message (empty body)
@@ -70,9 +78,101 @@ defmodule TidewaveTest do
     assert conn.resp_body =~ "Could not parse message"
   end
 
+  describe "host check" do
+    test "always allows IP addresses and localhost domains" do
+      for host <- ["127.0.0.1", "[::1]", "192.168.1.1", "localhost", "admin.localhost"] do
+        conn =
+          conn(:get, "http://#{host}:4000/tidewave/connect")
+          |> put_private(:phoenix_endpoint, Endpoint)
+          |> Tidewave.call(Tidewave.init([]))
+
+        assert conn.status == 200, "expected #{host} to be allowed"
+      end
+    end
+
+    test "allows the phoenix endpoint url host" do
+      conn =
+        conn(:get, "http://Example.com/tidewave/connect")
+        |> put_private(:phoenix_endpoint, ExampleEndpoint)
+        |> Tidewave.call(Tidewave.init([]))
+
+      assert conn.status == 200
+    end
+
+    test "allows hosts from allowed_origins, ignoring scheme and port" do
+      opts = Tidewave.init(allowed_origins: ["https://example.com:9898", "//*.test"])
+
+      for url <- ["http://example.com:4000/tidewave", "http://app.test/tidewave/connect"] do
+        conn = conn(:get, url) |> Tidewave.call(opts)
+        assert conn.status == 200, "expected #{url} to be allowed"
+      end
+    end
+
+    test "rejects other hosts on all routes" do
+      for {method, path} <- [get: "/", get: "/connect", get: "/config", post: "/mcp"] do
+        conn =
+          conn(method, "http://evil.com:4000/tidewave#{path}")
+          |> put_private(:phoenix_endpoint, Endpoint)
+          |> Tidewave.call(Tidewave.init([]))
+
+        assert conn.status == 403
+        assert conn.resp_body =~ ~s|allowed_origins: ["//evil.com"]|
+      end
+    end
+
+    test "rejects other hosts without a phoenix endpoint or allowed origins" do
+      for endpoint <- [nil, NilHostEndpoint] do
+        conn =
+          conn(:get, "http://myapp.test/tidewave/connect")
+          |> put_private(:phoenix_endpoint, endpoint)
+          |> Tidewave.call(Tidewave.init([]))
+
+        assert conn.status == 403
+        assert conn.resp_body =~ ~s|allowed_origins: ["//myapp.test"]|
+
+        conn =
+          conn(:get, "http://myapp.test/foo")
+          |> put_private(:phoenix_endpoint, endpoint)
+          |> Tidewave.call(Tidewave.init([]))
+          |> put_resp_content_type("text/html")
+          |> send_resp(200, "<html><head></head><body></body></html>")
+
+        assert conn.status == 200
+        refute conn.resp_body =~ "tidewave:config"
+        assert conn.resp_body =~ "tidewave:error"
+      end
+    end
+
+    test "only injects the config on allowed hosts" do
+      html = "<html><head></head><body></body></html>"
+
+      conn =
+        conn(:get, "http://localhost/foo")
+        |> put_private(:phoenix_endpoint, Endpoint)
+        |> Tidewave.call(Tidewave.init([]))
+        |> put_resp_content_type("text/html")
+        |> send_resp(200, html)
+
+      assert conn.resp_body =~ "tidewave:config"
+      refute conn.resp_body =~ "tidewave:error"
+
+      conn =
+        conn(:get, "http://evil.com/foo")
+        |> put_private(:phoenix_endpoint, Endpoint)
+        |> Tidewave.call(Tidewave.init([]))
+        |> put_resp_content_type("text/html")
+        |> send_resp(200, html)
+
+      refute conn.resp_body =~ "tidewave:config"
+      assert conn.resp_body =~ ~s|<meta name="tidewave:error"|
+      assert conn.resp_body =~ "allowed_origins: [&quot;//evil.com&quot;]"
+      assert conn.resp_body =~ "/tc/toolbar.js"
+    end
+  end
+
   test "validates content type" do
     assert_raise Plug.Conn.WrapperError, ~r/Plug.Parsers.UnsupportedMediaTypeError/, fn ->
-      conn(:post, "/tidewave/mcp")
+      conn(:post, "http://localhost/tidewave/mcp")
       |> put_req_header("content-type", "multipart/form-data")
       |> Tidewave.call(Tidewave.init([]))
     end
@@ -80,7 +180,7 @@ defmodule TidewaveTest do
 
   test "does not allow remote connections by default" do
     conn =
-      conn(:get, "/tidewave")
+      conn(:get, "http://localhost/tidewave")
       |> Map.put(:remote_ip, {192, 168, 1, 1})
       |> Tidewave.call(Tidewave.init([]))
 
@@ -90,14 +190,14 @@ defmodule TidewaveTest do
              "For security reasons, Tidewave does not accept remote connections by default."
 
     conn =
-      conn(:get, "/tidewave")
+      conn(:get, "http://localhost/tidewave")
       |> Map.put(:remote_ip, {127, 0, 0, 1})
       |> Tidewave.call(Tidewave.init([]))
 
     assert conn.status == 200
 
     conn =
-      conn(:get, "/tidewave")
+      conn(:get, "http://localhost/tidewave")
       |> Map.put(:remote_ip, {192, 168, 1, 1})
       |> Tidewave.call(Tidewave.init(allow_remote_access: true))
 
@@ -106,7 +206,7 @@ defmodule TidewaveTest do
 
   test "removes X-Frame-Options headers if set" do
     conn =
-      conn(:get, "/foo")
+      conn(:get, "http://localhost/foo")
       |> Plug.Conn.put_resp_header("x-frame-options", "DENY")
       |> Tidewave.call(Tidewave.init([]))
       |> Plug.Conn.send_resp(200, "foo")
@@ -119,7 +219,7 @@ defmodule TidewaveTest do
 
     refute ExUnit.CaptureLog.capture_log(fn ->
              conn =
-               conn(:get, "/foo")
+               conn(:get, "http://localhost/foo")
                |> put_req_header("x-tidewave-diagnostic", "true")
                |> put_req_header("sec-fetch-site", "same-origin")
                |> Tidewave.call(Tidewave.init([]))
@@ -133,7 +233,7 @@ defmodule TidewaveTest do
 
   test "updates CSP header if set (no toolbar)" do
     conn =
-      conn(:get, "/foo")
+      conn(:get, "http://localhost/foo")
       |> Plug.Conn.put_resp_header(
         "content-security-policy",
         "default-src 'self' http://example.com; connect-src 'none'; script-src 'self'; frame-ancestors 'none'"
@@ -148,7 +248,7 @@ defmodule TidewaveTest do
 
   test "updates CSP header if set (toolbar)" do
     conn =
-      conn(:get, "/foo")
+      conn(:get, "http://localhost/foo")
       |> Plug.Conn.put_resp_header(
         "content-security-policy",
         "default-src 'self' http://example.com; connect-src 'none'; script-src 'self'; frame-ancestors 'none'"
@@ -163,7 +263,7 @@ defmodule TidewaveTest do
 
   test "updates CSP headers with flags and trailing space" do
     conn =
-      conn(:get, "/foo")
+      conn(:get, "http://localhost/foo")
       |> Plug.Conn.put_resp_header(
         "content-security-policy",
         "upgrade-insecure-requests; script-src 'self'; frame-ancestors 'none';   "
@@ -178,7 +278,7 @@ defmodule TidewaveTest do
   describe "/mcp" do
     test "405 when GETing" do
       conn =
-        conn(:get, "/tidewave/mcp")
+        conn(:get, "http://localhost/tidewave/mcp")
         |> Tidewave.call(Tidewave.init([]))
 
       assert conn.status == 405
@@ -186,7 +286,7 @@ defmodule TidewaveTest do
 
     test "404 for .well-known resources lookup" do
       conn =
-        conn(:get, "/tidewave/mcp/.well-known/openid-configuration")
+        conn(:get, "http://localhost/tidewave/mcp/.well-known/openid-configuration")
         |> Tidewave.call(Tidewave.init([]))
 
       assert conn.status == 404
@@ -195,7 +295,7 @@ defmodule TidewaveTest do
 
   describe "/config" do
     test "returns config" do
-      conn = conn(:get, "/tidewave/config") |> Tidewave.call(Tidewave.init([]))
+      conn = conn(:get, "http://localhost/tidewave/config") |> Tidewave.call(Tidewave.init([]))
 
       assert %{
                "framework_type" => "phoenix",
@@ -286,7 +386,7 @@ defmodule TidewaveTest do
     upload_source = Path.join(System.tmp_dir!(), "tidewave-upload-source")
     File.write!(upload_source, file_contents)
 
-    conn(:post, "/upload", %{
+    conn(:post, "http://localhost/upload", %{
       "type" => "screenshot",
       "file" => %Plug.Upload{
         path: upload_source,

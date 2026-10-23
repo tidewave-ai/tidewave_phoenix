@@ -9,14 +9,13 @@ defmodule Tidewave.ControlTest do
     def config(:url), do: [host: "app.example.com"]
   end
 
-  defmodule EndpointWithHttpPort do
-    def config(:url), do: [path: "/", host: "localhost"]
-    def config(:http), do: [ip: {127, 0, 0, 1}, port: 9000]
+  defmodule LocalhostEndpoint do
+    def struct_url, do: URI.parse("http://localhost:4000")
   end
 
   describe "/tidewave/connect" do
     test "uses the control entrypoint" do
-      conn = conn(:get, "/tidewave/connect") |> Tidewave.call(Tidewave.init([]))
+      conn = conn(:get, "http://localhost/tidewave/connect") |> Tidewave.call(Tidewave.init([]))
 
       assert conn.status == 200
       assert get_resp_header_value(conn, "content-type") =~ "text/html"
@@ -75,11 +74,12 @@ defmodule Tidewave.ControlTest do
       assert conn.status == nil
     end
 
-    test "falls back to the phoenix endpoint url host when the port is configured on http" do
+    test "allows a websocket upgrade from another port on the endpoint host" do
+      # Pages on other localhost ports are same-site and accepted for now
       conn =
-        ws_conn()
-        |> Plug.Conn.put_req_header("origin", "http://localhost:9000")
-        |> Plug.Conn.put_private(:phoenix_endpoint, EndpointWithHttpPort)
+        ws_conn("localhost:4000")
+        |> Plug.Conn.put_req_header("origin", "http://localhost:5173")
+        |> Plug.Conn.put_private(:phoenix_endpoint, LocalhostEndpoint)
         |> Tidewave.call(Tidewave.init([]))
 
       assert conn.status == nil
@@ -87,20 +87,28 @@ defmodule Tidewave.ControlTest do
 
     test "rejects a websocket upgrade from a foreign origin" do
       conn =
-        conn(:get, "/tidewave/ws")
+        ws_conn()
         |> Plug.Conn.put_req_header("origin", "http://evil.example.com")
         |> Plug.Conn.put_private(:phoenix_endpoint, Endpoint)
         |> Tidewave.call(Tidewave.init([]))
 
       assert conn.status == 403
+
+      conn =
+        ws_conn()
+        |> Plug.Conn.put_req_header("origin", "null")
+        |> Tidewave.call(Tidewave.init(allowed_origins: ["//*.example.com"]))
+
+      assert conn.status == 403
     end
 
-    test "raises when no allowed origins or phoenix endpoint are configured" do
-      assert_raise RuntimeError, ~r/allowed_origins/, fn ->
-        conn(:get, "/tidewave/ws")
-        |> Plug.Conn.put_req_header("origin", "http://app.example.com")
+    test "rejects a websocket upgrade without allowed origins or phoenix endpoint" do
+      conn =
+        ws_conn()
+        |> Plug.Conn.put_req_header("origin", "http://localhost")
         |> Tidewave.call(Tidewave.init([]))
-      end
+
+      assert conn.status == 403
     end
 
     test "raises on invalid allowed origin configuration" do
@@ -114,6 +122,19 @@ defmodule Tidewave.ControlTest do
     end
   end
 
+  describe "/tidewave/upload" do
+    test "rejects uploads from a foreign origin" do
+      conn =
+        conn(:post, "http://localhost:4000/tidewave/upload")
+        |> Map.update!(:req_headers, &[{"host", "localhost:4000"} | &1])
+        |> Plug.Conn.put_req_header("origin", "http://evil.example.com")
+        |> Plug.Conn.put_private(:phoenix_endpoint, LocalhostEndpoint)
+        |> Tidewave.call(Tidewave.init([]))
+
+      assert conn.status == 403
+    end
+  end
+
   defp get_resp_header_value(conn, key) do
     case Plug.Conn.get_resp_header(conn, key) do
       [value | _] -> value
@@ -121,9 +142,9 @@ defmodule Tidewave.ControlTest do
     end
   end
 
-  defp ws_conn do
-    conn(:get, "http://localhost/tidewave/ws")
-    |> Map.update!(:req_headers, &[{"host", "localhost"} | &1])
+  defp ws_conn(host \\ "localhost") do
+    conn(:get, "http://#{host}/tidewave/ws")
+    |> Map.update!(:req_headers, &[{"host", host} | &1])
     |> Plug.Conn.put_req_header("connection", "upgrade")
     |> Plug.Conn.put_req_header("upgrade", "websocket")
     |> Plug.Conn.put_req_header("sec-websocket-key", "test-key")

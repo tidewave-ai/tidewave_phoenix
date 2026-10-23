@@ -30,7 +30,11 @@ defmodule Tidewave do
   def init(opts) do
     %{
       allow_remote_access: Keyword.get(opts, :allow_remote_access, false),
-      allowed_origins: opts |> Keyword.get(:allowed_origins, []) |> List.wrap(),
+      allowed_origins:
+        opts
+        |> Keyword.get(:allowed_origins, [])
+        |> List.wrap()
+        |> Enum.map(&parse_allowed_origin!/1),
       phoenix_endpoint: nil,
       url: nil,
       team: Keyword.get(opts, :team, []),
@@ -39,6 +43,19 @@ defmodule Tidewave do
         Keyword.get(opts, :inspect_opts, charlists: :as_lists, limit: 50, pretty: true),
       tmp_dir: Keyword.get(opts, :tmp_dir, "tmp")
     }
+  end
+
+  defp parse_allowed_origin!(origin) do
+    case URI.parse(origin) do
+      %URI{host: nil} ->
+        raise ArgumentError,
+              "invalid :allowed_origins value: #{inspect(origin)}. " <>
+                "Expected an origin with a host that is parsable by URI.parse/1. For example: " <>
+                "[\"https://example.com\", \"//another.com:888\", \"//other.com\"]"
+
+      %URI{host: host} = uri ->
+        %{uri | host: String.downcase(host)}
+    end
   end
 
   @impl true
@@ -184,9 +201,25 @@ defmodule Tidewave do
     client_url = Application.get_env(:tidewave, :client_url, "https://tidewave.ai")
 
     """
-    <meta name="tidewave:config" content="#{tidewave_config_meta(conn) |> Jason.encode!() |> Plug.HTML.html_escape()}" />
+    #{tidewave_meta(conn)}
     <script async type="module" src="#{client_url}/tc/toolbar.js"></script>
     """
+  end
+
+  # The config embeds project metadata, so we only inject it on allowed
+  # hosts to avoid leaking it through DNS rebinding. Otherwise, we inject
+  # an error, so the toolbar can tell the user how to fix it.
+  defp tidewave_meta(conn) do
+    if Tidewave.Router.allowed_host?(conn) do
+      ~s|<meta name="tidewave:config" content="#{tidewave_config_meta(conn) |> Jason.encode!() |> Plug.HTML.html_escape()}" />|
+    else
+      error =
+        "For security reasons, Tidewave only works on the same host your web app is running on. " <>
+          "If you really want to allow this host, configure the " <>
+          "`allowed_origins: [#{inspect("//" <> conn.host)}]` option in your `plug Tidewave` call."
+
+      ~s|<meta name="tidewave:error" content="#{Plug.HTML.html_escape(error)}" />|
+    end
   end
 
   @doc false
