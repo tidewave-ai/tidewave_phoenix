@@ -16,7 +16,7 @@ The workflows below assume a Phoenix application with Tidewave installed, Postgr
 
 The Claude workflow and the full Codex workflow at the end of this guide are triggered for every newly created issue. All examples also listen for newly created comments. The agent jobs check for `@claude` or `/tidewave` respectively before running. If your repository is publicly accessible, consider restricting who can trigger these jobs, for example by adding a job-level `if` condition that checks `github.event.sender.login`.
 
-You must store your Tidewave API key as `TIDEWAVE_API_KEY`.
+You must store your Tidewave Connect key as `TIDEWAVE_CONNECT_KEY`.
 
 ### Vision mode support
 
@@ -128,7 +128,7 @@ jobs:
         uses: tidewave-ai/connect-action@v1
         with:
           app_url: http://localhost:4000
-          api_key: ${{ secrets.TIDEWAVE_API_KEY }}
+          connect_key: ${{ secrets.TIDEWAVE_CONNECT_KEY }}
 
       - name: Run Claude Code
         id: claude
@@ -288,7 +288,7 @@ jobs:
         uses: tidewave-ai/connect-action@v1
         with:
           app_url: http://localhost:4000
-          api_key: ${{ secrets.TIDEWAVE_API_KEY }}
+          connect_key: ${{ secrets.TIDEWAVE_CONNECT_KEY }}
 
       - name: Prepare Codex prompt
         env:
@@ -546,7 +546,7 @@ The bot token makes the bot the PR author and lets `pull_request` workflows run 
 
 The full workflow below runs when you open an issue with `/tidewave` in its title or description, or add a `/tidewave <your request>` comment to an issue. It also handles these conversation comments on the PRs it creates. It checks that the PR is open, authored by the bot user, and uses a `bot/tidewave-` branch in the same repository before checking out its code. Changes requested on an issue open a new PR; follow-up changes on a bot PR are pushed to its existing branch and reported in a comment. Requests without code changes receive an answer and any media directly on the issue or PR.
 
-Save it as `.github/workflows/codex.yml` on your default branch and configure the `TIDEWAVE_API_KEY`, `OPENAI_API_KEY`, and bot user's `GH_COMMENT_TOKEN` repository secrets as described above. Follow-up pushes use `GITHUB_TOKEN`, so `pull_request` checks may require approval, as explained above.
+Save it as `.github/workflows/codex.yml` on your default branch and configure the `TIDEWAVE_CONNECT_KEY`, `OPENAI_API_KEY`, and bot user's `GH_COMMENT_TOKEN` repository secrets as described above. Follow-up pushes use `GITHUB_TOKEN`, so `pull_request` checks may require approval, as explained above.
 
 ```yaml
 name: Codex with Tidewave and bot pull requests
@@ -668,7 +668,7 @@ jobs:
         uses: tidewave-ai/connect-action@v1
         with:
           app_url: http://localhost:4000
-          api_key: ${{ secrets.TIDEWAVE_API_KEY }}
+          connect_key: ${{ secrets.TIDEWAVE_CONNECT_KEY }}
 
       - name: Prepare Codex prompt
         env:
@@ -894,7 +894,7 @@ http://localhost:4000/tidewave/connect#tidewave_auth_token=<encoded-token>&tidew
 
 Connect reads these parameters on page load and immediately removes them from the address bar. The fragment is not sent to the HTTP server. Build it with `URLSearchParams` so the token is encoded correctly, and avoid printing the token or the full launch URL to CI logs. Changing only the fragment of an already loaded page does not apply new settings. Open a new page with the parameters to apply them again.
 
-For example, save this launcher as `tmp/tidewave-connect.mjs`. Set `TIDEWAVE_API_KEY` from your CI secret, and optionally set `APP_URL` and `TIDEWAVE_TEAM_ID` to match your app:
+For example, save this launcher as `tmp/tidewave-connect.mjs`. Set `TIDEWAVE_CONNECT_KEY` from your CI secret, and optionally set `APP_URL` and `TIDEWAVE_TEAM_ID` to match your app:
 
 ```javascript
 import { chromium } from "playwright";
@@ -907,15 +907,15 @@ function baseUrl(value) {
 
 const appUrl = baseUrl(process.env.APP_URL ?? "http://localhost:4000");
 const tidewaveUrl = "https://tidewave.ai";
-const apiKey = process.env.TIDEWAVE_API_KEY;
-if (!apiKey) throw new Error("TIDEWAVE_API_KEY is required");
+const connectKey = process.env.TIDEWAVE_CONNECT_KEY;
+if (!connectKey) throw new Error("TIDEWAVE_CONNECT_KEY is required");
 // Do not let the browser process inherit the API key.
-delete process.env.TIDEWAVE_API_KEY;
+delete process.env.TIDEWAVE_CONNECT_KEY;
 
 const response = await fetch(new URL("api/api-key-exchange", tidewaveUrl), {
   method: "POST",
   headers: {
-    authorization: `Bearer ${apiKey}`,
+    authorization: `Bearer ${connectKey}`,
     "content-type": "application/json",
   },
   body: JSON.stringify({ team_id: process.env.TIDEWAVE_TEAM_ID || null }),
