@@ -4,13 +4,21 @@ Tidewave can be integrated into your CI runs using Tidewave Connect and an exist
 
 ## Why use Tidewave in CI?
 
-Tidewave gives your CI agent access to the running application and a real browser. This lets it reproduce reported bugs, exercise user flows, and verify its changes before replying to an issue or pull request.
+Tidewave gives your CI agent access to the running application and a real browser. This lets it reproduce reported bugs, run Accessibility and Web Framework diagnostics, and verify its changes through videos and screenshots before replying to an issue or pull request.
 
 * **Browser access**: The agent can navigate pages, click buttons, fill forms, and inspect the rendered app through [Tidewave's browser automation](connect.md).
 * **Runtime context**: The agent can evaluate code inside the running application to investigate its behavior. [Page diagnostics](diagnostics.md) also surface framework and JavaScript errors as it navigates, helping it connect browser failures to their source.
 * **Visual verification**: With [vision mode](vision_mode.md), the agent can inspect screenshots for layout issues and capture screenshots or videos to show what it tested. The examples below explain how to include that media in GitHub comments.
 
 ## GitHub Actions
+
+The workflows below assume a Phoenix application with Tidewave installed, PostgreSQL, and a `mix setup` alias. Adjust the app setup and port for your project. If you are using another framework or database, you can ask your coding agent to adapt the steps below.
+
+The Claude workflow and the full Codex workflow at the end of this guide are triggered for every newly created issue. All examples also listen for newly created comments. The agent jobs check for `@claude` or `/tidewave` respectively before running. If your repository is publicly accessible, consider restricting who can trigger these jobs, for example by adding a job-level `if` condition that checks `github.event.sender.login`.
+
+You must store your Tidewave API key as `TIDEWAVE_API_KEY`.
+
+### Vision mode support
 
 Both agents can use [Tidewave's vision mode](vision_mode.md) to inspect the app, capture screenshots, and record videos. However, GitHub Actions' `GITHUB_TOKEN` and GitHub App installation tokens currently cannot upload media attachments to issue or pull request comments ([GitHub CLI issue #14309](https://github.com/cli/cli/issues/14309)). Posting screenshots or videos alongside the agent's answer requires a personal access token (PAT). Vision mode itself works without one.
 
@@ -22,11 +30,9 @@ For media attachments, we recommend a separate bot user with write access to onl
 | Pull requests | Read and write | Post pull request comments. |
 | Contents | Read | Read the repository. |
 
-GitHub CLI's attachment uploader requires the bot user to have write access to the repository. This is separate from the PAT's Contents permission, which can remain read-only for these examples. Store the PAT as the `GH_COMMENT_TOKEN` repository secret. The workflows use it outside the agent for GitHub operations such as checking PR ownership, posting media, and opening pull requests.
+Store the PAT as the `GH_COMMENT_TOKEN` repository secret.
 
-The workflows below assume a Phoenix application with Tidewave installed, PostgreSQL, and a `mix setup` alias. Adjust the app setup and port for your project. Store your Tidewave API key as `TIDEWAVE_API_KEY`.
-
-The Claude workflow and the full Codex workflow at the end of this guide are triggered for every newly created issue. All examples also listen for newly created comments. The agent jobs check for `@claude` or `/tidewave` before running. If your repository is publicly accessible, consider restricting who can trigger these jobs, for example by adding a job-level `if` condition that checks `github.event.sender.login`.
+GitHub CLI's attachment uploader requires the bot user to have write access to the repository. This is separate from the PAT's Contents permission, which can remain read-only for these examples. The workflows use it outside the agent for GitHub operations such as checking PR ownership, posting media, and opening pull requests.
 
 ## Claude Code
 
@@ -878,7 +884,7 @@ npx playwright install --with-deps chromium
 
 ### Authenticate and open Connect
 
-Exchange your Tidewave API key for a Connect token by making a `POST` request to `https://tidewave.ai/api/api-key-exchange`. Send the API key in the `Authorization: Bearer ...` header and a JSON body with `team_id` set to your app's configured team ID, or `null` for a personal subscription. The response contains a `token` field. This token is valid for one day and is revoked if you delete the API key. The exchange happens outside the browser, so the API key itself is never passed to the page.
+Exchange your Tidewave API key for a Connect token by making a `POST` request to `https://tidewave.ai/api/connect-key-exchange`. Send the API key in the `Authorization: Bearer ...` header and a JSON body with `team_id` set to your app's configured team ID, or `null` for a personal subscription. The response contains a `token` field. This token is valid for one day and is revoked if you delete the API key. The exchange happens outside the browser, so the API key itself is never passed to the page.
 
 Pass the token and vision mode setting in the Connect URL's fragment:
 
