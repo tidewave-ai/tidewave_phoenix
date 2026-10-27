@@ -21,3 +21,7 @@ Finally, you must configure your web application itself to allow remote access. 
 > #### Containers configuration {: .info}
 >
 > If you are deploying remotely using containers, see our [Containers](containers.md) guide.
+
+> #### Step-by-step guide {: .info}
+>
+> For a complete example that runs Tidewave IDE and a Phoenix application on an Ubuntu or Debian server behind Caddy, see [Setting up Tidewave on a Remote Machine](../features/remote.md).
