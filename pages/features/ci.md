@@ -1,4 +1,4 @@
-# Running Tidewave in CI
+# Continuous Integration
 
 Tidewave can be integrated into your CI runs using Tidewave Connect and an existing agent harness like Anthropic's [`claude-code-action`](https://github.com/anthropics/claude-code-action) or OpenAI's [`codex-action`](https://github.com/openai/codex-action). This guide explores setting up both in a GitHub Actions environment. For other CI systems or custom browser launchers, see [Manual setup](#manual-setup).
 
