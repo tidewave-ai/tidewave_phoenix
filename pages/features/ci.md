@@ -912,7 +912,7 @@ if (!connectKey) throw new Error("TIDEWAVE_CONNECT_KEY is required");
 // Do not let the browser process inherit the API key.
 delete process.env.TIDEWAVE_CONNECT_KEY;
 
-const response = await fetch(new URL("api/api-key-exchange", tidewaveUrl), {
+const response = await fetch(new URL("api/connect-key-exchange", tidewaveUrl), {
   method: "POST",
   headers: {
     authorization: `Bearer ${connectKey}`,
