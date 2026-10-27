@@ -388,8 +388,15 @@ Share the two URLs and the credentials with the user. They then:
 1. Open the app URL, such as `https://app.example.com` or `https://tidewave.example.com:4443`, and sign in. Browsers store credentials per host and port, so this step stores them for the app.
 2. Open `https://tidewave.example.com` and sign in.
 3. Sign in with their Tidewave account when Tidewave IDE asks for it.
-4. Enter the app URL as the application address.
-5. Click **Allow** when the app asks whether to allow the connection from Tidewave IDE.
+4. Click **Proceed with Redirect** when tidewave.ai asks to confirm the redirect.
+5. Enter the app URL as the application address.
+6. Click **Allow** when the app asks whether to allow the connection from Tidewave IDE.
+
+After the sign-in, tidewave.ai sends the user back to Tidewave IDE together with a sign-in token. Because Tidewave IDE does not run on `localhost`, tidewave.ai asks the user to confirm the redirect. Only proceed if the redirect URL is your Tidewave IDE URL.
+
+![Prompt to confirm the redirect to Tidewave IDE](assets/external-redirect.png)
+
+Next, the app asks whether to allow the connection from Tidewave IDE:
 
 ![Prompt to allow the connection from Tidewave IDE](assets/allow-origin.png)
 
