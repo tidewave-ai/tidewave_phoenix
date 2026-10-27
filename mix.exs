@@ -103,6 +103,7 @@ defmodule Tidewave.MixProject do
         "pages/features/design_canvas.md",
         "pages/features/diagnostics.md",
         "pages/features/inspector.md",
+        "pages/features/remote.md",
         "pages/features/ui_variants.md",
         "pages/features/update_visualizer.md",
         "pages/features/vision_mode.md",
