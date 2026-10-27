@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.9.2 (2026-10-27)
+
+* Avoid DNS rebinding attacks on /tidewave/connect route (CVE-2026-109823)
+
 ## v0.9.1 (2026-09-23)
 
 * Add `mix tidewave.proxy`
