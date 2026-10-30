@@ -10,7 +10,7 @@ To enable this feature, you will need to:
 
 1. Install the [Figma Desktop](https://www.figma.com/downloads/) app
 2. Create or open a Figma Design file within the app
-3. Enable the local MCP server following [Figma's official instructions](https://www.youtube.com/watch?v=Cq-7lFMNESk)
+3. Enable the local MCP server following [Figma's official instructions](https://developers.figma.com/docs/figma-mcp-server/local-server-installation/). In case those instructions are out of date, you may try pressing `Cmd/Ctrl+K` and then toggling the "Enable Desktop MCP server" option
 4. Back in Tidewave IDE, open up Settings, click on Integrations, and enable the Figma integration
 
 Now, whenever you select a frame or layer on Figma, you can click the Attachment icon on Tidewave IDE's chatbox to attach your selection to your prompt.
